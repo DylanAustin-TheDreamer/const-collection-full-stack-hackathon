@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1>Artwork</h1>
+      {% if request.user.is_superuser %}
+        <a class="btn btn-success" href="{% url 'owner_app:create_art' %}">Add New Artwork</a>
+      {% endif %}
+    </div>
+
+    <div class="row">
+      {% for art in arts %}
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            {% if art.image %}
+              <img src="{{ art.image.url }}" class="card-img-top" alt="{{ art.title }}">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ art.title }}</h5>
+              <p class="card-text">Collection: {{ art.collection.name }}</p>
+              {% if request.user.is_superuser %}
+                <div class="mt-2">
+                  <a class="btn btn-sm btn-outline-secondary" href="{% url 'owner_app:edit_art' art.pk %}">Edit</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No artworks yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
