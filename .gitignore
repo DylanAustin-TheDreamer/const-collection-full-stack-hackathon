@@ -1,0 +1,80 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+*.coverage
+*.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# Pyre type checker
+.pyre/
+
+# IDEs and editors
+.idea/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Local SQLite DB
+db.sqlite3
+
+# Compiled python files in config (and others)
+config/*.pyc
+*.pyc
+
+# Local env files
+.env
+.env.*
+env.py
+
+# Test / type-check caches
+.pytest_cache/
+.mypy_cache/
+
+# Editor / project metadata
+.ropeproject/
+pip-wheel-metadata/
+
+# Node frontend
+node_modules/
+
+# Local settings and DB journal
+local_settings.py
+db.sqlite3-journal
