@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Art to {{ exhibition.title }} | Owner{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Assign Art to: {{ exhibition.title }}</h2>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="row">
+        {% for art in all_art %}
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              {% if art.image %}
+                <img src="{{ art.image.url }}" class="card-img-top" style="height:150px;object-fit:cover;" alt="{{ art.title }}">
+              {% endif %}
+              <div class="card-body">
+                <h6 class="card-title">{{ art.title }}</h6>
+                <p class="small text-muted">{{ art.collection.name }}</p>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="art" value="{{ art.pk }}" id="art-{{ art.pk }}"
+                  {% if art.pk in existing_ids %}checked{% endif %}>
+                  <label class="form-check-label" for="art-{{ art.pk }}">Include</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <button class="btn btn-primary" type="submit">Confirm Selection</button>
+      <a class="btn btn-link" href="{% url 'owner_app:exhibitions_list' %}">Cancel</a>
+    </form>
+  </div>
+{% endblock %}
