@@ -11,11 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-<<<<<<< HEAD:config/config/settings.py
-import os
-=======
 import os    # Val added 
->>>>>>> main:config/settings.py
 import sys
 import dj_database_url
 import cloudinary
@@ -80,7 +76,8 @@ LOGOUT_REDIRECT_URL = '/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    #'config.middleware.MediaCacheMiddleware', #  Custom media cache headers
+
+    # 'config.middleware.MediaCacheMiddleware',  # Custom media cache headers
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -88,7 +85,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    #'config.middleware.SecurityHeadersMiddleware',
+    # 'config.middleware.SecurityHeadersMiddleware',
+
 ]
 
 # Security Headers - Improve Best Practices Score
@@ -240,8 +238,16 @@ else:
         secure=True,  # Always use HTTPS
     )
 
-# Use Cloudinary for media storage in production
+import os
+
+# Cloudinary credentials from env
+CLOUDINARY = {
+    'cloud_name': os.getenv("dece3gnhm"),
+    'api_secret': os.getenv("pineappleJuiceis...mkay"),
+}
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'  # Django won't serve these in production; Cloudinary URLs will be returned for uploaded files
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
