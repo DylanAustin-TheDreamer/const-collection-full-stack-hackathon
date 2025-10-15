@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Events | Const Collection{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Events</h2>
+
+    <section class="my-4">
+      <h3>Upcoming</h3>
+      {% if upcoming_exhibitions %}
+        <div class="row">
+          {% for exhibition in upcoming_exhibitions %}
+            <div class="col-md-6 mb-3">
+              <div class="card h-100">
+                {% if exhibition.cover_image %}
+                  <img src="{{ exhibition.cover_image.url }}" class="card-img-top" alt="{{ exhibition.title }} cover">
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ exhibition.title }}</h5>
+                  <p class="card-text text-muted">
+                    {% if exhibition.start_date %}{{ exhibition.start_date }}{% endif %}
+                    {% if exhibition.end_date %} — {{ exhibition.end_date }}{% endif %}
+                  </p>
+                  <p class="card-text">
+                    {{ exhibition.description|truncatechars:140 }}
+                  </p>
+                  <a href="{% url 'events_app:detail' exhibition.pk %}" class="btn btn-sm btn-primary">View details</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No upcoming exhibitions.</p>
+      {% endif %}
+    </section>
+
+    <section class="my-4">
+      <h3>Previous</h3>
+      {% if previous_exhibitions %}
+        <div class="row">
+          {% for exhibition in previous_exhibitions %}
+            <div class="col-md-6 mb-3">
+              <div class="card h-100">
+                {% if exhibition.cover_image %}
+                  <img src="{{ exhibition.cover_image.url }}" class="card-img-top" alt="{{ exhibition.title }} cover">
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ exhibition.title }}</h5>
+                  <p class="card-text text-muted">
+                    {% if exhibition.start_date %}{{ exhibition.start_date }}{% endif %}
+                    {% if exhibition.end_date %} — {{ exhibition.end_date }}{% endif %}
+                  </p>
+                  <p class="card-text">{{ exhibition.description|truncatechars:140 }}</p>
+                  <a href="{% url 'events_app:detail' exhibition.pk %}" class="btn btn-sm btn-outline-secondary">View details</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No previous exhibitions.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
