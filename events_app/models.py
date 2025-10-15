@@ -2,7 +2,7 @@ from django.db import models
 
 
 # Add event models here
-class exhibition(models.Model):
+class Exhibition(models.Model):
     exhibition_id = models.IntegerField()
 
     title = models.CharField(max_length=200)

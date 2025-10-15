@@ -15,5 +15,4 @@ class Artwork(models.Model):
     status = models.CharField(max_length=50, choices=[('available', 'Available'), ('sold', 'Sold')], default='available')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    artist_id = models.IntegerField(null=True, blank=True)
     collection_id = models.IntegerField(null=True, blank=True)
