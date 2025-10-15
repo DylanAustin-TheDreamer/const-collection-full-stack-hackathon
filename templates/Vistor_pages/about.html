@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}About | Const Collection{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    {% if artist %}
+      <div class="row align-items-center">
+        <div class="col-md-4">
+          {% if artist.image %}
+            <img src="{{ artist.image.url }}" class="img-fluid rounded" alt="{{ artist.name }}">
+          {% endif %}
+        </div>
+        <div class="col-md-8">
+          <h2>{{ artist.name }}</h2>
+          <div class="about-bio">{{ artist.bio|linebreaks }}</div>
+          <p><strong>Email:</strong> <a href="mailto:{{ artist.email }}">{{ artist.email }}</a></p>
+          {% if artist.phone_number %}
+            <p><strong>Phone:</strong> {{ artist.phone_number }}</p>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <p>No artist profile available.</p>
+    {% endif %}
+  </div>
+{% endblock %}
