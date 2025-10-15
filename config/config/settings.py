@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+# Optionally load environment variables from a .env file if python-dotenv is installed
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / '.env')
+except Exception:
+    # If python-dotenv is not installed, skip loading .env — environment variables
+    # may still be provided by the environment (recommended for production).
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +30,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%t^#5%7(tk3uy#sy#y%1+^s8r2_81mjh7!=5524l-pnud@w4cy'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-%t^#5%7(tk3uy#sy#y%1+^s8r2_81mjh7!=5524l-pnud@w4cy')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '')
+if ALLOWED_HOSTS:
+    # split comma-separated hosts, strip whitespace
+    ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS.split(',') if h.strip()]
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -38,6 +53,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'collections_app',
+    'events_app',
+    'store_app',
+    'owner_app',
 ]
 
 MIDDLEWARE = [
@@ -74,12 +92,30 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configure the database from DATABASE_URL if provided (requires dj-database-url),
+# otherwise fall back to the default local sqlite3 database.
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    try:
+        import dj_database_url
+
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL),
+        }
+    except Exception:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 
 # Password validation
