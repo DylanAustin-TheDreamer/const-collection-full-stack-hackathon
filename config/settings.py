@@ -18,16 +18,19 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-if os.path.isfile("env.py"):
-   import env 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Val: Add the parent directory (repo root) to Python path to find collections_app
+# Add the parent directory (repo root) to Python path
+# to find collections_app
 REPO_ROOT = BASE_DIR.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+# Import env.py from repo root if it exists
+env_path = REPO_ROOT / "env.py"
+if env_path.exists():
+    import env  # noqa
 
 
 # Quick-start development settings - unsuitable for production
@@ -73,7 +76,8 @@ LOGOUT_REDIRECT_URL = '/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    #'config.middleware.MediaCacheMiddleware', #  Custom media cache headers
+
+    # 'config.middleware.MediaCacheMiddleware',  # Custom media cache headers
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,7 +85,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    #'config.middleware.SecurityHeadersMiddleware',
+    # 'config.middleware.SecurityHeadersMiddleware',
+
 ]
 
 # Security Headers - Improve Best Practices Score
@@ -113,12 +118,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DATABASES = {
     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
@@ -131,24 +136,30 @@ if 'test' in sys.argv:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'NumericPasswordValidator',
     },
 ]
 
 # Django Allauth settings for better user experience
 ACCOUNT_SESSION_REMEMBER = True  # Show "Remember Me" checkbox
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # Auto login after email confirmation
+# Auto login after email confirmation
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # Auto login after password reset
-ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False  # Don't logout when changing password
+# Don't logout when changing password
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
 
 # Session settings for "Remember Me" functionality
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds (14 * 24 * 60 * 60)
@@ -235,8 +246,16 @@ else:
         secure=True,  # Always use HTTPS
     )
 
-# Use Cloudinary for media storage in production
+import os
+
+# Cloudinary credentials from env
+CLOUDINARY = {
+    'cloud_name': os.getenv("dece3gnhm"),
+    'api_secret': os.getenv("pineappleJuiceis...mkay"),
+}
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'  # Django won't serve these in production; Cloudinary URLs will be returned for uploaded files
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
