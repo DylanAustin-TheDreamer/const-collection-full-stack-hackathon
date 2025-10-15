@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Gallery | Const Collection{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Gallery</h2>
+    <div class="row">
+      {% for collection in collections %}
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            {% if collection.cover_image %}
+              <img src="{{ collection.cover_image.url }}" class="card-img-top" alt="{{ collection.name }}">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ collection.name }}</h5>
+              <p class="card-text">By {{ collection.artist.name }}</p>
+              <p>
+                <a class="btn btn-outline-secondary" data-bs-toggle="collapse" href="#desc-{{ collection.id }}" role="button" aria-expanded="false" aria-controls="desc-{{ collection.id }}">
+                  About
+                </a>
+                <a class="btn btn-primary" href="{% url 'collections_app:collection_detail' collection.id %}">View full collection</a>
+              </p>
+
+              <div class="collapse" id="desc-{{ collection.id }}">
+                <div class="card card-body">
+                  {{ collection.description }}
+                </div>
+              </div>
+
+              {% if collection.arts.all %}
+                <div id="carousel-{{ collection.id }}" class="carousel slide mt-3" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    {% for art in collection.arts.all|slice:":4" %}
+                      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        {% if art.image %}
+                          <img src="{{ art.image.url }}" class="d-block w-100" alt="{{ art.title }}">
+                        {% endif %}
+                        <div class="carousel-caption d-none d-md-block">
+                          <h5>{{ art.title }}</h5>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ collection.id }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ collection.id }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No collections yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
