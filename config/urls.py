@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+from owner_app import views as owner_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +25,10 @@ urlpatterns = [
     path('events/', include('events_app.urls')),
     path('store/', include('store_app.urls')),
     path('owner/', include('owner_app.urls')),
+    path(
+        'contact/',
+        TemplateView.as_view(template_name='Vistor_pages/contact.html'),
+        name='contact',
+    ),
+    path('about/', owner_views.public_about, name='about'),
 ]
