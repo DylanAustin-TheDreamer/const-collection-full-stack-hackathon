@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ collection.name }} | Gallery{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>{{ collection.name }}</h2>
+    <p>By {{ collection.artist.name }}</p>
+    <p>{{ collection.description }}</p>
+
+    <div class="row">
+      {% for art in collection.arts.all %}
+        <div class="col-md-3 mb-3">
+          <div class="card">
+            {% if art.image %}
+              <img src="{{ art.image.url }}" class="card-img-top" alt="{{ art.title }}">
+            {% endif %}
+            <div class="card-body">
+              <h6 class="card-title">{{ art.title }}</h6>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No art in this collection.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
