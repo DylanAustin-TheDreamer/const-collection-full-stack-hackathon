@@ -8,7 +8,13 @@ This platform is designed to honor the artist's voice, showcase their evolving b
 
 <br>
 
-<div align="center">![Art by Cecilia Image](https://github.com/DylanAustin-TheDreamer/const-collection-full-stack-hackathon/blob/main/collections_app/static/collections_app/images/readme-images/Cecilia.png)</div>
+<p align="center">
+    <a href="https://constcollection.com/" target="_blank" rel="noopener noreferrer">
+        <img src="https://github.com/DylanAustin-TheDreamer/const-collection-full-stack-hackathon/blob/main/collections_app/static/collections_app/images/readme-images/Cecilia.png" alt="Art by Cecilia" style="max-width:100%;height:auto;">
+    </a>
+    <br>
+    <em>Artwork: Art by Cecilia K. — <a href="https://constcollection.com/" target="_blank" rel="noopener noreferrer">constcollection.com</a></em>
+</p>
 
  **Deployed Link**: [Art by Cecilia](link will be here)
 
@@ -431,3 +437,4 @@ GitHub Copilot helped shape user stories, generate Django scaffolding, and strea
 [![Using MermaidChart](https://img.shields.io/badge/Using-MermaidChart-00BFA5?logo=mermaid&logoColor=white)](https://www.mermaidchart.com/)
 
 </div>
+
