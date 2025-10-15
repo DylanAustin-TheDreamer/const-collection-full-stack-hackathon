@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h1>Add New Artwork</h1>
+    <p class="text-muted">You can create a new collection inline if needed.</p>
+    <div class="card">
+      <div class="card-body">
+        {% if created_collection %}
+          <div class="alert alert-success">Created collection: <strong>{{ created_collection.name }}</strong></div>
+        {% endif %}
+
+        <div class="mb-3">
+          <a class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" href="#newCollection" role="button" aria-expanded="false" aria-controls="newCollection">Create new collection</a>
+        </div>
+
+        <div class="collapse mb-3" id="newCollection">
+          <div class="card card-body">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ collection_form.as_p }}
+              <button name="create_collection" value="1" class="btn btn-primary btn-sm" type="submit">Create collection</button>
+            </form>
+          </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
