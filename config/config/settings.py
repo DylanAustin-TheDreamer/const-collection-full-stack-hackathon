@@ -11,22 +11,35 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os    # Val added 
+import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+if os.path.isfile("env.py"):
+   import env 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Val: Add the parent directory (repo root) to Python path to find collections_app
+REPO_ROOT = BASE_DIR.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%t^#5%7(tk3uy#sy#y%1+^s8r2_81mjh7!=5524l-pnud@w4cy'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',]
+CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
 
 # Application definition
 
@@ -37,18 +50,40 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'django_summernote',
+    'cloudinary',
+    'crispy_forms',
+    'crispy_bootstrap5',
     'collections_app',
 ]
 
+SITE_ID = 1  # Required by allauth
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'config.middleware.MediaCacheMiddleware',  # Custom media cache headers
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'config.middleware.SecurityHeadersMiddleware',
 ]
+
+# Security Headers - Improve Best Practices Score
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 ROOT_URLCONF = 'config.urls'
 
@@ -74,13 +109,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
 
+DATABASES = {
+   'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -100,11 +138,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Django Allauth settings for better user experience
+ACCOUNT_SESSION_REMEMBER = True  # Show "Remember Me" checkbox
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # Auto login after email confirmation
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # Auto login after password reset
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False  # Don't logout when changing password
+
+# Session settings for "Remember Me" functionality
+SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds (14 * 24 * 60 * 60)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Don't expire when browser closes
+SESSION_SAVE_EVERY_REQUEST = True  # Refresh session on every request
+
+# Cookie Security Settings - Improve Best Practices Score
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
+SESSION_COOKIE_SAMESITE = 'Lax'  # Prevent CSRF attacks
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookies
+CSRF_COOKIE_SAMESITE = 'Lax'  # Prevent CSRF attacks
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'UTC'
 
@@ -116,7 +172,65 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# WhiteNoise configuration for efficient static file caching
+# This significantly improves repeat visit performance
+WHITENOISE_USE_FINDERS = True  # Use Django's staticfiles finders
+WHITENOISE_AUTOREFRESH = True  # Auto-refresh static files in development
+
+# Cache static files for 1 year (31536000 seconds) for maximum efficiency
+# These files have cache-busting via Django's collectstatic versioning
+WHITENOISE_MAX_AGE = 31536000  # 1 year cache for static files
+
+# Configure different cache times for different file types
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz',
+    'bz2', 'tbz', 'xz', 'br'
+]
+
+# Enable static file compression for better transfer efficiency
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Media files (user uploads like images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary Configuration
+if 'CLOUDINARY_URL' in os.environ:
+    # Use the CLOUDINARY_URL if available (most common format)
+    cloudinary.config()
+    # Explicitly set the config as backup
+    cloudinary.config(
+        cloud_name='dece3gnhm',
+        api_key='832681451742447',
+        api_secret='1XTFspXWu98Gs8G7YtAUNmAVC6U',
+        secure=True,
+    )
+else:
+    # Fallback to individual environment variables
+    cloudinary.config(
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+        secure=True,  # Always use HTTPS
+    )
+
+# Use Cloudinary for media storage in production
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
