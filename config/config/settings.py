@@ -36,7 +36,7 @@ if str(REPO_ROOT) not in sys.path:
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('1', 'true', 'yes')
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1',]
 CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
@@ -60,6 +60,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'collections_app',
+    'events_app',
+    'store_app',
+    'owner_app',
 ]
 
 SITE_ID = 1  # Required by allauth
@@ -69,7 +72,7 @@ LOGOUT_REDIRECT_URL = '/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'config.middleware.MediaCacheMiddleware',  # Custom media cache headers
+    # 'config.middleware.MediaCacheMiddleware',  # Custom media cache headers
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,7 +80,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'config.middleware.SecurityHeadersMiddleware',
+    # 'config.middleware.SecurityHeadersMiddleware',
 ]
 
 # Security Headers - Improve Best Practices Score
@@ -229,8 +232,16 @@ else:
         secure=True,  # Always use HTTPS
     )
 
-# Use Cloudinary for media storage in production
+import os
+
+# Cloudinary credentials from env
+CLOUDINARY = {
+    'cloud_name': os.getenv("dece3gnhm"),
+    'api_secret': os.getenv("pineappleJuiceis...mkay"),
+}
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'  # Django won't serve these in production; Cloudinary URLs will be returned for uploaded files
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
