@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Out | Const Collection{% endblock %}
+
+{% block content %}
+<div class="container account mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="auth-card text-center">
+        <h2 class="mb-4">Sign Out</h2>
+        
+        <p class="mb-4">Are you sure you want to sign out?</p>
+
+        <form method="POST" action="{% url 'account_logout' %}">
+          {% csrf_token %}
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-lg">Sign Out</button>
+            <a href="{% url 'collections_app:index' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
