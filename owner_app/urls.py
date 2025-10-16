@@ -15,6 +15,11 @@ urlpatterns = [
         name='create_exhibition',
     ),
     path(
+        'exhibitions/<int:pk>/edit/',
+        views.edit_exhibition,
+        name='edit_exhibition',
+    ),
+    path(
         'exhibitions/<int:exhibition_pk>/assign-art/',
         views.assign_art,
         name='assign_art',
