@@ -292,6 +292,41 @@ CLOUDINARY = {
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'  # Django won't serve these in production; Cloudinary URLs will be returned for uploaded files
 
+# ============================================================================
+# STRIPE PAYMENT CONFIGURATION
+# ============================================================================
+
+# Stripe API keys - get from https://dashboard.stripe.com/apikeys
+# For development, use test keys (start with pk_test_ and sk_test_)
+# For production, use live keys (start with pk_live_ and sk_live_)
+
+# Public key (used in client-side JavaScript)
+STRIPE_PUBLIC_KEY = os.environ.get(
+    'STRIPE_PUBLIC_KEY', 
+    'pk_test_YOUR_TEST_PUBLIC_KEY_HERE'  # Replace with your test key
+)
+
+# Secret key (used in server-side code, never expose to client)
+STRIPE_SECRET_KEY = os.environ.get(
+    'STRIPE_SECRET_KEY', 
+    'sk_test_YOUR_TEST_SECRET_KEY_HERE'  # Replace with your test key
+)
+
+# Webhook secret for verifying webhook signatures
+STRIPE_WEBHOOK_SECRET = os.environ.get(
+    'STRIPE_WEBHOOK_SECRET', 
+    'whsec_YOUR_WEBHOOK_SECRET_HERE'  # Replace with your webhook secret
+)
+
+# Stripe API version (optional, uses Stripe's default if not set)
+STRIPE_API_VERSION = '2024-11-20.acacia'
+
+# Currency for payments (ISO 4217 code)
+STRIPE_CURRENCY = 'usd'
+
+# Enable Stripe payment logging for debugging
+STRIPE_LOGGING_ENABLED = DEBUG
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

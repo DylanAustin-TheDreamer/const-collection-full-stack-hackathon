@@ -30,4 +30,33 @@ urlpatterns = [
     
     # Search and filter artworks by price range
     path('artworks/search/price/', views.artwork_search_by_price, name='artwork_search_by_price'),
+    
+    # ============================================================================
+    # BASKET URL PATTERNS - Shopping cart functionality
+    # ============================================================================
+    
+    # View shopping basket
+    path('basket/', views.basket_view, name='basket'),
+    
+    # Add artwork to basket
+    path('basket/add/<int:artwork_id>/', views.add_to_basket, name='add_to_basket'),
+    
+    # Update basket item quantity
+    path('basket/update/<int:item_id>/', views.update_basket_item, name='update_basket_item'),
+    
+    # Remove item from basket
+    path('basket/remove/<int:item_id>/', views.remove_from_basket, name='remove_from_basket'),
+    
+    # Clear entire basket
+    path('basket/clear/', views.clear_basket, name='clear_basket'),
+    
+    # Get basket count (AJAX)
+    path('basket/count/', views.get_basket_count, name='basket_count'),
+    
+    # ============================================================================
+    # CHECKOUT URL PATTERNS - Order processing and payment
+    # ============================================================================
+    
+    # Checkout page with order summary and billing form
+    path('checkout/', views.checkout, name='checkout'),
 ]

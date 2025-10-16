@@ -1,5 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse
 from django.db.models import Q
+from django.views.decorators.http import require_POST
 
 
 def index(request):
@@ -249,3 +253,355 @@ def artwork_search_by_price(request):
     
     # Render the price search template
     return render(request, 'Vistor_pages/artwork_price_search.html', context)
+
+
+# ============================================================================
+# BASKET VIEWS - Shopping cart functionality
+# ============================================================================
+
+@login_required
+def basket_view(request):
+    """
+    Display the user's shopping basket.
+    Shows all items in the basket with quantities and prices.
+    
+    Features:
+    - Displays all basket items
+    - Shows individual item prices and subtotals
+    - Calculates and displays total basket value
+    - Provides links to update/remove items
+    
+    Requires:
+    - User must be logged in
+    """
+    from .models import Basket
+    
+    # Get or create basket for the current user
+    # This ensures every logged-in user has a basket
+    basket, created = Basket.objects.get_or_create(user=request.user)
+    
+    # Get all items in the basket with related artwork data
+    # Using select_related to optimize database queries
+    basket_items = basket.items.select_related('artwork', 'artwork__artist').all()
+    
+    # Calculate basket totals
+    total_price = basket.get_total_price()
+    item_count = basket.get_item_count()
+    
+    # Prepare context data for template
+    context = {
+        'basket': basket,
+        'basket_items': basket_items,
+        'total_price': total_price,
+        'item_count': item_count,
+    }
+    
+    return render(request, 'Vistor_pages/basket.html', context)
+
+
+@login_required
+@require_POST
+def add_to_basket(request, artwork_id):
+    """
+    Add an artwork to the user's basket.
+    If the artwork is already in the basket, increase quantity.
+    
+    Args:
+        artwork_id: ID of the artwork to add
+    
+    Features:
+    - Creates basket if user doesn't have one
+    - Adds artwork or updates quantity if already in basket
+    - Stores current price as price_at_addition
+    - Returns JSON response for AJAX requests
+    - Redirects to basket or referrer for regular requests
+    
+    Requires:
+    - User must be logged in
+    - POST request only
+    """
+    from .models import Basket, BasketItem, Artwork
+    
+    # Get the artwork or return 404 if not found
+    artwork = get_object_or_404(Artwork, pk=artwork_id)
+    
+    # Check if artwork is available for purchase
+    if not artwork.is_available:
+        messages.error(request, f"Sorry, {artwork.title} is not available for purchase.")
+        return redirect(request.META.get('HTTP_REFERER', 'collections_app:artwork_list'))
+    
+    # Check if artwork has a price
+    if not artwork.price:
+        messages.error(request, f"Sorry, {artwork.title} does not have a price set.")
+        return redirect(request.META.get('HTTP_REFERER', 'collections_app:artwork_list'))
+    
+    # Get or create basket for the user
+    basket, created = Basket.objects.get_or_create(user=request.user)
+    
+    # Get quantity from request (default to 1)
+    quantity = int(request.POST.get('quantity', 1))
+    
+    # Validate quantity
+    if quantity < 1:
+        quantity = 1
+    
+    # Check if artwork is already in basket
+    basket_item, item_created = BasketItem.objects.get_or_create(
+        basket=basket,
+        artwork=artwork,
+        defaults={
+            'quantity': quantity,
+            'price_at_addition': artwork.price
+        }
+    )
+    
+    # If item already existed, update quantity
+    if not item_created:
+        basket_item.quantity += quantity
+        basket_item.save()
+        messages.success(
+            request,
+            f"Updated {artwork.title} quantity to {basket_item.quantity} in your basket."
+        )
+    else:
+        messages.success(
+            request,
+            f"Added {artwork.title} to your basket."
+        )
+    
+    # Handle AJAX requests
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'message': f"Added {artwork.title} to basket",
+            'basket_count': basket.get_item_count(),
+            'basket_total': float(basket.get_total_price())
+        })
+    
+    # Redirect to basket page or back to previous page
+    next_url = request.POST.get('next', request.META.get('HTTP_REFERER', 'collections_app:basket'))
+    return redirect(next_url)
+
+
+@login_required
+@require_POST
+def update_basket_item(request, item_id):
+    """
+    Update the quantity of an item in the basket.
+    
+    Args:
+        item_id: ID of the basket item to update
+    
+    Features:
+    - Updates item quantity
+    - Removes item if quantity is 0
+    - Validates quantity is positive
+    - Ensures item belongs to current user's basket
+    
+    Requires:
+    - User must be logged in
+    - POST request only
+    """
+    from .models import BasketItem
+    
+    # Get the basket item, ensuring it belongs to the current user
+    basket_item = get_object_or_404(
+        BasketItem,
+        pk=item_id,
+        basket__user=request.user
+    )
+    
+    # Get new quantity from request
+    new_quantity = int(request.POST.get('quantity', 1))
+    
+    # If quantity is 0 or less, remove the item
+    if new_quantity <= 0:
+        artwork_title = basket_item.artwork.title
+        basket_item.delete()
+        messages.success(request, f"Removed {artwork_title} from your basket.")
+    else:
+        # Update quantity
+        basket_item.quantity = new_quantity
+        basket_item.save()
+        messages.success(
+            request,
+            f"Updated {basket_item.artwork.title} quantity to {new_quantity}."
+        )
+    
+    # Handle AJAX requests
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        basket = basket_item.basket
+        return JsonResponse({
+            'success': True,
+            'basket_count': basket.get_item_count(),
+            'basket_total': float(basket.get_total_price()),
+            'item_subtotal': float(basket_item.get_subtotal()) if new_quantity > 0 else 0
+        })
+    
+    return redirect('collections_app:basket')
+
+
+@login_required
+@require_POST
+def remove_from_basket(request, item_id):
+    """
+    Remove an item from the basket.
+    
+    Args:
+        item_id: ID of the basket item to remove
+    
+    Features:
+    - Removes item completely from basket
+    - Ensures item belongs to current user's basket
+    - Shows confirmation message
+    
+    Requires:
+    - User must be logged in
+    - POST request only
+    """
+    from .models import BasketItem
+    
+    # Get the basket item, ensuring it belongs to the current user
+    basket_item = get_object_or_404(
+        BasketItem,
+        pk=item_id,
+        basket__user=request.user
+    )
+    
+    # Store artwork title before deletion
+    artwork_title = basket_item.artwork.title
+    basket = basket_item.basket
+    
+    # Delete the item
+    basket_item.delete()
+    
+    messages.success(request, f"Removed {artwork_title} from your basket.")
+    
+    # Handle AJAX requests
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'message': f"Removed {artwork_title} from basket",
+            'basket_count': basket.get_item_count(),
+            'basket_total': float(basket.get_total_price())
+        })
+    
+    return redirect('collections_app:basket')
+
+
+@login_required
+@require_POST
+def clear_basket(request):
+    """
+    Remove all items from the user's basket.
+    
+    Features:
+    - Clears entire basket
+    - Shows confirmation message
+    - Useful for starting fresh or after order completion
+    
+    Requires:
+    - User must be logged in
+    - POST request only
+    """
+    from .models import Basket
+    
+    # Get user's basket
+    try:
+        basket = Basket.objects.get(user=request.user)
+        # Clear all items
+        basket.clear()
+        messages.success(request, "Your basket has been cleared.")
+    except Basket.DoesNotExist:
+        messages.info(request, "Your basket is already empty.")
+    
+    return redirect('collections_app:basket')
+
+
+def get_basket_count(request):
+    """
+    Get the number of items in the user's basket.
+    Used for displaying basket count in navigation bar.
+    
+    Returns:
+    - JSON response with basket count
+    - Returns 0 if user is not logged in or has no basket
+    
+    Features:
+    - Works for both logged-in and anonymous users
+    - Lightweight query for navbar display
+    - Returns JSON for AJAX requests
+    """
+    from .models import Basket
+    
+    # Return 0 if user is not authenticated
+    if not request.user.is_authenticated:
+        return JsonResponse({'count': 0})
+    
+    try:
+        basket = Basket.objects.get(user=request.user)
+        count = basket.get_item_count()
+    except Basket.DoesNotExist:
+        count = 0
+    
+    return JsonResponse({'count': count})
+
+
+# ============================================================================
+# CHECKOUT VIEWS - Order processing and payment
+# ============================================================================
+
+@login_required
+def checkout(request):
+    """
+    Display the checkout page with order summary and billing form.
+    Users can review their basket items and enter billing information.
+    
+    Features:
+    - Displays basket items with images, prices, and quantities
+    - Shows order total and breakdown
+    - Collects billing address information
+    - Validates basket is not empty
+    - Prepares order for payment processing
+    
+    Requires:
+    - User must be logged in
+    - Basket must contain at least one item
+    
+    Template:
+    - Vistor_pages/checkout.html
+    """
+    from .models import Basket
+    
+    # Get user's basket
+    try:
+        basket = Basket.objects.prefetch_related(
+            'items__artwork__artist'
+        ).get(user=request.user)
+        
+        # Check if basket is empty
+        if basket.get_item_count() == 0:
+            messages.warning(request, "Your basket is empty. Please add items before checking out.")
+            return redirect('collections_app:artwork_list')
+        
+        # Calculate totals
+        subtotal = basket.get_total_price()
+        # TODO: Add shipping cost calculation based on location
+        shipping_cost = 0  # Free shipping for now
+        total = subtotal + shipping_cost
+        
+    except Basket.DoesNotExist:
+        messages.warning(request, "Your basket is empty. Please add items before checking out.")
+        return redirect('collections_app:artwork_list')
+    
+    context = {
+        'basket': basket,
+        'subtotal': subtotal,
+        'shipping_cost': shipping_cost,
+        'total': total,
+    }
+    
+    return render(request, 'Vistor_pages/checkout.html', context)
+    # Render the price search template
+    return render(request, 'Vistor_pages/artwork_price_search.html', context)
+

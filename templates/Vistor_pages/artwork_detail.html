@@ -123,13 +123,63 @@
             <!-- Action Buttons -->
             <div class="d-grid gap-2">
               {% if artwork.is_available %}
+                <!-- Add to Basket Button (Primary CTA) -->
+                {% if user.is_authenticated %}
+                  <form 
+                    method="post" 
+                    action="{% url 'collections_app:add_to_basket' artwork.pk %}"
+                    id="add-to-basket-form"
+                  >
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="next" value="{% url 'collections_app:artwork_detail' artwork.pk %}">
+                    <button 
+                      type="submit" 
+                      class="btn btn-success btn-lg w-100"
+                      id="add-to-basket-btn"
+                    >
+                      <i class="bi bi-cart-plus"></i> Add to Basket
+                    </button>
+                  </form>
+                  
+                  <!-- JavaScript to update basket count after adding item -->
+                  <script>
+                    document.getElementById('add-to-basket-form').addEventListener('submit', function() {
+                      // Disable button to prevent double-submission
+                      document.getElementById('add-to-basket-btn').disabled = true;
+                      
+                      // Update basket count after form submission
+                      // Using setTimeout to allow the server to process the request first
+                      setTimeout(function() {
+                        if (typeof window.updateBasketCount === 'function') {
+                          window.updateBasketCount();
+                        }
+                      }, 500);
+                    });
+                  </script>
+                {% else %}
+                  <!-- Login Required for Adding to Basket -->
+                  <a 
+                    href="{% url 'account_login' %}?next={% url 'collections_app:artwork_detail' artwork.pk %}" 
+                    class="btn btn-success btn-lg"
+                  >
+                    <i class="bi bi-cart-plus"></i> Login to Purchase
+                  </a>
+                {% endif %}
+                
                 <!-- Contact/Inquiry Button -->
                 <a 
                   href="{% url 'contact' %}?artwork={{ artwork.title }}" 
-                  class="btn btn-primary btn-lg"
+                  class="btn btn-outline-primary btn-lg"
                 >
-                  Inquire About This Artwork
+                  <i class="bi bi-envelope"></i> Inquire About This Artwork
                 </a>
+              {% else %}
+                <!-- Sold/Unavailable Message -->
+                <div class="alert alert-warning" role="alert">
+                  <i class="bi bi-exclamation-triangle"></i> 
+                  This artwork is currently not available for purchase.
+                </div>
               {% endif %}
               
               <!-- Back to Artworks List Button -->
