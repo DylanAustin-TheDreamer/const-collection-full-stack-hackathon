@@ -78,15 +78,24 @@
        * @param {string} message - The message to show in the toast
        * @param {string} type - The type of toast ('success' or 'error'), affects styling
        */
+      let currentToast = null;
+      let toastTimeout = null;
+
       function showToast(message, type = 'success') {
-        // Find or create the container for toast messages
+        // Find the container for toast messages
         const toastContainer = document.querySelector('.toast-container');
+        
+        // If there's an existing toast, remove it immediately
+        if (currentToast) {
+          currentToast.remove();
+          clearTimeout(toastTimeout);
+        }
 
         // Create a new toast element
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         
-        // Set the toast content with a header (title) and body (message)
+        // Set the toast content
         toast.innerHTML = `
           <div class="toast-header">
             <strong class="me-auto text-primary">${type === 'success' ? 'Success' : 'Error'}</strong>
@@ -97,16 +106,22 @@
         
         // Add the toast to the container
         toastContainer.appendChild(toast);
+        currentToast = toast;
 
-        // Small delay before showing the toast allows for animation
-        setTimeout(() => toast.classList.add('show'), 100);
+        // Show immediately
+        requestAnimationFrame(() => toast.classList.add('show'));
         
-        // Automatically remove the toast after 3 seconds
-        setTimeout(() => {
-          // First hide the toast with animation
+        // Set up auto-removal
+        toastTimeout = setTimeout(() => {
           toast.classList.remove('show');
-          // Then remove it from the DOM after animation completes
-          setTimeout(() => toast.remove(), 300);
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.remove();
+            }
+            if (currentToast === toast) {
+              currentToast = null;
+            }
+          }, 300);
         }, 3000);
       }
 

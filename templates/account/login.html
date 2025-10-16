@@ -10,14 +10,6 @@
       <div class="auth-card">
         <h2 class="text-center mb-4">Sign In</h2>
         
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" role="alert">
-              {{ message }}
-            </div>
-          {% endfor %}
-        {% endif %}
-
         <form method="POST" action="{% url 'account_login' %}">
           {% csrf_token %}
           
