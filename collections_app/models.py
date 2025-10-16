@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import PROTECT
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from cloudinary.models import CloudinaryField
@@ -37,225 +38,118 @@ class Art(models.Model):
     )
 
     # Store-related fields
-    physical_available = models.BooleanField(default=False)
-    digital_available = models.BooleanField(default=False)
-    physical_price = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
-    digital_price = models.DecimalField(
+    # Legacy per-medium flags/prices (kept for Phase A compatibility).
+    # These remain in the model temporarily so migrations and the DB
+    # stay compatible during the phased rollout. They will be removed
+    # by an explicit Phase-B migration when ready.
+        # Note: legacy per-medium fields (physical_available/digital_available
+        # and physical_price/digital_price) were removed in the Phase-B
+        # migration; variants (ArtVariant) are now the source of truth.
+
+    # --- ECOMMERCE / METADATA FIELDS (new, nullable) ---
+    # unified price field (we'll map artwork.price to this by default)
+    price = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
 
+    # Currency code for price display
+    currency = models.CharField(max_length=3, default='USD', blank=True)
+
+    # Availability flag for store
+    is_available = models.BooleanField(default=False)
+
+    # Featured flag for storefront
+    is_featured = models.BooleanField(default=False)
+
+    # Optional depth for 3D artworks
+    depth_cm = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True
+    )
+
+    # Generic description field (from Artwork.description)
+    description = models.TextField(blank=True)
+
+    # Optional timestamps (nullable so existing rows are not affected)
+    created_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    # (artwork_link removed after migration consolidation)
+
     def __str__(self):
+        # Return a friendly string including artist for compatibility with
+        # old Artwork
+        artist = getattr(self.collection, 'artist', None)
+        if artist:
+            # ArtistProfile typically exposes name and email in tests
+            artist_name = getattr(artist, 'name', str(artist))
+            artist_email = getattr(artist, 'email', '')
+            if artist_email:
+                artist_email = f"<{artist_email}>"
+            return f"{self.title} by {artist_name} {artist_email}".strip()
         return f"{self.title} ({self.collection.name})"
 
-    def clean(self):
-        # ensure price is set if availability is true
-        from django.core.exceptions import ValidationError
+    @property
+    def artist(self):
+        """Compatibility property so templates expecting artwork.artist work on Art.
+        Returns the ArtistProfile linked via the Art's collection."""
+        return getattr(self.collection, 'artist', None)
 
-        errors = {}
-        if self.physical_available and not self.physical_price:
-            errors['physical_price'] = (
-                'Set a physical price when physical_available is True.'
-            )
-        if self.digital_available and not self.digital_price:
-            errors['digital_price'] = (
-                'Set a digital price when digital_available is True.'
-            )
-        if errors:
-            raise ValidationError(errors)
-
-
-# New Artwork Model for displaying price, size, and medium
-class Artwork(models.Model):
-    """
-    Model representing an artwork with essential buyer information.
-    This model includes fields for price, size, and medium to help buyers
-    make informed purchasing decisions.
-    """
-
-    # Basic Information
-    # Title of the artwork
-    title = models.CharField(
-        max_length=200,
-        help_text="The name/title of the artwork"
-    )
-    
-    # Artist Information
-    # Foreign key to link artwork to an artist
-    artist = models.ForeignKey(
-        'owner_app.ArtistProfile',
-        on_delete=models.CASCADE,
-        related_name='artworks',
-        help_text="The artist who created this artwork"
-    )
-    
-    # Medium Information
-    # The medium/materials used to create the artwork
-    medium = models.CharField(
-        max_length=200,
-        blank=True,
-        help_text="Medium used (e.g., Oil on Canvas, Acrylic, Watercolor, Digital, Mixed Media)"
-    )
-    
-    # Size Information
-    # Width of the artwork in centimeters
-    width_cm = models.DecimalField(
-        max_digits=7,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Width of the artwork in centimeters"
-    )
-    
-    # Height of the artwork in centimeters
-    height_cm = models.DecimalField(
-        max_digits=7,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Height of the artwork in centimeters"
-    )
-    
-    # Depth of the artwork in centimeters (for 3D artworks)
-    depth_cm = models.DecimalField(
-        max_digits=7,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Depth of the artwork in centimeters (optional, for 3D works)"
-    )
-    
-    # Price Information
-    # Price of the artwork in the default currency
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Price of the artwork (in default currency)"
-    )
-    
-    # Currency field to specify the currency of the price
-    currency = models.CharField(
-        max_length=3,
-        default='USD',
-        help_text="Currency code (e.g., USD, EUR, GBP)"
-    )
-    
-    # Additional Information
-    # Description of the artwork
-    description = models.TextField(
-        blank=True,
-        help_text="Detailed description of the artwork"
-    )
-    
-    # Year the artwork was created
-    year_created = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text="Year the artwork was created"
-    )
-    
-    # Image of the artwork
-    image = CloudinaryField(
-        resource_type='image',
-        blank=True,
-        null=True,
-        help_text="Primary image of the artwork"
-    )
-    
-    # Availability status
-    is_available = models.BooleanField(
-        default=True,
-        help_text="Is the artwork available for purchase?"
-    )
-    
-    # Featured artwork flag
-    is_featured = models.BooleanField(
-        default=False,
-        help_text="Mark as featured artwork for homepage display"
-    )
-    
-    # Timestamps
-    # Date and time when the artwork was added to the system
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Date and time when artwork was added"
-    )
-    
-    # Date and time when the artwork was last updated
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        help_text="Date and time when artwork was last updated"
-    )
-
-    class Meta:
-        # Order artworks by creation date (newest first)
-        ordering = ['-created_at']
-        # Add verbose names for admin interface
-        verbose_name = 'Artwork'
-        verbose_name_plural = 'Artworks'
-
-    def __str__(self):
-        """String representation of the artwork"""
-        return f"{self.title} by {self.artist}"
-    
     def get_size_display(self):
-        """
-        Returns a formatted string representation of the artwork size.
-        Returns: String in format "Width x Height cm" or "Width x Height x Depth cm" for 3D works
-        """
+        """Return formatted size string similar to
+        Artwork.get_size_display()."""
         if self.width_cm and self.height_cm:
-            if self.depth_cm:
-                # For 3D artworks, include depth
-                return f"{self.width_cm} x {self.height_cm} x {self.depth_cm} cm"
-            else:
-                # For 2D artworks
-                return f"{self.width_cm} x {self.height_cm} cm"
+            if getattr(self, 'depth_cm', None):
+                return (
+                    f"{self.width_cm} x {self.height_cm} x "
+                    f"{self.depth_cm} cm"
+                )
+            return f"{self.width_cm} x {self.height_cm} cm"
         return "Size not specified"
-    
+
     def get_price_display(self):
-        """
-        Returns a formatted string representation of the price.
-        Returns: String with currency symbol and price (e.g., "$1,250.00")
-        """
+        """Return formatted price string similar to
+        Artwork.get_price_display()."""
         if self.price:
-            # Format price with thousand separators
             return f"{self.currency} {self.price:,.2f}"
         return "Price not available"
-    
-    def clean(self):
-        """
-        Validate the model fields before saving.
-        Ensures that if the artwork is available, it must have a price.
-        """
-        from django.core.exceptions import ValidationError
-        
-        errors = {}
-        
-        # If artwork is available for purchase, it must have a price
-        if self.is_available and not self.price:
-            errors['price'] = 'Price must be set when artwork is available for purchase.'
-        
-        # Ensure dimensions are positive values
-        if self.width_cm is not None and self.width_cm <= 0:
-            errors['width_cm'] = 'Width must be a positive value.'
-        
-        if self.height_cm is not None and self.height_cm <= 0:
-            errors['height_cm'] = 'Height must be a positive value.'
-        
-        if self.depth_cm is not None and self.depth_cm <= 0:
-            errors['depth_cm'] = 'Depth must be a positive value.'
-        
-        # Raise validation errors if any exist
-        if errors:
-            raise ValidationError(errors)
 
+    def clean(self):
+        # Phase B: validation is based on ArtVariant availability/pricing.
+        # Keep a no-op here to preserve behavior for existing code paths.
+        return
+
+
+class ArtVariant(models.Model):
+    ORIGINAL = 'original_piece'
+    POSTER = 'printed_poster'
+    DIGITAL = 'digital_copy'
+    MEDIUM_CHOICES = [
+        (ORIGINAL, 'Original piece'),
+        (POSTER, 'Printed poster'),
+        (DIGITAL, 'Digital copy'),
+    ]
+
+    art = models.ForeignKey(
+        Art, on_delete=models.CASCADE, related_name='variants'
+    )
+    medium = models.CharField(max_length=32, choices=MEDIUM_CHOICES)
+    is_available = models.BooleanField(default=False)
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    currency = models.CharField(max_length=3, default='USD', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('art', 'medium')
+
+    def __str__(self):
+        return f"{self.get_medium_display()} — {self.art.title}"
 
 # ============================================================================
 # BASKET MODELS - Shopping cart functionality for purchasing artworks
-# ============================================================================
+# =============================================================================
 
 class Basket(models.Model):
     """
@@ -356,12 +250,24 @@ class BasketItem(models.Model):
         help_text="The basket containing this item"
     )
     
-    # The artwork being purchased
-    artwork = models.ForeignKey(
-        Artwork,
-        on_delete=models.CASCADE,
+    # The canonical art reference (only 'art' now remains)
+    art = models.ForeignKey(
+        'Art',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
         related_name='basket_items',
-        help_text="The artwork in this basket item"
+        help_text="The linked Art for this basket item",
+    )
+
+    # Optional specific variant (format) selected by the user
+    variant = models.ForeignKey(
+        'ArtVariant',
+        null=False,
+        blank=False,
+        on_delete=PROTECT,
+        related_name='basket_items',
+        help_text="Selected ArtVariant (format)",
     )
     
     # Quantity of this artwork (usually 1 for originals, can be >1 for prints)
@@ -388,13 +294,18 @@ class BasketItem(models.Model):
     class Meta:
         verbose_name = 'Basket Item'
         verbose_name_plural = 'Basket Items'
-        # Ensure each artwork appears only once per basket
-        unique_together = ['basket', 'artwork']
+        # Allow multiple items per art if different variants are chosen
+        unique_together = ['basket', 'art', 'variant']
         ordering = ['-added_at']
     
     def __str__(self):
         """String representation of the basket item"""
-        return f"{self.quantity}x {self.artwork.title} in {self.basket.user.username}'s basket"
+        display = self.display_artwork
+        title = display.title if display else 'Unknown artwork'
+        return (
+            f"{self.quantity}x {title} in "
+            f"{self.basket.user.username}'s basket"
+        )
     
     def get_subtotal(self):
         """
@@ -411,11 +322,24 @@ class BasketItem(models.Model):
         Override save method to automatically set price_at_addition
         if not already set.
         """
-        # If price_at_addition is not set, use the current artwork price
-        if not self.price_at_addition and self.artwork.price:
-            self.price_at_addition = self.artwork.price
-        
+        # Variant is required in Phase B; ensure it's present
+        if not getattr(self, 'variant', None):
+            raise ValueError('BasketItem.variant is required')
+
+        # Snapshot the variant price at time of add
+        if not self.price_at_addition:
+            if getattr(self.variant, 'price', None) is not None:
+                self.price_at_addition = self.variant.price
+            else:
+                # Fallback to Art.price if variant price missing
+                self.price_at_addition = getattr(self.art, 'price', None) or 0
+
         super().save(*args, **kwargs)
+
+    @property
+    def display_artwork(self):
+        """Return the canonical Art instance for display purposes."""
+        return getattr(self, 'art', None)
 
 
 # ============================================================================
@@ -545,7 +469,10 @@ class Order(models.Model):
     
     def __str__(self):
         """String representation of the order"""
-        return f"Order {self.order_number} by {self.user.username if self.user else 'Guest'}"
+        return (
+            f"Order {self.order_number} by "
+            f"{self.user.username if self.user else 'Guest'}"
+        )
     
     def save(self, *args, **kwargs):
         """
@@ -582,13 +509,10 @@ class OrderItem(models.Model):
         help_text="The order containing this item"
     )
     
-    # The artwork purchased (can be null if artwork is deleted later)
-    artwork = models.ForeignKey(
-        Artwork,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='order_items',
-        help_text="The artwork purchased"
+    # The art purchased (snapshot stored separately). Keep art FK for history.
+    art = models.ForeignKey(
+        'Art', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='order_items', help_text="The Art purchased"
     )
     
     # Snapshot of artwork details at time of purchase
@@ -621,6 +545,20 @@ class OrderItem(models.Model):
         decimal_places=2,
         help_text="Price at time of purchase"
     )
+    # Snapshot of the selected variant at time of purchase (if any)
+    variant_id = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="ArtVariant primary key at time of purchase (nullable)"
+    )
+
+    variant_medium = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text=(
+            "Human-readable medium/format of the variant at time of purchase"
+        )
+    )
     
     class Meta:
         verbose_name = 'Order Item'
@@ -628,7 +566,10 @@ class OrderItem(models.Model):
     
     def __str__(self):
         """String representation of the order item"""
-        return f"{self.quantity}x {self.artwork_title} in order {self.order.order_number}"
+        return (
+            f"{self.quantity}x {self.artwork_title} in order "
+            f"{self.order.order_number}"
+        )
     
     def get_subtotal(self):
         """

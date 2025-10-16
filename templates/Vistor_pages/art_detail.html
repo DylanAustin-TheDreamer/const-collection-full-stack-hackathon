@@ -32,50 +32,65 @@
       {# Right column - Purchase info and artist details #}
       <div class="col-md-4">
         <div class="artwork-sidebar p-4 rounded">
-          {# Pricing and availability #}
+          {# Pricing and availability (variant-aware) #}
           <div class="price-section mb-4">
-            {% if art.physical_available or art.digital_available %}
-              <h5 class="mb-3">Available Formats</h5>
-              {% if art.physical_available %}
-                <div class="format-option mb-2">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <span>Physical Edition</span>
-                    <strong>${{ art.physical_price }}</strong>
-                  </div>
-                </div>
-              {% endif %}
-              {% if art.digital_available %}
-                <div class="format-option">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <span>Digital Edition</span>
-                    <strong>${{ art.digital_price }}</strong>
-                  </div>
-                </div>
-              {% endif %}
-
-              {# Add to Basket button #}
-              {% if user.is_authenticated %}
-                {% if artwork %}
-                  <form method="post" action="{% url 'collections_app:add_to_basket' artwork.pk %}" class="mt-4">
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    <button type="submit" class="btn btn-outline-primary w-100">
-                      <i class="bi bi-cart-plus"></i> Add to Basket
-                    </button>
-                  </form>
-                {% else %}
-                  <div class="alert alert-info mt-4">
-                    This artwork is not available in the store yet.
-                  </div>
-                {% endif %}
-              {% else %}
-                <a href="{% url 'account_login' %}?next={{ request.path }}" 
-                   class="btn btn-outline-primary w-100 mt-4">
-                  <i class="bi bi-cart-plus"></i> Login to Purchase
-                </a>
-              {% endif %}
+            {% comment %}resolve a canonical object whether view provided `art` or `artwork`{% endcomment %}
+            {% if artwork %}
+              {% with obj=artwork %}
+            {% else %}
+              {% with obj=art %}
             {% endif %}
+
+            {% with variants=obj.variants.all %}
+              {% if variants %}
+                <h5 class="mb-3">Available Formats</h5>
+                <form method="post" action="{% url 'collections_app:add_to_basket' obj.pk %}" class="mt-3" id="add-to-basket-form" data-art-title="{{ obj.title|escapejs }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="quantity" value="1">
+                  <input type="hidden" name="next" value="{{ request.path }}">
+                  {# Hidden variant id that will be populated from the top radios by JS #}
+                  <input type="hidden" name="variant_id" id="add-to-basket-variant-id" value="">
+
+                  <div class="list-group">
+                    {% for v in variants %}
+                      <label class="list-group-item d-flex justify-content-between align-items-center" for="top-variant-{{ v.pk }}">
+                        <div>
+                          <input type="radio" name="variant_top" id="top-variant-{{ v.pk }}" value="{{ v.pk }}" {% if forloop.first %}checked{% endif %} class="form-check-input me-2" data-price="{{ v.price|default_if_none:'' }}" data-currency="{{ v.currency|default:art.collection.currency|default:art.collection.artist.currency|default:art.currency }}" />
+                          <strong>{{ v.get_medium_display }}</strong>
+                          {% if not v.is_available %}
+                            <span class="badge bg-secondary ms-2">Unavailable</span>
+                          {% endif %}
+                        </div>
+                        <div>
+                          {# Removed visible per-variant price; main price updates when selecting a variant #}
+                        </div>
+                      </label>
+                    {% endfor %}
+                  </div>
+
+                  {# Add to Basket button #}
+                  {% if user.is_authenticated %}
+                    <div class="mt-3">
+                      <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-cart-plus"></i> Add to Basket
+                      </button>
+                    </div>
+                  {% else %}
+                    <div class="mt-3">
+                      <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-cart-plus"></i> Login to Purchase
+                      </a>
+                    </div>
+                  {% endif %}
+                </form>
+              {% else %}
+                <div class="alert alert-info mt-2">
+                  This artwork is not available in the store yet.
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            {% endwith %}
           </div>
 
           {# Collection and Artist info #}

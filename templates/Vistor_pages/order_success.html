@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmation | Const Collection{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">Thank you — your order is confirmed</h3>
+            <p class="mb-2">Order number: <strong>#{{ order.order_number }}</strong></p>
+            <p class="mb-2">A confirmation email was sent to <strong>{{ order.email }}</strong>.</p>
+            <a href="{% url 'collections_app:artwork_list' %}" class="btn btn-primary mt-3">Continue shopping</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
