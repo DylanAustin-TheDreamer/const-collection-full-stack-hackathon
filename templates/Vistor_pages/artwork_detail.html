@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ artwork.title }} | Const Collection{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row g-4">
+      <!-- Left Column: Image -->
+      <div class="col-md-7 col-lg-8">
+        {% if artwork.image %}
+          <div class="artwork-image-container mb-4">
+            <img 
+              src="{{ artwork.image.url }}" 
+              class="img-fluid rounded" 
+              alt="{{ artwork.title }}"
+              style="width: 100%; max-height: 600px; object-fit: contain;"
+            >
+          </div>
+        {% endif %}
+        
+        {% if artwork.description %}
+          <div class="artwork-description mt-4">
+            <h5 class="mb-3">About This Artwork</h5>
+            <p class="text-muted">{{ artwork.description }}</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Right Column: Artwork Details -->
+      <div class="col-md-5 col-lg-4">
+        <div class="artwork-details p-4 bg-white rounded">
+          <!-- Title and Artist -->
+          <h2 class="h3 mb-2">{{ artwork.title }}</h2>
+          <p class="text-muted mb-4">
+            <a href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
+               class="text-decoration-none">
+              {{ artwork.artist.name }}
+            </a>
+          </p>
+
+          <!-- Price -->
+          <div class="mb-4">
+            <p class="h4 mb-1">{{ price_display }}</p>
+            <small class="text-muted">{{ artwork.currency }}</small>
+          </div>
+
+          <!-- Artwork Info -->
+          <div class="artwork-info mb-4">
+            {% if artwork.medium %}
+              <div class="mb-3">
+                <p class="text-muted small mb-1">Medium</p>
+                <p class="mb-0">{{ artwork.medium }}</p>
+              </div>
+            {% endif %}
+
+            {% if artwork.width_cm and artwork.height_cm %}
+              <div class="mb-3">
+                <p class="text-muted small mb-1">Dimensions</p>
+                <p class="mb-0">{{ size_display }}</p>
+              </div>
+            {% endif %}
+
+            {% if artwork.year_created %}
+              <div class="mb-3">
+                <p class="text-muted small mb-1">Year</p>
+                <p class="mb-0">{{ artwork.year_created }}</p>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Purchase Actions -->
+          {% if artwork.is_available %}
+            {% if user.is_authenticated %}
+              <form method="post" 
+                    action="{% url 'collections_app:add_to_basket' artwork.pk %}"
+                    id="add-to-basket-form"
+                    class="mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="next" value="{% url 'collections_app:artwork_detail' artwork.pk %}">
+                <button type="submit" 
+                        class="btn btn-outline-primary w-100"
+                        id="add-to-basket-btn">
+                  <i class="bi bi-cart-plus"></i> Add to Basket
+                </button>
+              </form>
+            {% else %}
+              <a href="{% url 'account_login' %}?next={% url 'collections_app:artwork_detail' artwork.pk %}" 
+                 class="btn btn-outline-primary w-100 mb-3">
+                <i class="bi bi-cart-plus"></i> Login to Purchase
+              </a>
+            {% endif %}
+
+            <!-- Contact Button -->
+            <a href="{% url 'contact' %}?artwork={{ artwork.title }}" 
+               class="btn btn-outline-secondary w-100 mb-3">
+              <i class="bi bi-envelope"></i> Inquire About Artwork
+            </a>
+          {% else %}
+            <div class="alert alert-secondary" role="alert">
+              <i class="bi bi-info-circle"></i> 
+              This artwork is currently not available.
+            </div>
+          {% endif %}
+
+          <!-- Back Button -->
+          <a href="{% url 'collections_app:artwork_list' %}" 
+             class="btn btn-link text-muted w-100">
+            ← Back to Artworks
+          </a>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="mt-4 p-4 bg-white rounded">
+          <p class="text-muted small mb-2">Added {{ artwork.created_at|date:"F d, Y" }}</p>
+          {% if artwork.is_featured %}
+            <span class="badge bg-light text-dark">✨ Featured Artwork</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Similar Artworks by Same Artist -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h3 class="h5 mb-0">More by {{ artwork.artist.name }}</h3>
+          <a href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
+             class="btn btn-link text-decoration-none">
+            View All →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('add-to-basket-form')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = this;
+      const btn = document.getElementById('add-to-basket-btn');
+      btn.disabled = true;
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Added to basket successfully!', 'success');
+          updateBasketCount();
+        } else {
+          showToast('Failed to add to basket. Please try again.', 'error');
+        }
+      })
+      .catch(() => {
+        showToast('An error occurred. Please try again.', 'error');
+      })
+      .finally(() => {
+        btn.disabled = false;
+      });
+    });
+  </script>
+{% endblock %}

@@ -11,30 +11,48 @@
   </head>
   <body>
     <header>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">Const Collection</a>
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+          <a class="navbar-brand" href="{% url 'collections_app:index' %}">Const Collection</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item"><a class="nav-link" href="{% url 'collections_app:index' %}">Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+            <ul class="navbar-nav me-auto">
               <li class="nav-item"><a class="nav-link" href="{% url 'collections_app:gallery' %}">Gallery</a></li>
-              <li class="nav-item"><a class="nav-link" href="{% url 'events_app:index' %}">Events</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'store_app:index' %}">Store</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
             </ul>
-            <ul class="navbar-nav">
-              <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
-                {% if request.user.is_superuser %}
-                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:art_list' %}">Manage Art</a></li>
-                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:create_art' %}">Add New Artwork</a></li>
-                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:exhibitions_list' %}">Manage Exhibitions</a></li>
-                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:create_exhibition' %}">Create Exhibition</a></li>
-                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:edit_artist' %}">Edit About</a></li>
-                {% endif %}
+            <ul class="navbar-nav ms-auto">
+              {% if user.is_authenticated %}
+                <li class="nav-item">
+                  <a class="nav-link position-relative" href="{% url 'collections_app:basket' %}" title="Basket">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2 9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3 3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>
+                    </svg>
+                    <span id="basket-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                  </a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ user.username }}
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="{% url 'collections_app:user_dashboard' %}">Dashboard</a></li>
+                    {% if request.user.is_superuser %}
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'owner_app:art_list' %}">Manage Art</a></li>
+                      <li><a class="dropdown-item" href="/admin/">Admin Panel</a></li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                  </ul>
+                </li>
+              {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+              {% endif %}
             </ul>
           </div>
         </div>
@@ -43,8 +61,90 @@
     <main>
       {% block content %}{% endblock %}
     </main>
-      <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="{% static 'js/main.js' %}"></script>
     <!-- Bootstrap 5 JS bundle -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      /**
+       * Shows a toast notification message to the user
+       * Toast notifications are small, temporary messages that appear at the bottom-right
+       * of the screen to provide feedback about an action (like adding an item to basket)
+       * 
+       * @param {string} message - The message to show in the toast
+       * @param {string} type - The type of toast ('success' or 'error'), affects styling
+       */
+      let currentToast = null;
+      let toastTimeout = null;
+
+      function showToast(message, type = 'success') {
+        // Find the container for toast messages
+        const toastContainer = document.querySelector('.toast-container');
+        
+        // If there's an existing toast, remove it immediately
+        if (currentToast) {
+          currentToast.remove();
+          clearTimeout(toastTimeout);
+        }
+
+        // Create a new toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        // Set the toast content
+        toast.innerHTML = `
+          <div class="toast-header">
+            <strong class="me-auto text-primary">${type === 'success' ? 'Success' : 'Error'}</strong>
+            <button type="button" class="btn-close" onclick="this.closest('.toast').remove()"></button>
+          </div>
+          <div class="toast-body">${message}</div>
+        `;
+        
+        // Add the toast to the container
+        toastContainer.appendChild(toast);
+        currentToast = toast;
+
+        // Show immediately
+        requestAnimationFrame(() => toast.classList.add('show'));
+        
+        // Set up auto-removal
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.remove();
+            }
+            if (currentToast === toast) {
+              currentToast = null;
+            }
+          }, 300);
+        }, 3000);
+      }
+
+      /**
+       * Updates the basket count in the navigation bar
+       * Fetches the current basket count from the server and updates the display
+       */
+      function updateBasketCount() {
+        // Fetch the current basket count from the server
+        fetch('/basket/count/')
+          .then(response => response.json())
+          .then(data => {
+            // Find the basket count element
+            const basketCount = document.getElementById('basket-count');
+            if (basketCount) {
+              // Update the displayed count
+              basketCount.textContent = data.count;
+            }
+          });
+      }
+
+      // Initialize the basket count when the page loads
+      updateBasketCount();
+    </script>
   </body>
 </html>

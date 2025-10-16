@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Artworks by {{ artist.user.username }} | Const Collection{% endblock %}
+
+{% block content %}
+  <!-- 
+    ARTWORKS BY ARTIST PAGE
+    Purpose: Display all artworks by a specific artist with price, size, and medium
+    Helps buyers explore an artist's complete portfolio
+  -->
+  
+  <div class="container mt-4">
+    <!-- Artist Header Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <!-- Artist Name -->
+                <h1 class="display-5 mb-2">{{ artist.name }}</h1>
+                <p class="text-muted lead mb-0">Artist Profile</p>
+              </div>
+              <div class="col-md-4 text-md-end">
+                <!-- Number of available artworks -->
+                <span class="badge bg-primary fs-5">
+                  {{ artworks|length }} Artwork{{ artworks|length|pluralize }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Title -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2>Available Artworks</h2>
+        <p class="text-muted">Browse all available artworks by this artist, complete with pricing and specifications</p>
+      </div>
+    </div>
+
+    <!-- Artworks Grid -->
+    <div class="row">
+      {% for artwork in artworks %}
+        <!-- Individual Artwork Card -->
+        <div class="col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            <!-- Artwork Image -->
+            {% if artwork.image %}
+              <img 
+                src="{{ artwork.image.url }}" 
+                class="card-img-top" 
+                alt="{{ artwork.title }}"
+                style="height: 250px; object-fit: cover;"
+              >
+            {% else %}
+              <!-- Placeholder if no image -->
+              <div 
+                class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                style="height: 250px;"
+              >
+                <span class="text-muted">No Image</span>
+              </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+              <!-- Artwork Title -->
+              <h5 class="card-title">{{ artwork.title }}</h5>
+              
+              <!-- Year Created (if available) -->
+              {% if artwork.year_created %}
+                <p class="card-text text-muted mb-2">
+                  <small>Created in {{ artwork.year_created }}</small>
+                </p>
+              {% endif %}
+              
+              <!-- Medium - Important for buyer decisions -->
+              <p class="card-text mb-1">
+                <strong>Medium:</strong>
+                <br>
+                <span class="badge bg-secondary">{{ artwork.medium|default:"Not specified" }}</span>
+              </p>
+              
+              <!-- Size - Important for buyer decisions -->
+              <p class="card-text mb-1">
+                <strong>Size:</strong>
+                <br>
+                <span class="text-muted">{{ artwork.get_size_display }}</span>
+              </p>
+              
+              <!-- Price - Critical for buyer decisions -->
+              <p class="card-text mb-3">
+                <strong>Price:</strong>
+                <br>
+                <span class="text-success fw-bold fs-5">{{ artwork.get_price_display }}</span>
+              </p>
+              
+              <!-- View Details Button -->
+              <div class="mt-auto">
+                <a 
+                  href="{% url 'collections_app:artwork_detail' artwork.pk %}" 
+                  class="btn btn-primary w-100"
+                >
+                  View Details
+                </a>
+              </div>
+            </div>
+            
+            <!-- Featured Badge (if applicable) -->
+            {% if artwork.is_featured %}
+              <div class="card-footer bg-warning text-dark text-center">
+                <small>⭐ Featured Artwork</small>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <!-- Message when no artworks available -->
+        <div class="col-12">
+          <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">No Available Artworks</h4>
+            <p>This artist currently has no artworks available for purchase. Check back later!</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <a 
+          href="{% url 'collections_app:artwork_list' %}" 
+          class="btn btn-outline-secondary"
+        >
+          ← Back to All Artworks
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

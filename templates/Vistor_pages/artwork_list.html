@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Artworks | Const Collection{% endblock %}
+
+{% block content %}
+  <!-- 
+    ARTWORK LIST PAGE
+    Purpose: Display all available artworks with price, size, and medium information
+    This template helps buyers make informed purchasing decisions
+  -->
+  
+  <div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="display-4">Available Artworks</h1>
+        <p class="lead text-muted">Browse our collection of artworks with detailed pricing and specifications</p>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Search & Filter</h5>
+            <!-- Search form to filter artworks by various criteria -->
+            <form method="get" action="{% url 'collections_app:artwork_list' %}" class="row g-3">
+              
+              <!-- Search by title, medium, or artist -->
+              <div class="col-md-4">
+                <label for="search" class="form-label">Search</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="search" 
+                  name="search" 
+                  value="{{ search_query }}" 
+                  placeholder="Search by title, medium, or artist"
+                >
+              </div>
+              
+              <!-- Filter by minimum price -->
+              <div class="col-md-2">
+                <label for="min_price" class="form-label">Min Price (USD)</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="min_price" 
+                  name="min_price" 
+                  value="{{ min_price }}" 
+                  placeholder="0"
+                  step="0.01"
+                >
+              </div>
+              
+              <!-- Filter by maximum price -->
+              <div class="col-md-2">
+                <label for="max_price" class="form-label">Max Price (USD)</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="max_price" 
+                  name="max_price" 
+                  value="{{ max_price }}" 
+                  placeholder="10000"
+                  step="0.01"
+                >
+              </div>
+              
+              <!-- Filter by medium -->
+              <div class="col-md-3">
+                <label for="medium" class="form-label">Medium</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="medium" 
+                  name="medium" 
+                  value="{{ medium_filter }}" 
+                  placeholder="e.g., Oil, Acrylic, Digital"
+                >
+              </div>
+              
+              <!-- Submit button -->
+              <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Artworks Grid Display -->
+    <div class="row">
+      {% for artwork in artworks %}
+        <!-- Individual Artwork Card -->
+        <div class="col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            <!-- Artwork Image -->
+            {% if artwork.image %}
+              <img 
+                src="{{ artwork.image.url }}" 
+                class="card-img-top" 
+                alt="{{ artwork.title }}"
+                style="height: 250px; object-fit: cover;"
+              >
+            {% else %}
+              <!-- Placeholder if no image available -->
+              <div 
+                class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                style="height: 250px;"
+              >
+                <span class="text-muted">No Image</span>
+              </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+              <!-- Artwork Title -->
+              <h5 class="card-title">{{ artwork.title }}</h5>
+              
+              <!-- Artist Name -->
+              <p class="card-text text-muted mb-2">
+                <small>by {{ artwork.artist.name }}</small>
+              </p>
+              
+              <!-- Medium - Important for buyer decisions -->
+              <p class="card-text mb-1">
+                <strong>Medium:</strong> 
+                <span class="badge bg-secondary">{{ artwork.medium|default:"Not specified" }}</span>
+              </p>
+              
+              <!-- Size/Dimensions - Important for buyer decisions -->
+              <p class="card-text mb-1">
+                <strong>Size:</strong> {{ artwork.get_size_display }}
+              </p>
+              
+              <!-- Price - Critical for buyer decisions -->
+              <p class="card-text mb-3">
+                <strong>Price:</strong> 
+                <span class="text-success fw-bold fs-5">{{ artwork.get_price_display }}</span>
+              </p>
+              
+              <!-- View Details Button -->
+              <div class="mt-auto">
+                <a 
+                  href="{% url 'collections_app:artwork_detail' artwork.pk %}" 
+                  class="btn btn-primary w-100"
+                >
+                  View Details
+                </a>
+              </div>
+            </div>
+            
+            <!-- Availability Badge (if needed) -->
+            {% if not artwork.is_available %}
+              <div class="card-footer bg-danger text-white text-center">
+                <small>Currently Unavailable</small>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <!-- Message when no artworks found -->
+        <div class="col-12">
+          <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">No artworks found</h4>
+            <p>Try adjusting your search filters or check back later for new artworks.</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Results Summary -->
+    {% if artworks %}
+      <div class="row mt-4">
+        <div class="col-12">
+          <p class="text-muted text-center">
+            Showing {{ artworks|length }} artwork{{ artworks|length|pluralize }}
+          </p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

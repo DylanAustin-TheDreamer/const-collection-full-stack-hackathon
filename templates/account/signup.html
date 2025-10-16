@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign Up | Const Collection{% endblock %}
+
+{% block content %}
+<div class="container account mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="auth-card">
+        <h2 class="text-center mb-4">Create Account</h2>
+        
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'account_signup' %}">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Username</label>
+            <input 
+              type="text" 
+              name="username" 
+              class="form-control" 
+              id="id_username" 
+              placeholder="Choose a username"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <label for="id_email" class="form-label">Email Address</label>
+            <input 
+              type="email" 
+              name="email" 
+              class="form-control" 
+              id="id_email" 
+              placeholder="Enter your email"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password1" class="form-label">Password</label>
+            <input 
+              type="password" 
+              name="password1" 
+              class="form-control" 
+              id="id_password1" 
+              placeholder="Create a password"
+              required
+            >
+            <div class="form-text">Your password must be at least 8 characters.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password2" class="form-label">Confirm Password</label>
+            <input 
+              type="password" 
+              name="password2" 
+              class="form-control" 
+              id="id_password2" 
+              placeholder="Confirm your password"
+              required
+            >
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-lg">Sign Up</button>
+          </div>
+
+          <div class="auth-divider"></div>
+
+          <div class="text-center">
+            <p class="mb-0">Already have an account? <a href="{% url 'account_login' %}">Sign In</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
