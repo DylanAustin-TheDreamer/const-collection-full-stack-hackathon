@@ -22,6 +22,17 @@
               <li class="nav-item"><a class="nav-link" href="{% url 'collections_app:index' %}">Home</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'collections_app:gallery' %}">Gallery</a></li>
+              <!-- New Artworks Navigation -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="artworksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Artworks
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="artworksDropdown">
+                  <li><a class="dropdown-item" href="{% url 'collections_app:artwork_list' %}">Browse All Artworks</a></li>
+                  <li><a class="dropdown-item" href="{% url 'collections_app:featured_artworks' %}">Featured Artworks</a></li>
+                  <li><a class="dropdown-item" href="{% url 'collections_app:artwork_search_by_price' %}">Search by Price</a></li>
+                </ul>
+              </li>
               <li class="nav-item"><a class="nav-link" href="{% url 'events_app:index' %}">Events</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'store_app:index' %}">Store</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>

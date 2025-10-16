@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ artwork.title }} | Const Collection{% endblock %}
+
+{% block content %}
+  <!-- 
+    ARTWORK DETAIL PAGE
+    Purpose: Display comprehensive information about a specific artwork
+    Shows price, size, medium, and all other relevant details for buyer decisions
+  -->
+  
+  <div class="container mt-4">
+    <div class="row">
+      
+      <!-- Left Column: Image and Additional Info -->
+      <div class="col-md-7 col-lg-8">
+        <!-- Artwork Image -->
+        {% if artwork.image %}
+          <img 
+            src="{{ artwork.image.url }}" 
+            class="img-fluid rounded shadow-lg mb-4" 
+            alt="{{ artwork.title }}"
+            style="width: 100%; max-height: 600px; object-fit: contain; background-color: #f8f9fa;"
+          >
+        {% else %}
+          <!-- Placeholder if no image -->
+          <div 
+            class="bg-light rounded shadow-lg mb-4 d-flex align-items-center justify-content-center" 
+            style="width: 100%; height: 400px;"
+          >
+            <span class="text-muted fs-4">No Image Available</span>
+          </div>
+        {% endif %}
+        
+        <!-- Detailed Description Section -->
+        {% if artwork.description %}
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">About This Artwork</h5>
+              <p class="card-text">{{ artwork.description }}</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Right Column: Artwork Details -->
+      <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <!-- Artwork Title -->
+            <h2 class="card-title mb-3">{{ artwork.title }}</h2>
+            
+            <!-- Artist Information -->
+            <div class="mb-3 pb-3 border-bottom">
+              <h6 class="text-muted text-uppercase mb-2">Artist</h6>
+              <p class="mb-0">
+                <a 
+                  href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
+                  class="text-decoration-none"
+                >
+                  {{ artwork.artist.name }}
+                </a>
+              </p>
+            </div>
+            
+            <!-- PRICE - Critical buying information -->
+            <div class="mb-3 pb-3 border-bottom">
+              <h6 class="text-muted text-uppercase mb-2">Price</h6>
+              <p class="mb-0">
+                <span class="text-success fw-bold fs-3">{{ price_display }}</span>
+              </p>
+              <small class="text-muted">{{ artwork.currency }}</small>
+            </div>
+            
+            <!-- MEDIUM - Important buying information -->
+            <div class="mb-3 pb-3 border-bottom">
+              <h6 class="text-muted text-uppercase mb-2">Medium</h6>
+              <p class="mb-0">
+                <span class="badge bg-secondary fs-6">{{ artwork.medium|default:"Not specified" }}</span>
+              </p>
+            </div>
+            
+            <!-- SIZE/DIMENSIONS - Important buying information -->
+            <div class="mb-3 pb-3 border-bottom">
+              <h6 class="text-muted text-uppercase mb-2">Dimensions</h6>
+              <p class="mb-0">{{ size_display }}</p>
+              <!-- Detailed dimensions breakdown -->
+              {% if artwork.width_cm and artwork.height_cm %}
+                <small class="text-muted">
+                  <ul class="list-unstyled mt-2 mb-0">
+                    <li>Width: {{ artwork.width_cm }} cm</li>
+                    <li>Height: {{ artwork.height_cm }} cm</li>
+                    {% if artwork.depth_cm %}
+                      <li>Depth: {{ artwork.depth_cm }} cm</li>
+                    {% endif %}
+                  </ul>
+                </small>
+              {% endif %}
+            </div>
+            
+            <!-- Year Created -->
+            {% if artwork.year_created %}
+              <div class="mb-3 pb-3 border-bottom">
+                <h6 class="text-muted text-uppercase mb-2">Year Created</h6>
+                <p class="mb-0">{{ artwork.year_created }}</p>
+              </div>
+            {% endif %}
+            
+            <!-- Availability Status -->
+            <div class="mb-4">
+              <h6 class="text-muted text-uppercase mb-2">Availability</h6>
+              {% if artwork.is_available %}
+                <span class="badge bg-success fs-6">
+                  <i class="bi bi-check-circle"></i> Available for Purchase
+                </span>
+              {% else %}
+                <span class="badge bg-danger fs-6">
+                  <i class="bi bi-x-circle"></i> Currently Unavailable
+                </span>
+              {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2">
+              {% if artwork.is_available %}
+                <!-- Contact/Inquiry Button -->
+                <a 
+                  href="{% url 'contact' %}?artwork={{ artwork.title }}" 
+                  class="btn btn-primary btn-lg"
+                >
+                  Inquire About This Artwork
+                </a>
+              {% endif %}
+              
+              <!-- Back to Artworks List Button -->
+              <a 
+                href="{% url 'collections_app:artwork_list' %}" 
+                class="btn btn-outline-secondary"
+              >
+                ← Back to Artworks
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Additional Information Card -->
+        <div class="card mt-3 shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title text-uppercase mb-3">Quick Facts</h6>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <strong>Listed:</strong> {{ artwork.created_at|date:"F d, Y" }}
+              </li>
+              <li class="mb-2">
+                <strong>Last Updated:</strong> {{ artwork.updated_at|date:"F d, Y" }}
+              </li>
+              {% if artwork.is_featured %}
+                <li class="mb-2">
+                  <span class="badge bg-warning text-dark">⭐ Featured Artwork</span>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Similar Artworks by Same Artist (Optional) -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <h3 class="mb-4">More by {{ artwork.artist.name }}</h3>
+        <a 
+          href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
+          class="btn btn-outline-primary"
+        >
+          View All Artworks by This Artist →
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
