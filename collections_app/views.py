@@ -602,6 +602,25 @@ def checkout(request):
     }
     
     return render(request, 'Vistor_pages/checkout.html', context)
-    # Render the price search template
-    return render(request, 'Vistor_pages/artwork_price_search.html', context)
+
+
+# ============================================================================
+# USER DASHBOARD VIEW
+# ============================================================================
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def user_dashboard(request):
+    """
+    Display the user dashboard with profile info and recent activity.
+    """
+    user = request.user
+    # Example: fetch recent orders if implemented
+    orders = []
+    if hasattr(user, 'order_set'):
+        orders = user.order_set.order_by('-created_at')[:5]
+    return render(request, 'Vistor_pages/user_dashboard.html', {
+        'user': user,
+        'orders': orders,
+    })
 
