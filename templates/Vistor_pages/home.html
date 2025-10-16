@@ -6,29 +6,52 @@
 
 {% block content %}
 <div id="hero">
-<video id="hero" autoplay muted loop>
-    <source src="{% static 'videos/Hero.mp4' %}" type="video/mp4">
-  </video>
+<div class="text-center" style="color: white;">
+    <h1 id="multi-color">Evening Garden Exihibition - 2025</h1>
+    <div style="padding: 20px;">
+      <video class="video mt-4" controls>
+        <source src="{% static 'videos/GardenExCombined.mp4' %}" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid text-center" style="background-color: rgb(151, 151, 151);">
+  <div class="container" id="intro">
+  <p>Illuminated acrylic artist - Artist Name</p>
+  <br>
+  <p>I am a Mother Artist - My art is for my daughters, to express love, resilience and compassion for their pain.
+    further pushing the boundries of what artistic expression can be. And most importantly,
+    the <strong>Way of seeing</strong> in being a mother.</p>
+  </div>
 </div>
 
 <div class="container d-flex flex-column align-items-center mt-2 text-center">
-  <p>Illuminated acrylic artist - Artist Name</p>
-  <br>
-  <p>I am a 'Mother' Artist - My art is for my daughters - to express love, resilience and compassion for their pain.
-    further pushing the boundries of what artistic expression can be, in creativity and philosophy. And most importantly,
-    the 'Way of seeing' in being a mother.</p>
+  <video class="video mt-4" autoplay loop muted>
+    <source src="{% static 'videos/Hero.mp4' %}" type="video/mp4">
 </div>
 
-<div style="box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);">
-</div>
-  
-
-  <div class="d-flex align-items-center justify-content-center" style="background-color: rgb(65, 65, 65); width: 100%;">
-    <div class="text-center" style="color: white; padding: 20px;">
-    <h1>Evening Garden Exihibition - 2025</h1>
-    <video class="video" style="padding: 20px;" controls>
-      <source src="{% static 'videos/GardenExCombined.mp4' %}" type="video/mp4">
-    </video>
+<div class="grid-container">
+  <div style="flex: 0;">
+    <img src="{% static 'images/artwork1.jpg' %}" alt="Artwork 1">
+    <img src="{% static 'images/artwork2.jpg' %}" alt="Artwork 2">
+  </div>
+  <div style="flex: 1;">
+    <img src="{% static 'images/artwork3.jpg' %}" alt="Artwork 3">
+    <img src="{% static 'images/artwork4.jpg' %}" alt="Artwork 4">
   </div>
 </div>
+
+<div class="mt-4"style="box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);">
+</div>
+
 {% endblock %}
+
+<style>
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+</style>
