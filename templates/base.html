@@ -62,8 +62,75 @@
     <main>
       {% block content %}{% endblock %}
     </main>
-      <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="{% static 'js/main.js' %}"></script>
     <!-- Bootstrap 5 JS bundle -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      /**
+       * Shows a toast notification message to the user
+       * Toast notifications are small, temporary messages that appear at the bottom-right
+       * of the screen to provide feedback about an action (like adding an item to basket)
+       * 
+       * @param {string} message - The message to show in the toast
+       * @param {string} type - The type of toast ('success' or 'error'), affects styling
+       */
+      function showToast(message, type = 'success') {
+        // Find or create the container for toast messages
+        const toastContainer = document.querySelector('.toast-container');
+
+        // Create a new toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        // Set the toast content with a header (title) and body (message)
+        toast.innerHTML = `
+          <div class="toast-header">
+            <strong class="me-auto">${type === 'success' ? 'Success' : 'Error'}</strong>
+            <button type="button" class="btn-close" onclick="this.closest('.toast').remove()"></button>
+          </div>
+          <div class="toast-body">${message}</div>
+        `;
+        
+        // Add the toast to the container
+        toastContainer.appendChild(toast);
+
+        // Small delay before showing the toast allows for animation
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Automatically remove the toast after 3 seconds
+        setTimeout(() => {
+          // First hide the toast with animation
+          toast.classList.remove('show');
+          // Then remove it from the DOM after animation completes
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      /**
+       * Updates the basket count in the navigation bar
+       * Fetches the current basket count from the server and updates the display
+       */
+      function updateBasketCount() {
+        // Fetch the current basket count from the server
+        fetch('/basket/count/')
+          .then(response => response.json())
+          .then(data => {
+            // Find the basket count element
+            const basketCount = document.getElementById('basket-count');
+            if (basketCount) {
+              // Update the displayed count
+              basketCount.textContent = data.count;
+            }
+          });
+      }
+
+      // Initialize the basket count when the page loads
+      updateBasketCount();
+    </script>
   </body>
 </html>

@@ -235,3 +235,72 @@ body {
 .navbar .nav-link svg {
 	vertical-align: middle;
 }
+
+/* Toast Notifications Styling
+   A toast is a lightweight notification that appears temporarily
+   to provide feedback about an operation (like adding to basket) */
+
+/* Container for all toast messages
+   - Fixed position keeps it in view even when scrolling
+   - Bottom-right corner is a common, non-intrusive position
+   - High z-index ensures it appears above other content */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+/* Individual toast notification styling
+   - White background for readability
+   - Subtle border and shadow for depth
+   - Initially invisible (opacity: 0) and positioned below view
+   - Transform and transition for sliding animation */
+.toast {
+    background: #FFFFFF;
+    border: 1px solid #D3D3D3;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    min-width: 280px;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+}
+
+/* When toast becomes visible
+   - Full opacity and normal position
+   - Applied via JavaScript when toast appears */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Header section of toast
+   - Contains title and close button
+   - Subtle border separator */
+.toast-header {
+    background: transparent;
+    border-bottom: 1px solid #F5F5F5;
+    padding: 0.75rem 1rem;
+}
+
+/* Main content area of toast
+   - Contains the actual message */
+.toast-body {
+    padding: 0.75rem 1rem;
+    color: #333333;
+}
+
+/* Success toast variant
+   - Blue left border matches the primary button color
+   - Uses Bootstrap's primary blue color (#0d6efd) */
+.toast-success {
+    border-left: 4px solid #0d6efd;
+}
+
+/* Error toast variant
+   - Red left border indicates error or warning */
+.toast-error {
+    border-left: 4px solid #dc3545;
+}

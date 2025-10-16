@@ -7,39 +7,40 @@
     <h2>Store</h2>
     {% if sale_items %}
       <div class="row">
-        {% for art in sale_items %}
+        {% for artwork in sale_items %}
           {# Each artwork card in the store #}
           <div class="col-md-4 mb-3">
             <div class="card h-100 store-card">
               {# Clickable artwork image linking to detail view #}
-              {% if art.image %}
-                <a href="{% url 'collections_app:art_detail' art.pk %}" class="text-decoration-none">
-                  <img src="{{ art.image.url }}" class="card-img-top" style="height:220px;object-fit:cover;transition: opacity 0.2s ease;" alt="{{ art.title }}" title="Click to view details">
+              {% if artwork.image %}
+                <a href="{% url 'collections_app:artwork_detail' artwork.pk %}" class="text-decoration-none">
+                  <img src="{{ artwork.image.url }}" class="card-img-top" style="height:220px;object-fit:cover;transition: opacity 0.2s ease;" alt="{{ artwork.title }}" title="Click to view details">
                 </a>
               {% endif %}
               <div class="card-body position-relative">
-                {# Artwork title and collection info #}
-                <h5 class="card-title">{{ art.title }}</h5>
-                <p class="small text-muted">{{ art.collection.name }} — {{ art.collection.artist.name }}</p>
+                {# Artwork title and artist info #}
+                <h5 class="card-title">{{ artwork.title }}</h5>
+                <p class="small text-muted">{{ artwork.artist.name }}</p>
 
                 {# Display pricing information #}
                 <div class="mb-2">
-                  {% if art.physical_available %}
-                    <div>Physical: <strong>${{ art.physical_price }}</strong></div>
-                  {% endif %}
-                  {% if art.digital_available %}
-                    <div>Digital: <strong>${{ art.digital_price }}</strong></div>
+                  <div><strong>{{ artwork.get_price_display }}</strong></div>
+                  {% if artwork.medium %}
+                    <div class="text-muted small">{{ artwork.medium }}</div>
                   {% endif %}
                 </div>
 
                 {# Buttons container with both buttons at same height #}
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                  <a href="{% url 'collections_app:art_detail' art.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                  <a href="{% url 'collections_app:artwork_detail' artwork.pk %}" class="btn btn-sm btn-outline-primary">View</a>
 
-                  {% if art.physical_available or art.digital_available %}
+                  {% if artwork.is_available %}
                     {% if user.is_authenticated %}
                       {# Form for authenticated users to add item to basket #}
-                      <form method="post" action="{% url 'collections_app:add_to_basket' art.pk %}" style="margin: 0;">
+                      <form method="post" 
+                            action="{% url 'collections_app:add_artwork_to_basket' artwork.pk %}" 
+                            class="add-to-basket-form" 
+                            style="margin: 0;">
                         {% csrf_token %}
                         <input type="hidden" name="quantity" value="1">
                         <input type="hidden" name="next" value="{% url 'store_app:index' %}">
@@ -47,6 +48,58 @@
                           <i class="bi bi-cart-plus"></i> Add to Basket
                         </button>
                       </form>
+                      
+                      <script>
+                        /**
+                         * Add to Basket Functionality
+                         * Handles the "Add to Basket" form submission with the following features:
+                         * - Prevents normal form submission
+                         * - Shows loading state
+                         * - Sends request via AJAX
+                         * - Shows success/error messages via toast
+                         * - Updates basket count in navigation
+                         */
+                        document.querySelectorAll('.add-to-basket-form').forEach(form => {
+                          // Add submit handler to each "Add to Basket" form
+                          form.addEventListener('submit', function(e) {
+                            // Prevent the normal form submission
+                            e.preventDefault();
+
+                            // Get the submit button and disable it to prevent double-clicks
+                            const btn = this.querySelector('button');
+                            btn.disabled = true;
+
+                            // Send the form data via AJAX
+                            fetch(this.action, {
+                              method: 'POST',
+                              body: new FormData(this),
+                              headers: {
+                                'X-Requested-With': 'XMLHttpRequest' // Indicates AJAX request
+                              }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                              if (data.success) {
+                                // Show success message via toast
+                                showToast('Added to basket successfully!', 'success');
+                                // Update the basket count in navigation
+                                updateBasketCount();
+                              } else {
+                                // Show error message if server indicates failure
+                                showToast('Failed to add to basket. Please try again.', 'error');
+                              }
+                            })
+                            .catch(() => {
+                              // Show error message for network or other errors
+                              showToast('An error occurred. Please try again.', 'error');
+                            })
+                            .finally(() => {
+                              // Re-enable the button whether request succeeded or failed
+                              btn.disabled = false;
+                            });
+                          });
+                        });
+                      </script>
                     {% else %}
                       {# Login button for unauthenticated users #}
                       <a href="{% url 'account_login' %}?next={% url 'store_app:index' %}" 

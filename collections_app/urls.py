@@ -38,8 +38,9 @@ urlpatterns = [
     # View shopping basket
     path('basket/', views.basket_view, name='basket'),
     
-    # Add artwork to basket
+    # Add artwork to basket - supporting both old and new IDs
     path('basket/add/<int:artwork_id>/', views.add_to_basket, name='add_to_basket'),
+    path('basket/add_artwork/<int:artwork_id>/', views.add_to_basket, name='add_artwork_to_basket'),
     
     # Update basket item quantity
     path('basket/update/<int:item_id>/', views.update_basket_item, name='update_basket_item'),

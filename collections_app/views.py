@@ -32,10 +32,23 @@ def collection_detail(request, pk):
 
 
 def art_detail(request, pk):
-    from .models import Art
+    from .models import Art, Artwork
 
     art = Art.objects.select_related('collection__artist').get(pk=pk)
-    return render(request, 'Vistor_pages/art_detail.html', {'art': art})
+    
+    # Try to find corresponding Artwork object
+    try:
+        artwork = Artwork.objects.filter(
+            title=art.title,
+            artist=art.collection.artist
+        ).first()
+    except Artwork.DoesNotExist:
+        artwork = None
+
+    return render(request, 'Vistor_pages/art_detail.html', {
+        'art': art,
+        'artwork': artwork
+    })
 
 
 # ============================================================================

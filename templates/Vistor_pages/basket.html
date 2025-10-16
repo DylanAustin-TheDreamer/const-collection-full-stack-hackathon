@@ -225,12 +225,35 @@
               
               <!-- Checkout Button -->
               <div class="d-grid gap-2">
-                <a 
-                  href="{% url 'collections_app:checkout' %}" 
-                  class="btn btn-success btn-lg"
-                >
-                  <i class="bi bi-credit-card"></i> Proceed to Checkout
-                </a>
+                {% if user.is_staff %}
+                  {# Admin/Staff Only Checkout Button #}
+                  <a 
+                    href="{% url 'collections_app:checkout' %}" 
+                    class="btn btn-success btn-lg"
+                  >
+                    <i class="bi bi-credit-card"></i> Admin Test Checkout
+                  </a>
+                  <div class="alert alert-info mt-2 mb-0">
+                    <small>
+                      <i class="bi bi-info-circle"></i> 
+                      Admin test mode: Payment processing is available for testing purposes only.
+                    </small>
+                  </div>
+                {% else %}
+                  {# Regular User Message #}
+                  <button 
+                    class="btn btn-secondary btn-lg" 
+                    disabled
+                  >
+                    <i class="bi bi-clock"></i> Checkout Coming Soon
+                  </button>
+                  <div class="alert alert-warning mt-2 mb-0">
+                    <small>
+                      <i class="bi bi-exclamation-circle"></i> 
+                      Our payment system is currently under maintenance. Thank you for your patience!
+                    </small>
+                  </div>
+                {% endif %}
               </div>
               
               <!-- Security Badge -->

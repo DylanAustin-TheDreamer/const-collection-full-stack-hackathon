@@ -3,229 +3,166 @@
 {% block title %}{{ artwork.title }} | Const Collection{% endblock %}
 
 {% block content %}
-  <!-- 
-    ARTWORK DETAIL PAGE
-    Purpose: Display comprehensive information about a specific artwork
-    Shows price, size, medium, and all other relevant details for buyer decisions
-  -->
-  
-  <div class="container mt-4">
-    <div class="row">
-      
-      <!-- Left Column: Image and Additional Info -->
+  <div class="container mt-5">
+    <div class="row g-4">
+      <!-- Left Column: Image -->
       <div class="col-md-7 col-lg-8">
-        <!-- Artwork Image -->
         {% if artwork.image %}
-          <img 
-            src="{{ artwork.image.url }}" 
-            class="img-fluid rounded shadow-lg mb-4" 
-            alt="{{ artwork.title }}"
-            style="width: 100%; max-height: 600px; object-fit: contain; background-color: #f8f9fa;"
-          >
-        {% else %}
-          <!-- Placeholder if no image -->
-          <div 
-            class="bg-light rounded shadow-lg mb-4 d-flex align-items-center justify-content-center" 
-            style="width: 100%; height: 400px;"
-          >
-            <span class="text-muted fs-4">No Image Available</span>
+          <div class="artwork-image-container mb-4">
+            <img 
+              src="{{ artwork.image.url }}" 
+              class="img-fluid rounded" 
+              alt="{{ artwork.title }}"
+              style="width: 100%; max-height: 600px; object-fit: contain;"
+            >
           </div>
         {% endif %}
         
-        <!-- Detailed Description Section -->
         {% if artwork.description %}
-          <div class="card mb-4">
-            <div class="card-body">
-              <h5 class="card-title">About This Artwork</h5>
-              <p class="card-text">{{ artwork.description }}</p>
-            </div>
+          <div class="artwork-description mt-4">
+            <h5 class="mb-3">About This Artwork</h5>
+            <p class="text-muted">{{ artwork.description }}</p>
           </div>
         {% endif %}
       </div>
       
       <!-- Right Column: Artwork Details -->
       <div class="col-md-5 col-lg-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <!-- Artwork Title -->
-            <h2 class="card-title mb-3">{{ artwork.title }}</h2>
-            
-            <!-- Artist Information -->
-            <div class="mb-3 pb-3 border-bottom">
-              <h6 class="text-muted text-uppercase mb-2">Artist</h6>
-              <p class="mb-0">
-                <a 
-                  href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
-                  class="text-decoration-none"
-                >
-                  {{ artwork.artist.name }}
-                </a>
-              </p>
-            </div>
-            
-            <!-- PRICE - Critical buying information -->
-            <div class="mb-3 pb-3 border-bottom">
-              <h6 class="text-muted text-uppercase mb-2">Price</h6>
-              <p class="mb-0">
-                <span class="text-success fw-bold fs-3">{{ price_display }}</span>
-              </p>
-              <small class="text-muted">{{ artwork.currency }}</small>
-            </div>
-            
-            <!-- MEDIUM - Important buying information -->
-            <div class="mb-3 pb-3 border-bottom">
-              <h6 class="text-muted text-uppercase mb-2">Medium</h6>
-              <p class="mb-0">
-                <span class="badge bg-secondary fs-6">{{ artwork.medium|default:"Not specified" }}</span>
-              </p>
-            </div>
-            
-            <!-- SIZE/DIMENSIONS - Important buying information -->
-            <div class="mb-3 pb-3 border-bottom">
-              <h6 class="text-muted text-uppercase mb-2">Dimensions</h6>
-              <p class="mb-0">{{ size_display }}</p>
-              <!-- Detailed dimensions breakdown -->
-              {% if artwork.width_cm and artwork.height_cm %}
-                <small class="text-muted">
-                  <ul class="list-unstyled mt-2 mb-0">
-                    <li>Width: {{ artwork.width_cm }} cm</li>
-                    <li>Height: {{ artwork.height_cm }} cm</li>
-                    {% if artwork.depth_cm %}
-                      <li>Depth: {{ artwork.depth_cm }} cm</li>
-                    {% endif %}
-                  </ul>
-                </small>
-              {% endif %}
-            </div>
-            
-            <!-- Year Created -->
+        <div class="artwork-details p-4 bg-white rounded">
+          <!-- Title and Artist -->
+          <h2 class="h3 mb-2">{{ artwork.title }}</h2>
+          <p class="text-muted mb-4">
+            <a href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
+               class="text-decoration-none">
+              {{ artwork.artist.name }}
+            </a>
+          </p>
+
+          <!-- Price -->
+          <div class="mb-4">
+            <p class="h4 mb-1">{{ price_display }}</p>
+            <small class="text-muted">{{ artwork.currency }}</small>
+          </div>
+
+          <!-- Artwork Info -->
+          <div class="artwork-info mb-4">
+            {% if artwork.medium %}
+              <div class="mb-3">
+                <p class="text-muted small mb-1">Medium</p>
+                <p class="mb-0">{{ artwork.medium }}</p>
+              </div>
+            {% endif %}
+
+            {% if artwork.width_cm and artwork.height_cm %}
+              <div class="mb-3">
+                <p class="text-muted small mb-1">Dimensions</p>
+                <p class="mb-0">{{ size_display }}</p>
+              </div>
+            {% endif %}
+
             {% if artwork.year_created %}
-              <div class="mb-3 pb-3 border-bottom">
-                <h6 class="text-muted text-uppercase mb-2">Year Created</h6>
+              <div class="mb-3">
+                <p class="text-muted small mb-1">Year</p>
                 <p class="mb-0">{{ artwork.year_created }}</p>
               </div>
             {% endif %}
-            
-            <!-- Availability Status -->
-            <div class="mb-4">
-              <h6 class="text-muted text-uppercase mb-2">Availability</h6>
-              {% if artwork.is_available %}
-                <span class="badge bg-success fs-6">
-                  <i class="bi bi-check-circle"></i> Available for Purchase
-                </span>
-              {% else %}
-                <span class="badge bg-danger fs-6">
-                  <i class="bi bi-x-circle"></i> Currently Unavailable
-                </span>
-              {% endif %}
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="d-grid gap-2">
-              {% if artwork.is_available %}
-                <!-- Add to Basket Button (Primary CTA) -->
-                {% if user.is_authenticated %}
-                  <form 
-                    method="post" 
+          </div>
+
+          <!-- Purchase Actions -->
+          {% if artwork.is_available %}
+            {% if user.is_authenticated %}
+              <form method="post" 
                     action="{% url 'collections_app:add_to_basket' artwork.pk %}"
                     id="add-to-basket-form"
-                  >
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="next" value="{% url 'collections_app:artwork_detail' artwork.pk %}">
-                    <button 
-                      type="submit" 
-                      class="btn btn-success btn-lg w-100"
-                      id="add-to-basket-btn"
-                    >
-                      <i class="bi bi-cart-plus"></i> Add to Basket
-                    </button>
-                  </form>
-                  
-                  <!-- JavaScript to update basket count after adding item -->
-                  <script>
-                    document.getElementById('add-to-basket-form').addEventListener('submit', function() {
-                      // Disable button to prevent double-submission
-                      document.getElementById('add-to-basket-btn').disabled = true;
-                      
-                      // Update basket count after form submission
-                      // Using setTimeout to allow the server to process the request first
-                      setTimeout(function() {
-                        if (typeof window.updateBasketCount === 'function') {
-                          window.updateBasketCount();
-                        }
-                      }, 500);
-                    });
-                  </script>
-                {% else %}
-                  <!-- Login Required for Adding to Basket -->
-                  <a 
-                    href="{% url 'account_login' %}?next={% url 'collections_app:artwork_detail' artwork.pk %}" 
-                    class="btn btn-success btn-lg"
-                  >
-                    <i class="bi bi-cart-plus"></i> Login to Purchase
-                  </a>
-                {% endif %}
-                
-                <!-- Contact/Inquiry Button -->
-                <a 
-                  href="{% url 'contact' %}?artwork={{ artwork.title }}" 
-                  class="btn btn-outline-primary btn-lg"
-                >
-                  <i class="bi bi-envelope"></i> Inquire About This Artwork
-                </a>
-              {% else %}
-                <!-- Sold/Unavailable Message -->
-                <div class="alert alert-warning" role="alert">
-                  <i class="bi bi-exclamation-triangle"></i> 
-                  This artwork is currently not available for purchase.
-                </div>
-              {% endif %}
-              
-              <!-- Back to Artworks List Button -->
-              <a 
-                href="{% url 'collections_app:artwork_list' %}" 
-                class="btn btn-outline-secondary"
-              >
-                ← Back to Artworks
+                    class="mb-3">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="next" value="{% url 'collections_app:artwork_detail' artwork.pk %}">
+                <button type="submit" 
+                        class="btn btn-outline-primary w-100"
+                        id="add-to-basket-btn">
+                  <i class="bi bi-cart-plus"></i> Add to Basket
+                </button>
+              </form>
+            {% else %}
+              <a href="{% url 'account_login' %}?next={% url 'collections_app:artwork_detail' artwork.pk %}" 
+                 class="btn btn-outline-primary w-100 mb-3">
+                <i class="bi bi-cart-plus"></i> Login to Purchase
               </a>
+            {% endif %}
+
+            <!-- Contact Button -->
+            <a href="{% url 'contact' %}?artwork={{ artwork.title }}" 
+               class="btn btn-outline-secondary w-100 mb-3">
+              <i class="bi bi-envelope"></i> Inquire About Artwork
+            </a>
+          {% else %}
+            <div class="alert alert-secondary" role="alert">
+              <i class="bi bi-info-circle"></i> 
+              This artwork is currently not available.
             </div>
-          </div>
+          {% endif %}
+
+          <!-- Back Button -->
+          <a href="{% url 'collections_app:artwork_list' %}" 
+             class="btn btn-link text-muted w-100">
+            ← Back to Artworks
+          </a>
         </div>
-        
-        <!-- Additional Information Card -->
-        <div class="card mt-3 shadow-sm">
-          <div class="card-body">
-            <h6 class="card-title text-uppercase mb-3">Quick Facts</h6>
-            <ul class="list-unstyled mb-0">
-              <li class="mb-2">
-                <strong>Listed:</strong> {{ artwork.created_at|date:"F d, Y" }}
-              </li>
-              <li class="mb-2">
-                <strong>Last Updated:</strong> {{ artwork.updated_at|date:"F d, Y" }}
-              </li>
-              {% if artwork.is_featured %}
-                <li class="mb-2">
-                  <span class="badge bg-warning text-dark">⭐ Featured Artwork</span>
-                </li>
-              {% endif %}
-            </ul>
-          </div>
+
+        <!-- Quick Info -->
+        <div class="mt-4 p-4 bg-white rounded">
+          <p class="text-muted small mb-2">Added {{ artwork.created_at|date:"F d, Y" }}</p>
+          {% if artwork.is_featured %}
+            <span class="badge bg-light text-dark">✨ Featured Artwork</span>
+          {% endif %}
         </div>
       </div>
     </div>
     
-    <!-- Similar Artworks by Same Artist (Optional) -->
+    <!-- Similar Artworks by Same Artist -->
     <div class="row mt-5">
       <div class="col-12">
-        <h3 class="mb-4">More by {{ artwork.artist.name }}</h3>
-        <a 
-          href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
-          class="btn btn-outline-primary"
-        >
-          View All Artworks by This Artist →
-        </a>
+        <div class="d-flex justify-content-between align-items-center">
+          <h3 class="h5 mb-0">More by {{ artwork.artist.name }}</h3>
+          <a href="{% url 'collections_app:artworks_by_artist' artwork.artist.pk %}" 
+             class="btn btn-link text-decoration-none">
+            View All →
+          </a>
+        </div>
       </div>
     </div>
   </div>
+
+  <script>
+    document.getElementById('add-to-basket-form')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = this;
+      const btn = document.getElementById('add-to-basket-btn');
+      btn.disabled = true;
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Added to basket successfully!', 'success');
+          updateBasketCount();
+        } else {
+          showToast('Failed to add to basket. Please try again.', 'error');
+        }
+      })
+      .catch(() => {
+        showToast('An error occurred. Please try again.', 'error');
+      })
+      .finally(() => {
+        btn.disabled = false;
+      });
+    });
+  </script>
 {% endblock %}
