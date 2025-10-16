@@ -9,7 +9,9 @@ class ExhibitionAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'start_date',
+        'start_time',
         'end_date',
+        'end_time',
         'location',
         'status',
         'cover_preview',
