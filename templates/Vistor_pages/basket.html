@@ -3,6 +3,10 @@
 
 {% block title %}Shopping Basket | Const Collection{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/basket.css' %}">
+{% endblock %}
+
 {% block content %}
   <!-- 
     SHOPPING BASKET PAGE
@@ -12,13 +16,12 @@
   
   <div class="container mt-4 mb-5">
     <!-- Page Header -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <h1 class="display-5">
-          <i class="bi bi-cart3"></i> Shopping Basket
-        </h1>
-        <p class="text-muted">Review your selected artworks before checkout</p>
-      </div>
+    <div class="row mb-4 basket-header">
+        <div class="col-12">
+            <h1 class="display-5">Shopping Basket</h1>
+            <div class="accent-stripe"></div>
+            <p class="text-muted">Review your selected artworks before checkout</p>
+        </div>
     </div>
 
     {% if basket_items %}
@@ -26,10 +29,9 @@
       <div class="row">
         <!-- Items List Column -->
         <div class="col-lg-8">
-          <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
+          <div class="basket-card mb-4">
+            <div class="card-header">
               <h5 class="mb-0">
-                <i class="bi bi-bag-check"></i> 
                 Your Items ({{ basket_items|length }})
               </h5>
             </div>
@@ -172,14 +174,12 @@
 
           <!-- Continue Shopping Button -->
           <div class="mb-4">
-            <a 
-              href="{% url 'collections_app:artwork_list' %}" 
-              class="btn btn-outline-secondary"
-            >
-              <i class="bi bi-arrow-left"></i> Continue Shopping
-            </a>
-            
-            <!-- Clear Basket Button -->
+              <a 
+                href="{% url 'collections_app:artwork_list' %}" 
+                class="btn btn-minimal"
+              >
+                <i class="bi bi-arrow-left"></i> Continue Shopping
+              </a>            <!-- Clear Basket Button -->
             <form 
               method="post" 
               action="{% url 'collections_app:clear_basket' %}"
@@ -196,11 +196,9 @@
 
         <!-- Order Summary Column -->
         <div class="col-lg-4">
-          <div class="card shadow-sm sticky-top" style="top: 20px;">
-            <div class="card-header bg-success text-white">
-              <h5 class="mb-0">
-                <i class="bi bi-receipt"></i> Order Summary
-              </h5>
+          <div class="summary-card sticky-top" style="top: 20px;">
+            <div class="summary-header">
+              <h5 class="mb-0">Order Summary</h5>
             </div>
             <div class="card-body">
               <!-- Order Summary Details -->
