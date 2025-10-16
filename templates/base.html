@@ -41,9 +41,14 @@
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <li><a class="dropdown-item" href="{% url 'collections_app:user_dashboard' %}">Dashboard</a></li>
                     {% if request.user.is_superuser %}
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="{% url 'owner_app:art_list' %}">Manage Art</a></li>
-                      <li><a class="dropdown-item" href="/admin/">Admin Panel</a></li>
+                      <li><hr class="dropdown-divider"></li>                   
+                  <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:art_list' %}">Manage Art</a></li>
+                  <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:create_art' %}">Add New Artwork</a></li>
+                <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:collections_list' %}">Manage Collections</a></li>
+                <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:create_collection' %}">Create Collection</a></li>
+                  <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:exhibitions_list' %}">Manage Exhibitions</a></li>
+                  <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:create_exhibition' %}">Create Exhibition</a></li>
+                  <li><a class="dropdown-item" class="nav-link" href="{% url 'owner_app:edit_artist' %}">Edit About</a></li>
                     {% endif %}
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
