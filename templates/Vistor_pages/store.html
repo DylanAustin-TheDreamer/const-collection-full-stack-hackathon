@@ -8,15 +8,21 @@
     {% if sale_items %}
       <div class="row">
         {% for art in sale_items %}
+          {# Each artwork card in the store #}
           <div class="col-md-4 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 store-card">
+              {# Clickable artwork image linking to detail view #}
               {% if art.image %}
-                <img src="{{ art.image.url }}" class="card-img-top" style="height:220px;object-fit:cover;" alt="{{ art.title }}">
+                <a href="{% url 'collections_app:art_detail' art.pk %}" class="text-decoration-none">
+                  <img src="{{ art.image.url }}" class="card-img-top" style="height:220px;object-fit:cover;transition: opacity 0.2s ease;" alt="{{ art.title }}" title="Click to view details">
+                </a>
               {% endif %}
-              <div class="card-body">
+              <div class="card-body position-relative">
+                {# Artwork title and collection info #}
                 <h5 class="card-title">{{ art.title }}</h5>
                 <p class="small text-muted">{{ art.collection.name }} — {{ art.collection.artist.name }}</p>
 
+                {# Display pricing information #}
                 <div class="mb-2">
                   {% if art.physical_available %}
                     <div>Physical: <strong>${{ art.physical_price }}</strong></div>
@@ -26,21 +32,30 @@
                   {% endif %}
                 </div>
 
-                <a href="{% url 'collections_app:art_detail' art.pk %}" class="btn btn-sm btn-outline-primary">View</a>
-                {% if art.is_available and user.is_authenticated %}
-                  <form method="post" action="{% url 'collections_app:add_to_basket' art.pk %}" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="next" value="{% url 'store_app:index' %}">
-                    <button type="submit" class="btn btn-sm btn-success ms-1">
-                      <i class="bi bi-cart-plus"></i> Add to Basket
-                    </button>
-                  </form>
-                {% elif not user.is_authenticated %}
-                  <a href="{% url 'account_login' %}?next={% url 'store_app:index' %}" class="btn btn-sm btn-success ms-1">
-                    <i class="bi bi-cart-plus"></i> Login to Purchase
-                  </a>
-                {% endif %}
+                {# Buttons container with both buttons at same height #}
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <a href="{% url 'collections_app:art_detail' art.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+
+                  {% if art.physical_available or art.digital_available %}
+                    {% if user.is_authenticated %}
+                      {# Form for authenticated users to add item to basket #}
+                      <form method="post" action="{% url 'collections_app:add_to_basket' art.pk %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="next" value="{% url 'store_app:index' %}">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-cart-plus"></i> Add to Basket
+                        </button>
+                      </form>
+                    {% else %}
+                      {# Login button for unauthenticated users #}
+                      <a href="{% url 'account_login' %}?next={% url 'store_app:index' %}" 
+                         class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-cart-plus"></i> Login to Purchase
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                </div>
               </div>
             </div>
           </div>

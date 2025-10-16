@@ -1,3 +1,97 @@
+/* Store Card Add to Basket Button Placement */
+/* Store Card Styles */
+.store-card {
+    position: relative;
+    height: 100%;
+    border: 1px solid #D3D3D3;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+}
+
+.store-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+.store-card .card-body {
+    padding: 1.5rem;
+}
+
+.store-card .card-title {
+    color: #333333;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.store-card .text-muted {
+    color: #555555 !important;
+    font-size: 0.9rem;
+}
+
+.store-card .price-info {
+    color: #333333;
+    font-size: 0.95rem;
+    margin: 1rem 0;
+}
+
+.store-card .price-info strong {
+    color: #000000;
+    font-weight: 600;
+}
+
+/* Store Card Buttons */
+.store-card .btn-outline-primary {
+    color: #333333;
+    border-color: #D3D3D3;
+    background: transparent;
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s;
+}
+
+.store-card .btn-outline-primary:hover {
+    background: #F5F5F5;
+    color: #000000;
+    border-color: #A9A9A9;
+}
+
+/* Card action buttons */
+.store-card .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.store-card .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid #D3D3D3;
+    color: #333333;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.store-card .btn:hover {
+    background: #F5F5F5;
+    color: #000000;
+    border-color: #A9A9A9;
+    transform: translateY(-1px);
+}
+
+/* Card Image */
+.store-card .card-img-top {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.store-card a:hover .card-img-top {
+    opacity: 0.9;
+}
 /* Minimalist Grayscale Palette for Auth Pages Only */
 .auth-card, .account .card {
 	background: #F5F5F5; /* Light Gray */
@@ -83,5 +177,61 @@
 	justify-content: center;
 }
 /* Minimal placeholder styles */
-body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-.navbar-brand { font-weight: 600; }
+body { 
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; 
+	background: #FFFFFF;
+	color: #555555;
+}
+
+/* Compact Minimalist Navbar */
+.navbar {
+	background: #FFFFFF !important;
+	border-bottom: 1px solid #F5F5F5;
+	padding: 0.5rem 0;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.navbar-brand { 
+	font-weight: 600;
+	color: #333333 !important;
+	font-size: 1.1rem;
+	letter-spacing: 0.5px;
+}
+
+.navbar .nav-link {
+	color: #555555 !important;
+	font-size: 0.95rem;
+	padding: 0.4rem 0.8rem !important;
+	transition: color 0.2s;
+}
+
+.navbar .nav-link:hover {
+	color: #000000 !important;
+}
+
+.navbar .dropdown-menu {
+	border: 1px solid #D3D3D3;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	border-radius: 6px;
+	min-width: 160px;
+}
+
+.navbar .dropdown-item {
+	color: #555555;
+	font-size: 0.9rem;
+	padding: 0.5rem 1rem;
+}
+
+.navbar .dropdown-item:hover {
+	background: #F5F5F5;
+	color: #000000;
+}
+
+.navbar .dropdown-divider {
+	border-color: #D3D3D3;
+}
+
+/* Basket icon styling */
+.navbar .nav-link svg {
+	vertical-align: middle;
+}
