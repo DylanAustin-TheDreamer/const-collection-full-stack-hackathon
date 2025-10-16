@@ -21,9 +21,10 @@ import cloudinary.api
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Add the parent directory (repo root) to Python path
-# to find collections_app
-REPO_ROOT = BASE_DIR.parent
+# Add the repository root to Python path so apps at the project root
+# (for example `collections_app`) can be imported and so we can import
+# the repo-level `env.py` helper.
+REPO_ROOT = BASE_DIR
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -31,6 +32,20 @@ if str(REPO_ROOT) not in sys.path:
 env_path = REPO_ROOT / "env.py"
 if env_path.exists():
     import env  # noqa
+    # Defensive: if env.py did not populate DATABASE_URL (or other vars),
+    # execute it directly to ensure os.environ is set. This handles cases
+    # where import caching or package paths prevent the simple import from
+    # running the file as expected.
+    try:
+        # runpy is safe here — it executes the file in a fresh namespace
+        # and will set os.environ as env.py intends.
+        import runpy
+        if not os.environ.get('DATABASE_URL'):
+            runpy.run_path(str(env_path), run_name='__env_fallback__')
+    except Exception:
+        # Keep behavior unchanged on failure; let settings code raise any
+        # clear errors later when DATABASE_URL is used.
+        pass
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,7 +55,7 @@ if env_path.exists():
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() in ('1', 'true', 'yes')
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1',]
 CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
@@ -125,11 +140,31 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
-}
-if 'test' in sys.argv:
-    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+# Read and sanitize DATABASE_URL from environment to tolerate a few
+# common mis-formattings (for example when a bytes repr or extra quotes
+# were accidentally stored). We keep Postgres as the required DB.
+_raw_db = os.environ.get('DATABASE_URL')
+if isinstance(_raw_db, (bytes, bytearray)):
+    _raw_db = _raw_db.decode('utf-8', errors='ignore')
+if isinstance(_raw_db, str):
+    _raw_db = _raw_db.strip()
+    if _raw_db.startswith("b'") or _raw_db.startswith('b"'):
+        # remove leading b' and trailing quote from reprs
+        _raw_db = _raw_db[2:]
+    # strip surrounding quotes
+    _raw_db = _raw_db.strip('"\'')
+
+if not _raw_db:
+    raise RuntimeError(
+        'DATABASE_URL environment variable is not set. Please set it to a valid '
+        'Postgres URL (e.g. postgresql://user:pass@host:port/dbname)'
+    )
+
+try:
+    DATABASES = {'default': dj_database_url.parse(_raw_db)}
+except Exception as exc:
+    raise RuntimeError(f"Unable to parse DATABASE_URL={_raw_db!r}: {exc}") from exc
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
