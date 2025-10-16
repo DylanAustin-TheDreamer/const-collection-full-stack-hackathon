@@ -7,7 +7,9 @@ class Exhibition(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     start_date = models.DateField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
     STATUS_CHOICES = (
         ('upcoming', 'Upcoming'),
         ('ongoing', 'Ongoing'),
@@ -18,6 +20,7 @@ class Exhibition(models.Model):
         max_length=16, choices=STATUS_CHOICES, default='upcoming'
     )
     location = models.CharField(max_length=255, blank=True)
+
     cover_image = CloudinaryField(resource_type='image', blank=True, null=True)
 
     def __str__(self):

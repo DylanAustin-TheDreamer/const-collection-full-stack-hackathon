@@ -6,7 +6,7 @@
   <div class="container mt-4">
     <div class="row">
       <div class="col-md-8">
-        <h2>Add New Exhibition</h2>
+        <h2>{% if exhibition.title %}Edit exhibition {%else %} Add New Exhibition {% endif %}</h2>
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {{ form.non_field_errors }}
@@ -35,10 +35,19 @@
               {{ form.start_date.errors }}
             </div>
             <div class="col-md-6 mb-3">
+              {{ form.start_time.label_tag }}
+              {{ form.start_time }}
+              {{ form.start_time.errors }}
+            </div>
+            <div class="col-md-6 mb-3">
               {{ form.end_date.label_tag }}
               {{ form.end_date }}
               {{ form.end_date.errors }}
             </div>
+            <div class="col-md-6 mb-3">
+              {{ form.end_time.label_tag }}
+              {{ form.end_time }}
+              {{ form.end_time.errors }}
           </div>
 
           <div class="mb-3">

@@ -12,7 +12,11 @@
         {% endif %}
         <p class="text-muted">
           {% if exhibition.start_date %}{{ exhibition.start_date }}{% endif %}
+          {% if exhibition.start_time %} {{ exhibition.start_time }}{% endif %}
+        </p>
+        <p class="text-muted">
           {% if exhibition.end_date %} — {{ exhibition.end_date }}{% endif %}
+          {% if exhibition.end_time %} {{ exhibition.end_time }}{% endif %}
         </p>
         <p>{{ exhibition.description|linebreaks }}</p>
       </div>

@@ -19,8 +19,12 @@
                 <div class="card-body">
                   <h5 class="card-title">{{ exhibition.title }}</h5>
                   <p class="card-text text-muted">
-                    {% if exhibition.start_date %}{{ exhibition.start_date }}{% endif %}
-                    {% if exhibition.end_date %} — {{ exhibition.end_date }}{% endif %}
+                    {% if exhibition.start_date %} {{ exhibition.start_date }}{% endif %}
+                    {% if exhibition.end_date %} & {{ exhibition.end_date }}{% endif %}
+                  </p>
+                  <p class="card-text text-muted">
+                    From: {% if exhibition.start_time %} {{ exhibition.start_time }}{% endif %}
+                    {% if exhibition.end_time %} to {{ exhibition.end_time }}{% endif %}
                   </p>
                   <p class="card-text">
                     {{ exhibition.description|truncatechars:140 }}
@@ -49,8 +53,12 @@
                 <div class="card-body">
                   <h5 class="card-title">{{ exhibition.title }}</h5>
                   <p class="card-text text-muted">
-                    {% if exhibition.start_date %}{{ exhibition.start_date }}{% endif %}
-                    {% if exhibition.end_date %} — {{ exhibition.end_date }}{% endif %}
+                    {% if exhibition.start_date %} {{ exhibition.start_date }}{% endif %}
+                    {% if exhibition.end_date %} & {{ exhibition.end_date }}{% endif %}
+                  </p>
+                  <p class="card-text text-muted">
+                    From: {% if exhibition.start_time %} {{ exhibition.start_time }}{% endif %}
+                    {% if exhibition.end_time %} to {{ exhibition.end_time }}{% endif %}
                   </p>
                   <p class="card-text">{{ exhibition.description|truncatechars:140 }}</p>
                   <a href="{% url 'events_app:detail' exhibition.pk %}" class="btn btn-sm btn-outline-secondary">View details</a>

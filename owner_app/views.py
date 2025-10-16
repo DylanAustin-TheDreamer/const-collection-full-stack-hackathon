@@ -124,6 +124,24 @@ def create_exhibition(request):
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def edit_exhibition(request, pk):
+    exhibition = Exhibition.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = ExhibitionForm(request.POST, request.FILES, instance=exhibition)
+        if form.is_valid():
+            form.save()
+            return redirect('owner_app:exhibitions_list')
+    else:
+        form = ExhibitionForm(instance=exhibition)
+
+    return render(
+        request,
+        'owner_pages/exhibition_form.html',
+        {'form': form, 'exhibition': exhibition},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
 def assign_art(request, exhibition_pk):
     """Allow owner to select artworks to include in an exhibition.
 
