@@ -16,42 +16,67 @@
   </div>
 </div>
 
-<div class="container-fluid text-center" style="background-color: rgb(151, 151, 151);">
-  <div class="container" id="intro">
-  <p>Illuminated acrylic artist - Artist Name</p>
+<div class="container-fluid text-center" style="background:linear-gradient(90deg, #797979 65%, #d1d1d1 100%); padding: 25px;">
+  <div class="container" id="intro" >
+  <h2>Illuminated acrylic artist - Cecilia Kristoffersson</h2>
   <br>
-  <p>I am a Mother Artist - My art is for my daughters, to express love, resilience and compassion for their pain.
+  <p>I am a <strong>Mother</strong> Artist - My art is for my daughters, to express love, resilience and compassion for their pain.
     further pushing the boundries of what artistic expression can be. And most importantly,
     the <strong>Way of seeing</strong> in being a mother.</p>
   </div>
 </div>
 
-<div class="container d-flex flex-column align-items-center mt-2 text-center">
-  <video class="video mt-4" autoplay loop muted>
+<div class="container-fluid card-color" style="background-color: rgb(78, 78, 78); padding: 25px;">
+<div class="container d-flex flex-column align-items-center justify-content-center">
+  <video class="video" autoplay loop muted>
     <source src="{% static 'videos/Hero.mp4' %}" type="video/mp4">
+  </video>
+</div>
 </div>
 
-<div class="grid-container">
-  <div style="flex: 0;">
-    <img src="{% static 'images/artwork1.jpg' %}" alt="Artwork 1">
-    <img src="{% static 'images/artwork2.jpg' %}" alt="Artwork 2">
-  </div>
-  <div style="flex: 1;">
-    <img src="{% static 'images/artwork3.jpg' %}" alt="Artwork 3">
-    <img src="{% static 'images/artwork4.jpg' %}" alt="Artwork 4">
+<div class="my-space-inbetween container" style="padding: 35px;">
+<a href="" class="my-btn">Shop</a>
+<a href="" class="my-btn">Gallery</a>
+<a href="" class="my-btn">Contact</a>
+<a href="" class="my-btn">Exhibitions</a>
+<a href="" class="my-btn">Press & News</a>
+</div>
+
+<div class="container" style="padding: 25px; box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);" id="feature-card">
+  <h2>Featured Works</h2>
+  <div class="featured-works-grid">
+    <div class="featured-text">
+      <p>My work is a call for change, a gentle yet unyielding
+      demand for a new way of being. We are living through a
+      time of profound disconnection, where digital illusions
+      and performative identities often take the place of
+      genuine connection and truth. In this world of
+      fragmentation and make-believe, our daughters are
+      growing up surrounded by false mirrors. They are being
+      shaped by forces that too often diminish their sense of
+      worth. It is time for a new revolution, one that is quietly
+      powerful. A revolution of remembering, of returning to
+      what is real, embodied, and whole. My art is part of this
+      revolution. Through painting, I reclaim a space of deep
+      seeing, one that rejects distortion and affirms the
+      spiritual and ancestral richness of the feminine
+      experience. As mothers, we have an essential role in
+      this transformation. We are not only caretakers of our
+      daughters, but guardians of the world they will inherit.
+      We must begin to dismantle the barriers, internal and
+      external, that have kept us silent all this time.</p>
+    </div>
+    <div class="featured-image">
+      <img src="{% static 'images/let-sleeping-girls.jpg' %}" alt="Featured Artwork 1">
+      <h3 style="color: whitesmoke; background-color: rgb(77, 77, 77); padding: 15px;">Let sleeping girls lie? (2024)</h3>
+    </div>
   </div>
 </div>
+
+
+
 
 <div class="mt-4"style="box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);">
 </div>
 
 {% endblock %}
-
-<style>
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-  }
-</style>
