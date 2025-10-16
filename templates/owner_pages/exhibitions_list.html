@@ -23,12 +23,12 @@
                     From: {% if ex.start_time %} {{ ex.start_time }}{% endif %}
                     {% if ex.end_time %} to {{ ex.end_time }}{% endif %}
                 </div>
-                <div class="text-end">
-                  <span class="badge bg-secondary">{{ ex.get_status_display }}</span>
-                  <div class="mt-2">
-                    <a href="{% url 'owner_app:assign_art' ex.pk %}" class="btn btn-sm btn-outline-primary">Assign Art</a>
-                  </div>
-                </div>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-secondary">{{ ex.get_status_display }}</span>
+              <div class="mt-2">
+                <a href="{% url 'owner_app:assign_art' ex.pk %}" class="btn btn-sm btn-outline-primary">Assign Art</a>
+              </div>
               </div>
             </div>
           {% endfor %}

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
 from django.views.decorators.http import require_POST
+from .models import Order, OrderItem
 
 
 def index(request):
@@ -32,22 +33,14 @@ def collection_detail(request, pk):
 
 
 def art_detail(request, pk):
-    from .models import Art, Artwork
+    from .models import Art
 
     art = Art.objects.select_related('collection__artist').get(pk=pk)
-    
-    # Try to find corresponding Artwork object
-    try:
-        artwork = Artwork.objects.filter(
-            title=art.title,
-            artist=art.collection.artist
-        ).first()
-    except Artwork.DoesNotExist:
-        artwork = None
 
+    # For compatibility keep 'artwork' context key pointing to the Art instance
     return render(request, 'Vistor_pages/art_detail.html', {
         'art': art,
-        'artwork': artwork
+        'artwork': art,
     })
 
 
@@ -66,14 +59,19 @@ def artwork_list(request):
     - Optimizes database queries using select_related
     - Supports filtering and search functionality
     """
-    from .models import Artwork
-    
-    # Fetch all artworks with related artist information
-    # Using select_related to optimize database queries (reduce N+1 queries)
-    artworks = Artwork.objects.select_related('artist').all()
-    
-    # Filter to show only available artworks (optional - can be removed to show all)
-    artworks = artworks.filter(is_available=True)
+    from .models import Art
+
+    # Fetch all art rows (Art is canonical) and expose them as 'artworks' for templates
+    # Prefetch variants so templates can show per-medium pricing without N+1
+    artworks = (
+        Art.objects
+        .select_related('collection__artist')
+        .prefetch_related('variants')
+        .all()
+    )
+
+    # Only show arts that have at least one available variant
+    artworks = artworks.filter(variants__is_available=True).distinct()
     
     # Get search query from URL parameters (if provided)
     search_query = request.GET.get('search', '')
@@ -82,7 +80,7 @@ def artwork_list(request):
         artworks = artworks.filter(
             Q(title__icontains=search_query) |
             Q(medium__icontains=search_query) |
-            Q(artist__name__icontains=search_query)
+            Q(collection__artist__name__icontains=search_query)
         )
     
     # Get filter parameters for price range (if provided)
@@ -91,9 +89,9 @@ def artwork_list(request):
     
     # Apply price filters if provided
     if min_price:
-        artworks = artworks.filter(price__gte=min_price)
+        artworks = artworks.filter(variants__price__gte=min_price)
     if max_price:
-        artworks = artworks.filter(price__lte=max_price)
+        artworks = artworks.filter(variants__price__lte=max_price)
     
     # Get filter parameter for medium (if provided)
     medium_filter = request.GET.get('medium', '')
@@ -104,6 +102,7 @@ def artwork_list(request):
     artworks = artworks.order_by('-created_at')
     
     # Prepare context data to pass to the template
+    # compute cheapest available variant price for template
     context = {
         'artworks': artworks,
         'search_query': search_query,
@@ -132,23 +131,51 @@ def artwork_detail(request, pk):
     - Includes artist information
     - Shows availability status
     """
-    from .models import Artwork
-    
-    # Fetch the artwork by primary key (ID)
-    # Use get_object_or_404 to return 404 error if artwork doesn't exist
-    # Using select_related to fetch artist information in the same query
-    artwork = get_object_or_404(
-        Artwork.objects.select_related('artist'),
+    from .models import Art
+
+    # Fetch the Art row and present it under 'artwork' for templates
+    art = get_object_or_404(
+        Art.objects.select_related('collection__artist').prefetch_related('variants'),
         pk=pk
     )
-    
-    # Prepare additional context data
+
+    # Prepare variant information for the template
+    variants_qs = list(art.variants.all())
+
+    # Build a mapping for medium -> variant and order by desired priority
+    variants_map = {v.medium: v for v in variants_qs}
+    preferred_order = [
+        'original_piece',
+        'printed_poster',
+        'digital_copy',
+    ]
+    variants = [variants_map[k] for k in preferred_order if k in variants_map]
+
+    # Determine main price display: prefer ORIGINAL then POSTER then DIGITAL when available
+    price_display = None
+    default_variant_pk = None
+    for medium_key in preferred_order:
+        v = variants_map.get(medium_key)
+        if v and v.is_available and v.price is not None:
+            price_display = f"{v.currency} {v.price:,.2f}"
+            default_variant_pk = v.pk
+            break
+    # Fallback: use any available variant with a price
+    if price_display is None:
+        for v in variants_qs:
+            if v.is_available and v.price is not None:
+                price_display = f"{v.currency} {v.price:,.2f}"
+                default_variant_pk = v.pk
+                break
+    # Final fallback: art-level price display
+    if price_display is None:
+        price_display = art.get_price_display()
+
     context = {
-        'artwork': artwork,
-        # Use the model's helper method to get formatted size
-        'size_display': artwork.get_size_display(),
-        # Use the model's helper method to get formatted price
-        'price_display': artwork.get_price_display(),
+        'artwork': art,
+        'size_display': art.get_size_display(),
+        'price_display': price_display,
+        'variants': variants,
     }
     
     # Render the artwork detail template with the context data
@@ -165,14 +192,13 @@ def featured_artworks(request):
     - Shows price, size, and medium for quick buyer information
     - Optimized for homepage display
     """
-    from .models import Artwork
-    
-    # Fetch only featured artworks that are available
-    # Using select_related to optimize database queries
-    artworks = Artwork.objects.select_related('artist').filter(
-        is_featured=True,
-        is_available=True
-    ).order_by('-created_at')
+    from .models import Art
+
+    artworks = (
+        Art.objects.select_related('collection__artist')
+        .filter(is_featured=True, is_available=True)
+        .order_by('-created_at')
+    )
     
     # Limit to the most recent 6 featured artworks
     artworks = artworks[:6]
@@ -199,7 +225,7 @@ def artworks_by_artist(request, artist_id):
     - Shows price, size, and medium information
     - Includes artist profile information
     """
-    from .models import Artwork
+    from .models import Art
     from owner_app.models import ArtistProfile
     
     # Fetch the artist profile
@@ -207,8 +233,9 @@ def artworks_by_artist(request, artist_id):
     
     # Fetch all artworks by this artist
     # Using filter to get artworks related to the artist
-    artworks = Artwork.objects.filter(
-        artist=artist,
+    # Art does not have direct artist FK; filter via collection__artist
+    artworks = Art.objects.select_related('collection__artist').filter(
+        collection__artist=artist,
         is_available=True
     ).order_by('-created_at')
     
@@ -232,16 +259,15 @@ def artwork_search_by_price(request):
     - Display price, size, and medium for filtered results
     - Sort by price (ascending or descending)
     """
-    from .models import Artwork
-    
-    # Get price range from query parameters
+    from .models import Art
+
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
-    sort_order = request.GET.get('sort', 'asc')  # 'asc' or 'desc'
-    
-    # Start with all available artworks
-    artworks = Artwork.objects.select_related('artist').filter(
-        is_available=True
+    sort_order = request.GET.get('sort', 'asc')
+
+    artworks = (
+        Art.objects.select_related('collection__artist')
+        .filter(is_available=True)
     )
     
     # Apply price filters if provided
@@ -293,9 +319,16 @@ def basket_view(request):
     # This ensures every logged-in user has a basket
     basket, created = Basket.objects.get_or_create(user=request.user)
     
-    # Get all items in the basket with related artwork data
-    # Using select_related to optimize database queries
-    basket_items = basket.items.select_related('artwork', 'artwork__artist').all()
+    # Get all items in the basket with related artwork/art data
+    # Prefer 'art' (canonical) but keep Artwork for compatibility
+    basket_items = (
+        basket.items
+        .select_related(
+            'art',
+            'art__collection__artist',
+        )
+        .all()
+    )
     
     # Calculate basket totals
     total_price = basket.get_total_price()
@@ -333,20 +366,77 @@ def add_to_basket(request, artwork_id):
     - User must be logged in
     - POST request only
     """
-    from .models import Basket, BasketItem, Artwork
-    
-    # Get the artwork or return 404 if not found
-    artwork = get_object_or_404(Artwork, pk=artwork_id)
-    
-    # Check if artwork is available for purchase
-    if not artwork.is_available:
-        messages.error(request, f"Sorry, {artwork.title} is not available for purchase.")
-        return redirect(request.META.get('HTTP_REFERER', 'collections_app:artwork_list'))
-    
-    # Check if artwork has a price
-    if not artwork.price:
-        messages.error(request, f"Sorry, {artwork.title} does not have a price set.")
-        return redirect(request.META.get('HTTP_REFERER', 'collections_app:artwork_list'))
+    from .models import Basket, BasketItem, Art
+
+    # We now use the canonical Art model; Artwork DB rows have been removed.
+    artwork = get_object_or_404(Art, pk=artwork_id)
+
+    # Phase B: variant selection is required
+    variant_id = request.POST.get('variant_id')
+    if not variant_id:
+        messages.error(
+            request,
+            'Please select a format/variant before adding to basket.',
+        )
+        return redirect(
+            request.META.get('HTTP_REFERER', 'collections_app:artwork_list')
+        )
+
+    from .models import ArtVariant
+    try:
+        variant = ArtVariant.objects.get(pk=int(variant_id), art=artwork)
+    except ArtVariant.DoesNotExist:
+        messages.error(request, 'Selected format is invalid.')
+        return redirect(
+            request.META.get('HTTP_REFERER', 'collections_app:artwork_list')
+        )
+
+    # Validate availability/price using variant if provided,
+    # otherwise fall back to art
+    if variant:
+        if not variant.is_available:
+            msg = (
+                f"Sorry, {artwork.title} "
+                f"({variant.get_medium_display()}) is unavailable."
+            )
+            messages.error(request, msg)
+            return redirect(
+                request.META.get(
+                    'HTTP_REFERER', 'collections_app:artwork_list'
+                )
+            )
+        if variant.price is None:
+            msg = (
+                f"Sorry, {artwork.title} "
+                f"({variant.get_medium_display()}) has no price set."
+            )
+            messages.error(request, msg)
+            return redirect(
+                request.META.get(
+                    'HTTP_REFERER', 'collections_app:artwork_list'
+                )
+            )
+    else:
+        if not getattr(artwork, 'is_available', True):
+            messages.error(
+                request,
+                f"Sorry, {artwork.title} is not available for purchase."
+            )
+            return redirect(
+                request.META.get(
+                    'HTTP_REFERER', 'collections_app:artwork_list'
+                )
+            )
+        if not getattr(artwork, 'price', None):
+            messages.error(
+                request,
+                f"Sorry, {artwork.title} does not have a price set."
+            )
+            return redirect(
+                request.META.get(
+                    'HTTP_REFERER', 'collections_app:artwork_list'
+                )
+            )
     
     # Get or create basket for the user
     basket, created = Basket.objects.get_or_create(user=request.user)
@@ -358,14 +448,19 @@ def add_to_basket(request, artwork_id):
     if quantity < 1:
         quantity = 1
     
-    # Check if artwork is already in basket
+    # Create or update BasketItem linked to the canonical Art model
+    # (and optional variant)
+    defaults = {'quantity': quantity}
+    if variant:
+        defaults['price_at_addition'] = variant.price
+    else:
+        defaults['price_at_addition'] = artwork.price
+
     basket_item, item_created = BasketItem.objects.get_or_create(
         basket=basket,
-        artwork=artwork,
-        defaults={
-            'quantity': quantity,
-            'price_at_addition': artwork.price
-        }
+        art=artwork,
+        variant=variant,
+        defaults=defaults,
     )
     
     # If item already existed, update quantity
@@ -374,7 +469,10 @@ def add_to_basket(request, artwork_id):
         basket_item.save()
         messages.success(
             request,
-            f"Updated {artwork.title} quantity to {basket_item.quantity} in your basket."
+            (
+                f"Updated {artwork.title} quantity to "
+                f"{basket_item.quantity} in your basket."
+            )
         )
     else:
         messages.success(
@@ -392,7 +490,9 @@ def add_to_basket(request, artwork_id):
         })
     
     # Redirect to basket page or back to previous page
-    next_url = request.POST.get('next', request.META.get('HTTP_REFERER', 'collections_app:basket'))
+    next_url = request.POST.get(
+        'next', request.META.get('HTTP_REFERER', 'collections_app:basket')
+    )
     return redirect(next_url)
 
 
@@ -429,16 +529,19 @@ def update_basket_item(request, item_id):
     
     # If quantity is 0 or less, remove the item
     if new_quantity <= 0:
-        artwork_title = basket_item.artwork.title
+        display = getattr(basket_item, 'display_artwork', None)
+        artwork_title = display.title if display else 'Unknown artwork'
         basket_item.delete()
         messages.success(request, f"Removed {artwork_title} from your basket.")
     else:
         # Update quantity
         basket_item.quantity = new_quantity
         basket_item.save()
+        display = getattr(basket_item, 'display_artwork', None)
+        title = display.title if display else 'Unknown artwork'
         messages.success(
             request,
-            f"Updated {basket_item.artwork.title} quantity to {new_quantity}."
+            f"Updated {title} quantity to {new_quantity}."
         )
     
     # Handle AJAX requests
@@ -448,7 +551,9 @@ def update_basket_item(request, item_id):
             'success': True,
             'basket_count': basket.get_item_count(),
             'basket_total': float(basket.get_total_price()),
-            'item_subtotal': float(basket_item.get_subtotal()) if new_quantity > 0 else 0
+            'item_subtotal': (
+                float(basket_item.get_subtotal()) if new_quantity > 0 else 0
+            )
         })
     
     return redirect('collections_app:basket')
@@ -482,7 +587,8 @@ def remove_from_basket(request, item_id):
     )
     
     # Store artwork title before deletion
-    artwork_title = basket_item.artwork.title
+    display = getattr(basket_item, 'display_artwork', None)
+    artwork_title = display.title if display else 'Unknown artwork'
     basket = basket_item.basket
     
     # Delete the item
@@ -588,23 +694,92 @@ def checkout(request):
     
     # Get user's basket
     try:
+        # Prefetch related art and artist via the art->collection->artist path
         basket = Basket.objects.prefetch_related(
-            'items__artwork__artist'
+            'items__art__collection__artist'
         ).get(user=request.user)
-        
+
         # Check if basket is empty
         if basket.get_item_count() == 0:
             messages.warning(request, "Your basket is empty. Please add items before checking out.")
             return redirect('collections_app:artwork_list')
-        
+
         # Calculate totals
         subtotal = basket.get_total_price()
         # TODO: Add shipping cost calculation based on location
         shipping_cost = 0  # Free shipping for now
         total = subtotal + shipping_cost
-        
+
+        # If this is a POST from the checkout form, create an Order (admin test checkout)
+        if request.method == 'POST':
+            # Create order using submitted billing fields
+            order = None
+            try:
+                order = Order.objects.create(
+                    user=request.user,
+                    total_amount=total,
+                    payment_method='admin-test',
+                    stripe_payment_intent='TEST',
+                    email=request.POST.get('email', request.user.email or ''),
+                    full_name=f"{request.POST.get('first_name','') } {request.POST.get('last_name','')}",
+                    address_line1=request.POST.get('address_line1',''),
+                    address_line2=request.POST.get('address_line2',''),
+                    city=request.POST.get('city',''),
+                    postal_code=request.POST.get('postal_code',''),
+                    country=request.POST.get('country','') or 'US',
+                )
+
+                # Create OrderItems from BasketItems
+                for bi in basket.items.all():
+                    display = getattr(bi, 'display_artwork', None)
+                    variant_obj = getattr(bi, 'variant', None)
+                    OrderItem.objects.create(
+                        order=order,
+                        art=(bi.art if getattr(bi, 'art', None) else None),
+                        artwork_title=(
+                            display.title if display else bi.price_at_addition
+                        ),
+                        artwork_artist=(
+                            display.artist.name
+                            if getattr(display, 'artist', None)
+                            else ''
+                        ),
+                        artwork_medium=(
+                            display.medium
+                            if getattr(display, 'medium', None)
+                            else ''
+                        ),
+                        quantity=bi.quantity,
+                        price=bi.price_at_addition,
+                        # snapshot selected variant info when available
+                        variant_id=(variant_obj.pk if variant_obj else None),
+                        variant_medium=(
+                            variant_obj.get_medium_display()
+                            if variant_obj
+                            else ''
+                        ),
+                    )
+
+                # Clear the basket
+                basket.clear()
+
+                messages.success(
+                    request,
+                    f'Payment successful! Order #{order.order_number}',
+                )
+                return redirect(
+                    'collections_app:order_success', order_id=order.id
+                )
+
+            except Exception as exc:
+                messages.error(request, f"Failed to create order: {exc}")
+                # Fall through to render the checkout page with an error
+
     except Basket.DoesNotExist:
-        messages.warning(request, "Your basket is empty. Please add items before checking out.")
+        messages.warning(
+            request,
+            "Your basket is empty. Please add items before checking out.",
+        )
         return redirect('collections_app:artwork_list')
     
     context = {
@@ -617,10 +792,16 @@ def checkout(request):
     return render(request, 'Vistor_pages/checkout.html', context)
 
 
+@login_required
+def order_success(request, order_id):
+    """Minimal order success page for admin test checkouts."""
+    order = get_object_or_404(Order, pk=order_id, user=request.user)
+    return render(request, 'Vistor_pages/order_success.html', {'order': order})
+
+
 # ============================================================================
 # USER DASHBOARD VIEW
 # ============================================================================
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def user_dashboard(request):

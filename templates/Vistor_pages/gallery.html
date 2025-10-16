@@ -10,7 +10,16 @@
         <div class="col-md-6 mb-4">
           <div class="card">
             {% if collection.cover_image %}
-              <img src="{{ collection.cover_image.url }}" class="card-img-top" alt="{{ collection.name }}">
+              {% with url=collection.cover_image.url %}
+                {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+                  <video class="card-img-top" controls>
+                    <source src="{{ url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                {% else %}
+                  <img src="{{ url }}" class="card-img-top" alt="{{ collection.name }}">
+                {% endif %}
+              {% endwith %}
             {% endif %}
             <div class="card-body">
               <h5 class="card-title">{{ collection.name }}</h5>

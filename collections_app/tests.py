@@ -2,8 +2,51 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from decimal import Decimal
-from .models import Artwork, Collection, Art
+from .models import Collection, Art, ArtVariant
 from owner_app.models import ArtistProfile
+
+
+def create_artwork_equivalent(title, artist, **kwargs):
+    """Helper for tests: create an Art and one ArtVariant (original) when
+    a test would previously create an Artwork. Accepts kwargs like medium,
+    width_cm, height_cm, depth_cm, price, currency, description,
+    is_available, is_featured, year_created.
+    """
+    coll, _ = Collection.objects.get_or_create(
+        artist=artist,
+        name='Test',
+    )
+    art_fields = {
+        'collection': coll,
+        'title': title,
+        'medium': kwargs.get('medium', ''),
+        'width_cm': kwargs.get('width_cm'),
+        'height_cm': kwargs.get('height_cm'),
+        'depth_cm': kwargs.get('depth_cm'),
+        'price': kwargs.get('price'),
+        'currency': kwargs.get('currency', 'USD'),
+        'description': kwargs.get('description', ''),
+        'is_available': kwargs.get('is_available', False),
+        'is_featured': kwargs.get('is_featured', False),
+        'year_created': kwargs.get('year_created'),
+    }
+    # remove keys with None so model defaults apply
+    art_fields = {k: v for k, v in art_fields.items() if v is not None}
+    art = Art.objects.create(**art_fields)
+    # create an original variant when a price is provided and available
+    if kwargs.get('is_available') and kwargs.get('price') is not None:
+        ArtVariant.objects.create(
+            art=art,
+            medium=ArtVariant.ORIGINAL,
+            is_available=True,
+            price=kwargs.get('price'),
+            currency=kwargs.get('currency', 'USD'),
+        )
+    else:
+        # create placeholders for completeness
+        ArtVariant.objects.get_or_create(art=art, medium=ArtVariant.POSTER)
+        ArtVariant.objects.get_or_create(art=art, medium=ArtVariant.DIGITAL)
+    return art
 
 
 # ============================================================================
@@ -30,10 +73,14 @@ class ArtworkModelTest(TestCase):
             bio='Test bio for artist'
         )
         
-        # Create a test artwork with price, size, and medium
-        self.artwork = Artwork.objects.create(
-            title='Test Artwork',
+        # Create a test Art with an available original variant
+        coll, _ = Collection.objects.get_or_create(
             artist=self.artist,
+            name='Test',
+        )
+        self.artwork = Art.objects.create(
+            collection=coll,
+            title='Test Artwork',
             medium='Oil on Canvas',
             width_cm=Decimal('50.00'),
             height_cm=Decimal('70.00'),
@@ -41,7 +88,14 @@ class ArtworkModelTest(TestCase):
             price=Decimal('1500.00'),
             currency='USD',
             description='A beautiful test artwork',
-            is_available=True
+            is_available=True,
+        )
+        ArtVariant.objects.create(
+            art=self.artwork,
+            medium=ArtVariant.ORIGINAL,
+            is_available=True,
+            price=Decimal('1500.00'),
+            currency='USD',
         )
     
     def test_artwork_creation(self):
@@ -75,13 +129,13 @@ class ArtworkModelTest(TestCase):
         Should return formatted string: "Width x Height cm"
         """
         # Create a 2D artwork (no depth)
-        artwork_2d = Artwork.objects.create(
-            title='2D Artwork',
-            artist=self.artist,
+        artwork_2d = create_artwork_equivalent(
+            '2D Artwork', self.artist,
             medium='Watercolor',
             width_cm=Decimal('30.00'),
             height_cm=Decimal('40.00'),
-            price=Decimal('500.00')
+            price=Decimal('500.00'),
+            is_available=True,
         )
         
         # Test size display format
@@ -103,14 +157,17 @@ class ArtworkModelTest(TestCase):
         Should return "Size not specified"
         """
         # Create artwork without dimensions
-        artwork_no_size = Artwork.objects.create(
-            title='No Size Artwork',
-            artist=self.artist,
+        artwork_no_size = create_artwork_equivalent(
+            'No Size Artwork', self.artist,
             medium='Digital',
-            price=Decimal('200.00')
+            price=Decimal('200.00'),
+            is_available=True,
         )
         
-        self.assertEqual(artwork_no_size.get_size_display(), "Size not specified")
+        self.assertEqual(
+            artwork_no_size.get_size_display(),
+            "Size not specified",
+        )
     
     def test_get_price_display(self):
         """
@@ -126,13 +183,16 @@ class ArtworkModelTest(TestCase):
         Should return "Price not available"
         """
         # Create artwork without price
-        artwork_no_price = Artwork.objects.create(
-            title='No Price Artwork',
-            artist=self.artist,
-            medium='Sketch'
+        artwork_no_price = create_artwork_equivalent(
+            'No Price Artwork', self.artist,
+            medium='Sketch',
+            is_available=False,
         )
         
-        self.assertEqual(artwork_no_price.get_price_display(), "Price not available")
+        self.assertEqual(
+            artwork_no_price.get_price_display(),
+            "Price not available",
+        )
     
     def test_artwork_medium_field(self):
         """
@@ -150,11 +210,11 @@ class ArtworkModelTest(TestCase):
         ]
         
         for medium in mediums:
-            artwork = Artwork.objects.create(
-                title=f'Artwork {medium}',
-                artist=self.artist,
+            artwork = create_artwork_equivalent(
+                f'Artwork {medium}', self.artist,
                 medium=medium,
-                price=Decimal('100.00')
+                price=Decimal('100.00'),
+                is_available=True,
             )
             self.assertEqual(artwork.medium, medium)
     
@@ -167,12 +227,11 @@ class ArtworkModelTest(TestCase):
         self.assertTrue(self.artwork.is_available)
         
         # Create unavailable artwork
-        unavailable_artwork = Artwork.objects.create(
-            title='Unavailable Artwork',
-            artist=self.artist,
+        unavailable_artwork = create_artwork_equivalent(
+            'Unavailable Artwork', self.artist,
             medium='Sculpture',
             price=Decimal('5000.00'),
-            is_available=False
+            is_available=False,
         )
         
         self.assertFalse(unavailable_artwork.is_available)
@@ -186,12 +245,12 @@ class ArtworkModelTest(TestCase):
         self.assertFalse(self.artwork.is_featured)
         
         # Create featured artwork
-        featured_artwork = Artwork.objects.create(
-            title='Featured Artwork',
-            artist=self.artist,
+        featured_artwork = create_artwork_equivalent(
+            'Featured Artwork', self.artist,
             medium='Oil Painting',
             price=Decimal('3000.00'),
-            is_featured=True
+            is_featured=True,
+            is_available=True,
         )
         
         self.assertTrue(featured_artwork.is_featured)
@@ -217,33 +276,30 @@ class ArtworkListViewTest(TestCase):
         )
         
         # Create multiple test artworks
-        self.artwork1 = Artwork.objects.create(
-            title='Artwork 1',
-            artist=self.artist,
+        self.artwork1 = create_artwork_equivalent(
+            'Artwork 1', self.artist,
             medium='Oil on Canvas',
             width_cm=Decimal('40.00'),
             height_cm=Decimal('60.00'),
             price=Decimal('1000.00'),
-            is_available=True
+            is_available=True,
         )
-        
-        self.artwork2 = Artwork.objects.create(
-            title='Artwork 2',
-            artist=self.artist,
+
+        self.artwork2 = create_artwork_equivalent(
+            'Artwork 2', self.artist,
             medium='Acrylic',
             width_cm=Decimal('50.00'),
             height_cm=Decimal('70.00'),
             price=Decimal('1500.00'),
-            is_available=True
+            is_available=True,
         )
-        
+
         # Create unavailable artwork (should not appear in list)
-        self.artwork3 = Artwork.objects.create(
-            title='Unavailable Artwork',
-            artist=self.artist,
+        self.artwork3 = create_artwork_equivalent(
+            'Unavailable Artwork', self.artist,
             medium='Watercolor',
             price=Decimal('500.00'),
-            is_available=False
+            is_available=False,
         )
         
         self.client = Client()
@@ -376,9 +432,8 @@ class ArtworkDetailViewTest(TestCase):
             email='detailtest@example.com'
         )
         
-        self.artwork = Artwork.objects.create(
-            title='Detail Test Artwork',
-            artist=self.artist,
+        self.artwork = create_artwork_equivalent(
+            'Detail Test Artwork', self.artist,
             medium='Mixed Media',
             width_cm=Decimal('100.00'),
             height_cm=Decimal('150.00'),
@@ -387,7 +442,7 @@ class ArtworkDetailViewTest(TestCase):
             currency='USD',
             description='Detailed artwork description',
             year_created=2024,
-            is_available=True
+            is_available=True,
         )
         
         self.client = Client()
@@ -488,25 +543,23 @@ class FeaturedArtworksViewTest(TestCase):
         )
         
         # Create featured artwork
-        self.featured_artwork = Artwork.objects.create(
-            title='Featured Artwork',
-            artist=self.artist,
+        self.featured_artwork = create_artwork_equivalent(
+            'Featured Artwork', self.artist,
             medium='Oil Painting',
             width_cm=Decimal('80.00'),
             height_cm=Decimal('100.00'),
             price=Decimal('5000.00'),
             is_available=True,
-            is_featured=True
+            is_featured=True,
         )
-        
+
         # Create non-featured artwork
-        self.regular_artwork = Artwork.objects.create(
-            title='Regular Artwork',
-            artist=self.artist,
+        self.regular_artwork = create_artwork_equivalent(
+            'Regular Artwork', self.artist,
             medium='Watercolor',
             price=Decimal('500.00'),
             is_available=True,
-            is_featured=False
+            is_featured=False,
         )
         
         self.client = Client()

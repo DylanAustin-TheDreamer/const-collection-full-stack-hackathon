@@ -255,10 +255,10 @@
                 <div class="d-flex mb-3 pb-3 border-bottom">
                   <!-- Artwork Image -->
                   <div class="flex-shrink-0 me-3">
-                    {% if item.artwork.image %}
+                    {% if item.display_artwork.image %}
                       <img 
-                        src="{{ item.artwork.image.url }}" 
-                        alt="{{ item.artwork.title }}"
+                        src="{{ item.display_artwork.image.url }}" 
+                        alt="{{ item.display_artwork.title }}"
                         class="rounded"
                         style="width: 80px; height: 80px; object-fit: cover;"
                       >
@@ -273,14 +273,17 @@
                   </div>
                   
                   <!-- Item Details -->
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1">{{ item.artwork.title }}</h6>
+                    <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ item.display_artwork.title }}</h6>
                     <small class="text-muted d-block mb-2">
-                      by {{ item.artwork.artist.name }}
+                      by {{ item.display_artwork.artist.name }}
                     </small>
+                    {% if item.variant %}
+                      <div class="small text-muted mb-2">Format: {{ item.variant.get_medium_display }}</div>
+                    {% endif %}
                     <div class="d-flex justify-content-between align-items-center">
                       <span class="text-muted">Qty: {{ item.quantity }}</span>
-                      <span class="fw-bold">${{ item.get_total_price }}</span>
+                      <span class="fw-bold">${{ item.get_subtotal|floatformat:2 }}</span>
                     </div>
                   </div>
                 </div>

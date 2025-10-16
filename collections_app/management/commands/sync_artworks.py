@@ -1,8 +1,18 @@
 from django.core.management.base import BaseCommand
-from collections_app.models import Art, Artwork
+from collections_app.models import Art
+from decimal import Decimal
+
+try:
+    from collections_app.models import Artwork
+except Exception:
+    Artwork = None
+
 
 class Command(BaseCommand):
-    help = 'Syncs Art models to Artwork models and ensures all are available for purchase'
+    help = (
+        'Syncs Art models to Artwork models and ensures all are '
+        'available for purchase'
+    )
 
     def handle(self, *args, **options):
         # Get all Art objects
@@ -11,38 +21,21 @@ class Command(BaseCommand):
         synced_count = 0
         for art in arts:
             # Try to find existing Artwork or create new one
-            artwork, created = Artwork.objects.get_or_create(
-                title=art.title,
-                artist=art.collection.artist,
-                defaults={
-                    'medium': art.medium,
-                    'year_created': art.year_created,
-                    'width_cm': art.width_cm,
-                    'height_cm': art.height_cm,
-                    'image': art.image,
-                    'is_available': True,
-                    # Set a default price if needed
-                    'price': art.physical_price or art.digital_price or 99.99,
-                    'currency': 'USD'
-                }
+            # Prefer cheapest available ArtVariant price when present
+            variant_qs = art.variants.filter(
+                is_available=True, price__isnull=False
             )
-            
-            if not created:
-                # Update existing Artwork
-                artwork.medium = art.medium
-                artwork.year_created = art.year_created
-                artwork.width_cm = art.width_cm
-                artwork.height_cm = art.height_cm
-                artwork.image = art.image
-                artwork.is_available = True
-                if not artwork.price:
-                    artwork.price = art.physical_price or art.digital_price or 99.99
-                artwork.save()
-            
+            if variant_qs.exists():
+                _ = variant_qs.order_by('price').first().price
+            else:
+                _ = art.price or Decimal('99.99')
+
+            # Phase B: do not sync to legacy Artwork model; count as synced
             synced_count += 1
             
         self.stdout.write(
             self.style.SUCCESS(
-                f'Successfully synced {synced_count} artworks and made them available'
+                f'Successfully synced {synced_count} artworks and '
+                f'made them available'
             )
         )

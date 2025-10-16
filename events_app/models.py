@@ -21,7 +21,8 @@ class Exhibition(models.Model):
     )
     location = models.CharField(max_length=255, blank=True)
 
-    cover_image = CloudinaryField(resource_type='image', blank=True, null=True)
+    # allow either image or video uploads for exhibition cover
+    cover_image = CloudinaryField(resource_type='auto', blank=True, null=True)
 
     def __str__(self):
         return self.title

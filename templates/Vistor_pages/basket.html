@@ -56,10 +56,10 @@
                         <!-- Artwork Image and Title -->
                         <td style="width: 200px;">
                           <div class="d-flex align-items-center">
-                            {% if item.artwork.image %}
+                            {% if item.display_artwork.image %}
                               <img 
-                                src="{{ item.artwork.image.url }}" 
-                                alt="{{ item.artwork.title }}"
+                                src="{{ item.display_artwork.image.url }}" 
+                                alt="{{ item.display_artwork.title }}"
                                 class="img-thumbnail me-2"
                                 style="width: 80px; height: 80px; object-fit: cover;"
                               >
@@ -73,11 +73,11 @@
                             {% endif %}
                             <div>
                               <strong>
-                                <a 
-                                  href="{% url 'collections_app:artwork_detail' item.artwork.pk %}"
+                                  <a 
+                                  href="{% url 'collections_app:artwork_detail' item.display_artwork.pk %}"
                                   class="text-decoration-none"
                                 >
-                                  {{ item.artwork.title }}
+                                  {{ item.display_artwork.title }}
                                 </a>
                               </strong>
                             </div>
@@ -87,12 +87,16 @@
                         <!-- Artwork Details -->
                         <td>
                           <small class="text-muted">
-                            <div><strong>Artist:</strong> {{ item.artwork.artist.name }}</div>
-                            {% if item.artwork.medium %}
-                              <div><strong>Medium:</strong> {{ item.artwork.medium }}</div>
+                            <div><strong>Artist:</strong> {{ item.display_artwork.artist.name }}</div>
+                            {% if item.variant %}
+                              <div><strong>Format:</strong> {{ item.variant.get_medium_display }}</div>
+                            {% else %}
+                              {% if item.display_artwork.medium %}
+                                <div><strong>Medium:</strong> {{ item.display_artwork.medium }}</div>
+                              {% endif %}
                             {% endif %}
-                            {% if item.artwork.get_size_display %}
-                              <div><strong>Size:</strong> {{ item.artwork.get_size_display }}</div>
+                            {% if item.display_artwork.get_size_display %}
+                              <div><strong>Size:</strong> {{ item.display_artwork.get_size_display }}</div>
                             {% endif %}
                           </small>
                         </td>
@@ -137,6 +141,9 @@
                         <!-- Price -->
                         <td class="text-end">
                           <strong>${{ item.price_at_addition|floatformat:2 }}</strong>
+                          {% if item.variant and item.variant.currency and item.variant.currency != item.display_artwork.currency %}
+                            <div class="small text-muted">{{ item.variant.currency }}</div>
+                          {% endif %}
                         </td>
 
                         <!-- Subtotal -->
@@ -152,7 +159,7 @@
                             method="post" 
                             action="{% url 'collections_app:remove_from_basket' item.id %}"
                             class="d-inline"
-                            onsubmit="return confirm('Remove {{ item.artwork.title }} from basket?');"
+                            onsubmit="return confirm('Remove {{ item.display_artwork.title }} from basket?');"
                           >
                             {% csrf_token %}
                             <button 
@@ -307,64 +314,7 @@
   </div>
 
   <!-- JavaScript for Quantity Controls -->
-  <script>
-    /**
-     * Increment quantity for a basket item
-     * Updates the quantity input and submits the form
-     */
-    function incrementQuantity(itemId) {
-      const input = document.getElementById(`quantity-${itemId}`);
-      const currentValue = parseInt(input.value);
-      const maxValue = parseInt(input.max);
-      
-      if (currentValue < maxValue) {
-        input.value = currentValue + 1;
-        updateQuantity(itemId);
-      }
-    }
-
-    /**
-     * Decrement quantity for a basket item
-     * Updates the quantity input and submits the form
-     * Removes item if quantity becomes 0
-     */
-    function decrementQuantity(itemId) {
-      const input = document.getElementById(`quantity-${itemId}`);
-      const currentValue = parseInt(input.value);
-      
-      if (currentValue > 1) {
-        input.value = currentValue - 1;
-        updateQuantity(itemId);
-      } else if (currentValue === 1) {
-        if (confirm('Remove this item from your basket?')) {
-          input.value = 0;
-          updateQuantity(itemId);
-        }
-      }
-    }
-
-    /**
-     * Update basket item quantity via AJAX
-     * Submits the update form for the specified item
-     */
-    function updateQuantity(itemId) {
-      const form = document.querySelector(`#basket-item-${itemId} .update-quantity-form`);
-      if (form) {
-        form.submit();
-      }
-    }
-
-    /**
-     * Handle quantity input change
-     * Automatically submit form when user types a new quantity
-     */
-    document.querySelectorAll('input[name="quantity"]').forEach(input => {
-      input.addEventListener('change', function() {
-        const itemId = this.id.split('-')[1];
-        updateQuantity(itemId);
-      });
-    });
-  </script>
+  <!-- quantity controls handled in static/js/main.js -->
 
   <!-- Include Bootstrap Icons if not already included -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">

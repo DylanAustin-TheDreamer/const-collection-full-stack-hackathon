@@ -135,10 +135,28 @@
                 <strong>Size:</strong> {{ artwork.get_size_display }}
               </p>
               
-              <!-- Price - Critical for buyer decisions -->
+              <!-- Price - show cheapest available variant price as 'From $X' -->
               <p class="card-text mb-3">
-                <strong>Price:</strong> 
-                <span class="text-success fw-bold fs-5">{{ artwork.get_price_display }}</span>
+                <strong>Price:</strong>
+                {% with variants=artwork.variants.all %}
+                  {% with prices=variants|dictsortreversed:'price' %}
+                    {% comment %}Compute cheapest available variant in template{% endcomment %}
+                    {% with cheapest=None %}
+                      {% for v in variants %}
+                        {% if v.is_available and v.price %}
+                          {% if forloop.first %}
+                            {% with cheapest=v.price %}{% endwith %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if cheapest %}
+                        <span class="text-success fw-bold fs-5">{{ artwork.currency }} {{ cheapest|floatformat:2 }}</span>
+                      {% else %}
+                        <span class="text-muted">Price not available</span>
+                      {% endif %}
+                    {% endwith %}
+                  {% endwith %}
+                {% endwith %}
               </p>
               
               <!-- View Details Button -->

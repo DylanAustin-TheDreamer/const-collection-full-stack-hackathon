@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Collection, Art, Artwork, Basket, BasketItem, Order, OrderItem
+from .models import Collection, Art, Basket, BasketItem, Order, OrderItem
+from .models import ArtVariant
 
 
 @admin.register(Collection)
@@ -30,10 +31,7 @@ class ArtAdmin(admin.ModelAdmin):
         'title',
         'collection',
         'year_created',
-        'physical_available',
-        'physical_price',
-        'digital_available',
-        'digital_price',
+        'image_preview',
         'image_preview',
     )
     search_fields = ('title', 'collection__name')
@@ -50,104 +48,30 @@ class ArtAdmin(admin.ModelAdmin):
     image_preview.short_description = 'Image'
 
 
+# Inline admin for ArtVariant
+class ArtVariantInline(admin.TabularInline):
+    model = ArtVariant
+    extra = 1
+    fields = ('medium', 'is_available', 'price', 'currency')
+
+
 # Inline so admins can add Art from a Collection page
 class ArtInline(admin.TabularInline):
     model = Art
     extra = 1
-    fields = ('title', 'image', 'physical_available', 'physical_price')
+    fields = ('title', 'image')
 
 
 # Attach the inline to the CollectionAdmin dynamically to avoid
 # import order issues
 CollectionAdmin.inlines = [ArtInline]
 
+# Attach ArtVariantInline to ArtAdmin so variants can be edited in the Art admin
+# Ensure we're concatenating tuples to match Django's expected type
+ArtAdmin.inlines = getattr(ArtAdmin, 'inlines', ()) + (ArtVariantInline,)
 
-# ============================================================================
-# ARTWORK ADMIN - Admin interface for the new Artwork model
-# ============================================================================
 
-@admin.register(Artwork)
-class ArtworkAdmin(admin.ModelAdmin):
-    """
-    Admin interface for Artwork model.
-    Provides comprehensive management of artworks with price, size, and medium.
-    """
-    
-    list_display = (
-        'title',
-        'artist',
-        'medium',
-        'price',
-        'currency',
-        'size_display',
-        'is_available',
-        'is_featured',
-        'created_at',
-        'artwork_image_preview',
-    )
-    
-    list_filter = (
-        'is_available',
-        'is_featured',
-        'currency',
-        'artist',
-        'created_at',
-    )
-    
-    search_fields = (
-        'title',
-        'artist__name',
-        'medium',
-        'description',
-    )
-    
-    list_editable = (
-        'is_available',
-        'is_featured',
-        'price',
-    )
-    
-    readonly_fields = (
-        'created_at',
-        'updated_at',
-        'artwork_image_preview',
-    )
-    
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('title', 'artist', 'description', 'image', 'artwork_image_preview')
-        }),
-        ('Artwork Details', {
-            'fields': ('medium', 'year_created', 'width_cm', 'height_cm', 'depth_cm')
-        }),
-        ('Pricing', {
-            'fields': ('price', 'currency', 'is_available')
-        }),
-        ('Display Options', {
-            'fields': ('is_featured',)
-        }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    def artwork_image_preview(self, obj):
-        """Display artwork image preview in admin"""
-        if obj.image:
-            return format_html(
-                '<img src="{}" style="max-height:200px; max-width:200px;" />',
-                obj.image.url,
-            )
-        return 'No image'
-    
-    artwork_image_preview.short_description = 'Image Preview'
-    
-    def size_display(self, obj):
-        """Display formatted size in list view"""
-        return obj.get_size_display()
-    
-    size_display.short_description = 'Size'
+# Artwork admin removed — Artwork model has been consolidated into Art
 
 
 # ============================================================================
@@ -162,7 +86,14 @@ class BasketItemInline(admin.TabularInline):
     model = BasketItem
     extra = 0
     readonly_fields = ('added_at', 'get_subtotal_display')
-    fields = ('artwork', 'quantity', 'price_at_addition', 'added_at', 'get_subtotal_display')
+    fields = (
+        'art',
+        'variant',
+        'quantity',
+        'price_at_addition',
+        'added_at',
+        'get_subtotal_display',
+    )
     
     def get_subtotal_display(self, obj):
         """Display subtotal for each basket item"""
@@ -190,7 +121,12 @@ class BasketAdmin(admin.ModelAdmin):
     
     list_filter = ('created_at', 'updated_at')
     search_fields = ('user__username', 'user__email')
-    readonly_fields = ('created_at', 'updated_at', 'get_total_display', 'get_item_count_display')
+    readonly_fields = (
+        'created_at',
+        'updated_at',
+        'get_total_display',
+        'get_item_count_display',
+    )
     
     inlines = [BasketItemInline]
     
@@ -216,7 +152,7 @@ class BasketItemAdmin(admin.ModelAdmin):
     
     list_display = (
         'basket',
-        'artwork',
+        'art',
         'quantity',
         'price_at_addition',
         'get_subtotal_display',
@@ -224,7 +160,7 @@ class BasketItemAdmin(admin.ModelAdmin):
     )
     
     list_filter = ('added_at',)
-    search_fields = ('basket__user__username', 'artwork__title')
+    search_fields = ('basket__user__username', 'art__title')
     readonly_fields = ('added_at', 'get_subtotal_display')
     
     def get_subtotal_display(self, obj):
@@ -245,8 +181,24 @@ class OrderItemInline(admin.TabularInline):
     """
     model = OrderItem
     extra = 0
-    readonly_fields = ('artwork', 'artwork_title', 'artwork_artist', 'artwork_medium', 'quantity', 'price', 'get_subtotal_display')
-    fields = ('artwork', 'artwork_title', 'artwork_artist', 'quantity', 'price', 'get_subtotal_display')
+    # Use the snapshot field names defined on OrderItem model
+    readonly_fields = (
+        'art',
+        'artwork_title',
+        'artwork_artist',
+        'artwork_medium',
+        'quantity',
+        'price',
+        'get_subtotal_display',
+    )
+    fields = (
+        'art',
+        'artwork_title',
+        'artwork_artist',
+        'quantity',
+        'price',
+        'get_subtotal_display',
+    )
     
     def get_subtotal_display(self, obj):
         """Display subtotal for each order item"""
@@ -315,7 +267,13 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('full_name', 'email')
         }),
         ('Billing Address', {
-            'fields': ('address_line1', 'address_line2', 'city', 'postal_code', 'country')
+            'fields': (
+                'address_line1',
+                'address_line2',
+                'city',
+                'postal_code',
+                'country',
+            )
         }),
         ('Payment Details', {
             'fields': ('payment_method', 'stripe_payment_intent')
@@ -343,6 +301,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     View individual order items.
     """
     
+    # Show the stored snapshot fields from the OrderItem model
     list_display = (
         'order',
         'artwork_title',
@@ -355,7 +314,10 @@ class OrderItemAdmin(admin.ModelAdmin):
     
     list_filter = ('order__created_at',)
     search_fields = ('order__order_number', 'artwork_title', 'artwork_artist')
-    readonly_fields = ('order', 'artwork', 'artwork_title', 'artwork_artist', 'artwork_medium', 'quantity', 'price')
+    readonly_fields = (
+        'order', 'art', 'artwork_title', 'artwork_artist',
+        'artwork_medium', 'quantity', 'price'
+    )
     
     def get_subtotal_display(self, obj):
         """Display subtotal for order item"""

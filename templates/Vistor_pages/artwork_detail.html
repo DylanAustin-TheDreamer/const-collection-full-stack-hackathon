@@ -38,10 +38,41 @@
             </a>
           </p>
 
-          <!-- Price -->
+          <!-- Price / Variants -->
           <div class="mb-4">
-            <p class="h4 mb-1">{{ price_display }}</p>
-            <small class="text-muted">{{ artwork.currency }}</small>
+            <p class="h4 mb-1" id="main-price">{{ price_display }}</p>
+            <small class="text-muted" id="main-currency">{{ artwork.currency }}</small>
+          </div>
+
+          <!-- Variants list integrated with radio selectors (preferred order already applied in view) -->
+          <div class="mb-3">
+            <p class="small text-muted mb-2">Available formats</p>
+            <ul class="list-group">
+              {% for v in variants %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ v.get_medium_display }}</strong>
+                    {% if not v.is_available %}
+                      <span class="badge bg-secondary ms-2">Unavailable</span>
+                    {% endif %}
+                  </div>
+
+                  <div>
+                    {% if v.is_available %}
+                      <div class="form-check">
+                        {# Top radios carry data attributes for price and currency; visible price removed from selection #}
+                        <input class="form-check-input" type="radio" name="variant_top" id="top-variant-{{ v.pk }}" value="{{ v.pk }}" data-price="{{ v.price|default_if_none:'' }}" data-currency="{{ v.currency|default:artwork.currency }}" {% if default_variant_pk and v.pk == default_variant_pk %}checked{% elif not default_variant_pk and forloop.first %}checked{% endif %}>
+                        <label class="form-check-label small" for="top-variant-{{ v.pk }}">Select</label>
+                      </div>
+                    {% else %}
+                      <span class="badge bg-secondary">Unavailable</span>
+                    {% endif %}
+                  </div>
+                </li>
+              {% empty %}
+                <li class="list-group-item">No variants available</li>
+              {% endfor %}
+            </ul>
           </div>
 
           <!-- Artwork Info -->
@@ -70,14 +101,18 @@
 
           <!-- Purchase Actions -->
           {% if artwork.is_available %}
-            {% if user.is_authenticated %}
-              <form method="post" 
-                    action="{% url 'collections_app:add_to_basket' artwork.pk %}"
-                    id="add-to-basket-form"
-                    class="mb-3">
+      {% if user.is_authenticated %}
+      <form method="post" 
+        action="{% url 'collections_app:add_to_basket' artwork.pk %}"
+        id="add-to-basket-form"
+        class="mb-3"
+        data-art-title="{{ artwork.title|escapejs }}">
                 {% csrf_token %}
                 <input type="hidden" name="quantity" value="1">
                 <input type="hidden" name="next" value="{% url 'collections_app:artwork_detail' artwork.pk %}">
+                {# Hidden variant id that will be filled from the top radio group by JS #}
+                <input type="hidden" name="variant_id" id="add-to-basket-variant-id" value="">
+
                 <button type="submit" 
                         class="btn btn-outline-primary w-100"
                         id="add-to-basket-btn">
@@ -134,35 +169,5 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById('add-to-basket-form')?.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = this;
-      const btn = document.getElementById('add-to-basket-btn');
-      btn.disabled = true;
-
-      fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          showToast('Added to basket successfully!', 'success');
-          updateBasketCount();
-        } else {
-          showToast('Failed to add to basket. Please try again.', 'error');
-        }
-      })
-      .catch(() => {
-        showToast('An error occurred. Please try again.', 'error');
-      })
-      .finally(() => {
-        btn.disabled = false;
-      });
-    });
-  </script>
+  <!-- add-to-basket behavior is handled in static/js/main.js -->
 {% endblock %}

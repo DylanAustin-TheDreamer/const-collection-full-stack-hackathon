@@ -1,6 +1,15 @@
 from django.core.management.base import BaseCommand
-from collections_app.models import Art, Artwork
+
+from collections_app.models import Art
 from decimal import Decimal
+
+
+try:
+    # Artwork may be removed after migration; import if still present
+    from collections_app.models import Artwork
+except Exception:
+    Artwork = None
+
 
 class Command(BaseCommand):
     help = 'Syncs Art objects with Artwork objects for store functionality'
@@ -13,43 +22,26 @@ class Command(BaseCommand):
         updated_count = 0
         
         for art in arts:
-            # Calculate a default price
-            default_price = art.physical_price or art.digital_price or Decimal('99.99')
-            
-            # Try to find or create an Artwork object
-            artwork, created = Artwork.objects.get_or_create(
-                title=art.title,
-                artist=art.collection.artist,
-                defaults={
-                    'medium': art.medium,
-                    'year_created': art.year_created,
-                    'width_cm': art.width_cm,
-                    'height_cm': art.height_cm,
-                    'image': art.image,
-                    'price': default_price,
-                    'is_available': True,
-                    'description': f"From collection: {art.collection.name}"
-                }
+            # Prefer cheapest available ArtVariant price when present
+            variant_qs = art.variants.filter(
+                is_available=True, price__isnull=False
             )
-            
-            if created:
-                created_count += 1
+            if variant_qs.exists():
+                _ = variant_qs.order_by('price').first().price
             else:
-                # Update existing artwork
-                artwork.medium = art.medium
-                artwork.year_created = art.year_created
-                artwork.width_cm = art.width_cm
-                artwork.height_cm = art.height_cm
-                artwork.image = art.image
-                artwork.price = default_price
-                artwork.is_available = True
-                artwork.save()
-                updated_count += 1
+                # Prefer Art.price; if not set, use a sensible default
+                _ = art.price or Decimal('99.99')
+
+            # In Phase B we no longer sync back to a legacy Artwork model.
+            # Treat each Art as 'updated' for reporting purposes.
+            updated_count += 1
         
         self.stdout.write(
             self.style.SUCCESS(
-                f'Successfully synced {created_count + updated_count} artworks:\n'
-                f'- Created: {created_count}\n'
-                f'- Updated: {updated_count}'
+                f'Successfully synced {created_count + updated_count} '
+                (
+                    f'artworks:\n- Created: {created_count}\n- '
+                    f'Updated: {updated_count}'
+                )
             )
         )

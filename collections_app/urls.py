@@ -60,6 +60,7 @@ urlpatterns = [
     
     # Checkout page with order summary and billing form
     path('checkout/', views.checkout, name='checkout'),
+    path('order/success/<int:order_id>/', views.order_success, name='order_success'),
     
     # User dashboard
     path('dashboard/', views.user_dashboard, name='user_dashboard'),
