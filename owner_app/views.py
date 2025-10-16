@@ -4,6 +4,7 @@ from .forms import ArtistProfileForm
 from collections_app.forms import ArtForm
 from collections_app.forms_collection import CollectionForm
 from collections_app.models import Art
+from collections_app.models import Collection
 from events_app.forms import ExhibitionForm
 from events_app.models import Exhibition
 from django.contrib.auth.decorators import user_passes_test
@@ -107,6 +108,52 @@ def exhibitions_list(request):
         request,
         'owner_pages/exhibitions_list.html',
         {'exhibitions': exhibitions},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def collections_list(request):
+    """Owner view: list collections with edit links."""
+    collections = Collection.objects.select_related('artist').all()
+    return render(
+        request,
+        'owner_pages/collections_list.html',
+        {'collections': collections},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def create_collection(request):
+    if request.method == 'POST':
+        form = CollectionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('owner_app:collections_list')
+    else:
+        form = CollectionForm()
+
+    return render(
+        request,
+        'owner_pages/collection_form.html',
+        {'form': form},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def edit_collection(request, pk):
+    collection = Collection.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = CollectionForm(request.POST, request.FILES, instance=collection)
+        if form.is_valid():
+            form.save()
+            return redirect('owner_app:collections_list')
+    else:
+        form = CollectionForm(instance=collection)
+
+    return render(
+        request,
+        'owner_pages/collection_form.html',
+        {'form': form, 'collection': collection, 'edit': True},
     )
 
 

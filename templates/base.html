@@ -27,10 +27,11 @@
               <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
             </ul>
             <ul class="navbar-nav">
-              <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
                 {% if request.user.is_superuser %}
                   <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:art_list' %}">Manage Art</a></li>
                   <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:create_art' %}">Add New Artwork</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:collections_list' %}">Manage Collections</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:create_collection' %}">Create Collection</a></li>
                   <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:exhibitions_list' %}">Manage Exhibitions</a></li>
                   <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:create_exhibition' %}">Create Exhibition</a></li>
                   <li class="nav-item"><a class="nav-link" href="{% url 'owner_app:edit_artist' %}">Edit About</a></li>

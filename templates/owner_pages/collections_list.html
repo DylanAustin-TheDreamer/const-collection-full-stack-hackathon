@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Collections{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Collections</h2>
+    <a class="btn btn-primary" href="{% url 'owner_app:create_collection' %}">Create Collection</a>
+  </div>
+
+  <table class="table mt-3">
+    <thead>
+      <tr>
+        <th>Cover</th>
+        <th>Name</th>
+        <th>Artist</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in collections %}
+        <tr>
+          <td>
+            {% if c.cover_image %}
+              {% with url=c.cover_image.url %}
+                {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+                  <video style="height:60px;" muted>
+                    <source src="{{ url }}" type="video/mp4">
+                  </video>
+                {% else %}
+                  <img src="{{ url }}" alt="{{ c.name }}" style="height:60px;">
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+          </td>
+          <td>{{ c.name }}</td>
+          <td>{{ c.artist.name }}</td>
+          <td>
+            <a class="btn btn-sm btn-secondary" href="{% url 'owner_app:edit_collection' c.pk %}">Edit</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">No collections yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

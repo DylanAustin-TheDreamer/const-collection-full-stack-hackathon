@@ -11,7 +11,8 @@ class Collection(models.Model):
     )
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    cover_image = CloudinaryField(resource_type='image', blank=True, null=True)
+    # allow either image or video uploads for collection cover
+    cover_image = CloudinaryField(resource_type='auto', blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} ({self.artist})"
