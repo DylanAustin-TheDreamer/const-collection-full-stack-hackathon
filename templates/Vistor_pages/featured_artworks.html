@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Featured Artworks | Const Collection{% endblock %}
+
+{% block content %}
+  <!-- 
+    FEATURED ARTWORKS PAGE
+    Purpose: Showcase curated featured artworks with price, size, and medium
+    Helps highlight special pieces for potential buyers
+  -->
+  
+  <div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12 text-center">
+        <h1 class="display-3">⭐ Featured Artworks</h1>
+        <p class="lead text-muted">Handpicked masterpieces from our collection</p>
+        <hr class="w-50 mx-auto">
+      </div>
+    </div>
+
+    <!-- Featured Artworks Grid -->
+    <div class="row">
+      {% for artwork in featured_artworks %}
+        <!-- Individual Featured Artwork Card -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-lg border-warning" style="border-width: 3px;">
+            <!-- Featured Badge -->
+            <div class="position-absolute top-0 end-0 m-2">
+              <span class="badge bg-warning text-dark fs-6">⭐ Featured</span>
+            </div>
+            
+            <!-- Artwork Image -->
+            {% if artwork.image %}
+              <img 
+                src="{{ artwork.image.url }}" 
+                class="card-img-top" 
+                alt="{{ artwork.title }}"
+                style="height: 300px; object-fit: cover;"
+              >
+            {% else %}
+              <!-- Placeholder if no image -->
+              <div 
+                class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                style="height: 300px;"
+              >
+                <span class="text-muted">No Image</span>
+              </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+              <!-- Artwork Title -->
+              <h4 class="card-title">{{ artwork.title }}</h4>
+              
+              <!-- Artist Name -->
+              <p class="card-text text-muted mb-3">
+                <small>by <strong>{{ artwork.artist.name }}</strong></small>
+              </p>
+              
+              <!-- Key Information: Medium, Size, Price -->
+              <div class="mb-3">
+                <!-- Medium -->
+                <div class="mb-2">
+                  <strong>Medium:</strong>
+                  <br>
+                  <span class="badge bg-secondary">{{ artwork.medium|default:"Not specified" }}</span>
+                </div>
+                
+                <!-- Size -->
+                <div class="mb-2">
+                  <strong>Size:</strong>
+                  <br>
+                  <span class="text-muted">{{ artwork.get_size_display }}</span>
+                </div>
+                
+                <!-- Price -->
+                <div class="mb-2">
+                  <strong>Price:</strong>
+                  <br>
+                  <span class="text-success fw-bold fs-4">{{ artwork.get_price_display }}</span>
+                </div>
+              </div>
+              
+              <!-- Short Description (if available) -->
+              {% if artwork.description %}
+                <p class="card-text text-muted small">
+                  {{ artwork.description|truncatewords:20 }}
+                </p>
+              {% endif %}
+              
+              <!-- View Details Button -->
+              <div class="mt-auto">
+                <a 
+                  href="{% url 'collections_app:artwork_detail' artwork.pk %}" 
+                  class="btn btn-warning text-dark w-100 fw-bold"
+                >
+                  View Full Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <!-- Message when no featured artworks -->
+        <div class="col-12">
+          <div class="alert alert-warning text-center" role="alert">
+            <h4 class="alert-heading">No Featured Artworks Yet</h4>
+            <p>Check back soon for our handpicked selection of exceptional artworks!</p>
+            <hr>
+            <a href="{% url 'collections_app:artwork_list' %}" class="btn btn-primary">
+              Browse All Artworks
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Call to Action -->
+    {% if featured_artworks %}
+      <div class="row mt-5">
+        <div class="col-12 text-center">
+          <h4>Interested in more artworks?</h4>
+          <a href="{% url 'collections_app:artwork_list' %}" class="btn btn-primary btn-lg mt-3">
+            Browse Full Collection →
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

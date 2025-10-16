@@ -1,0 +1,102 @@
+/* Basket Page Minimalist Styling */
+.basket-container {
+    background-color: #ffffff;
+}
+
+/* Header styling */
+.basket-header h1 {
+    color: #000000;
+    font-weight: 300;
+}
+
+/* Card styling */
+.basket-card {
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+    box-shadow: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.basket-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Table styling */
+.basket-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.basket-table th {
+    background-color: #f8f8f8;
+    color: #000000;
+    font-weight: 500;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.basket-table td {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Quantity controls */
+.quantity-control {
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+}
+
+.quantity-control:hover {
+    background-color: #f8f8f8;
+}
+
+/* Accent stripe */
+.accent-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, 
+        #ff6b6b 0%, 
+        #4ecdc4 50%, 
+        #45b7d1 100%
+    );
+    margin: 0 0 2rem 0;
+    width: 100px;
+}
+
+/* Buttons styling */
+.btn-minimal {
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.btn-minimal:hover {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.btn-minimal-danger {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.btn-minimal-danger:hover {
+    background-color: #ff6b6b;
+    color: #ffffff;
+}
+
+/* Summary card */
+.summary-card {
+    background-color: #ffffff;
+    border: 2px solid #000000;
+}
+
+.summary-header {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 1rem;
+}
+
+/* Empty basket styling */
+.empty-basket-icon {
+    color: #e0e0e0;
+    font-size: 4rem;
+}

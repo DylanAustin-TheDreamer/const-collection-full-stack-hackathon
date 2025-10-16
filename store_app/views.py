@@ -1,16 +1,13 @@
 from django.shortcuts import render
-from django.db import models
-
 
 def index(request):
-    from collections_app.models import Art
+    from collections_app.models import Artwork
 
     sale_items = (
-        Art.objects.filter(
-            models.Q(physical_available=True)
-            | models.Q(digital_available=True)
-        )
-        .select_related('collection', 'collection__artist')
+        Artwork.objects
+        .filter(is_available=True)
+        .select_related('artist')
+        .order_by('-created_at')
     )
 
     return render(

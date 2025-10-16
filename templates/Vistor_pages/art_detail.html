@@ -1,52 +1,99 @@
 {% extends 'base.html' %}
 
-
-
 {% block title %}{{ art.title }} | {{ art.collection.name }} | Const Collection{% endblock %}
 
-
-
 {% block content %}
-
-  <div class="container mt-4">  <div class="container mt-4">
-
-    <div class="row">    <div class="row">
-
-      <div class="col-md-8">      <div class="col-md-8">
-
-        <h2>{{ art.title }}</h2>
-
+  <div class="container mt-5">
+    <div class="row g-4">
+      {# Left column - Image and main details #}
+      <div class="col-md-8">
         {% if art.image %}
-
-          <img src="{{ art.image.url }}" class="img-fluid mb-3" alt="{{ art.title }}">
-
+          <div class="artwork-image-container mb-4">
+            <img src="{{ art.image.url }}" class="img-fluid rounded" alt="{{ art.title }}">
+          </div>
         {% endif %}
 
-        <p class="text-muted">{{ art.medium }}{% if art.year_created %} — {{ art.year_created }}{% endif %}</p>
-
-        <p>Dimensions: {{ art.width_cm }} cm × {{ art.height_cm }} cm</p>
-
-      </div>
-
-      <div class="col-md-4">
-
-        <h5>Collection</h5>
-
-        <a href="{% url 'collections_app:collection_detail' art.collection.pk %}">{{ art.collection.name }}</a>
-
-        <div class="mt-3">
-
-          <h6>Artist</h6>
-
-          <div>{{ art.collection.artist.name }}</div>
-
+        <div class="artwork-details">
+          <h1 class="h2 mb-3">{{ art.title }}</h1>
+          <div class="artwork-meta text-muted mb-4">
+            {% if art.medium %}
+              <span class="me-3">{{ art.medium }}</span>
+            {% endif %}
+            {% if art.year_created %}
+              <span class="me-3">{{ art.year_created }}</span>
+            {% endif %}
+            {% if art.width_cm and art.height_cm %}
+              <span>{{ art.width_cm }} × {{ art.height_cm }} cm</span>
+            {% endif %}
+          </div>
         </div>
-
       </div>
 
+      {# Right column - Purchase info and artist details #}
+      <div class="col-md-4">
+        <div class="artwork-sidebar p-4 rounded">
+          {# Pricing and availability #}
+          <div class="price-section mb-4">
+            {% if art.physical_available or art.digital_available %}
+              <h5 class="mb-3">Available Formats</h5>
+              {% if art.physical_available %}
+                <div class="format-option mb-2">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Physical Edition</span>
+                    <strong>${{ art.physical_price }}</strong>
+                  </div>
+                </div>
+              {% endif %}
+              {% if art.digital_available %}
+                <div class="format-option">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Digital Edition</span>
+                    <strong>${{ art.digital_price }}</strong>
+                  </div>
+                </div>
+              {% endif %}
+
+              {# Add to Basket button #}
+              {% if user.is_authenticated %}
+                {% if artwork %}
+                  <form method="post" action="{% url 'collections_app:add_to_basket' artwork.pk %}" class="mt-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                      <i class="bi bi-cart-plus"></i> Add to Basket
+                    </button>
+                  </form>
+                {% else %}
+                  <div class="alert alert-info mt-4">
+                    This artwork is not available in the store yet.
+                  </div>
+                {% endif %}
+              {% else %}
+                <a href="{% url 'account_login' %}?next={{ request.path }}" 
+                   class="btn btn-outline-primary w-100 mt-4">
+                  <i class="bi bi-cart-plus"></i> Login to Purchase
+                </a>
+              {% endif %}
+            {% endif %}
+          </div>
+
+          {# Collection and Artist info #}
+          <div class="artwork-info">
+            <div class="mb-4">
+              <h5 class="mb-2">Collection</h5>
+              <a href="{% url 'collections_app:collection_detail' art.collection.pk %}" 
+                 class="text-decoration-none">{{ art.collection.name }}</a>
+            </div>
+
+            <div>
+              <h5 class="mb-2">Artist</h5>
+              <div class="text-muted">{{ art.collection.artist.name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
-
 {% endblock %}
 

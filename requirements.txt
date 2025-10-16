@@ -1,7 +1,12 @@
 asgiref==3.10.0
+bleach==6.2.0
 certifi==2025.10.5
+cffi==2.0.0
 charset-normalizer==3.4.4
 cloudinary==1.44.1
+crispy-bootstrap5==2025.6
+cryptography==46.0.3
+defusedxml==0.7.1
 dj-database-url==3.0.1
 dj3-cloudinary-storage==0.0.6
 Django==4.2.24
@@ -15,11 +20,13 @@ psycopg2==2.9.10
 pycparser==2.23
 PyJWT==2.10.1
 python3-openid==3.2.0
+pywin32==306
 requests==2.32.5
 requests-oauthlib==2.0.0
 setuptools==80.9.0
 six==1.17.0
 sqlparse==0.5.3
+stripe==11.3.0
 tzdata==2025.2
 urllib3==1.26.20
 webencodings==0.5.1

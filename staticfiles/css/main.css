@@ -1,0 +1,87 @@
+/* Minimalist Grayscale Palette for Auth Pages Only */
+.auth-card, .account .card {
+	background: #F5F5F5; /* Light Gray */
+	border: 1px solid #D3D3D3; /* Cool Gray */
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(51,51,51,0.04);
+	max-width: 400px;
+	margin: 40px auto;
+	padding: 2.5rem 2rem 2rem 2rem;
+}
+.auth-card h1, .auth-card h2, .auth-card h3, .auth-card h4, .auth-card h5, .auth-card h6,
+.account .card-title {
+	color: #333333; /* Graphite */
+	font-weight: 600;
+	margin-bottom: 1.5rem;
+}
+.auth-card label, .account label {
+	color: #555555; /* Charcoal Gray */
+	font-weight: 500;
+}
+.auth-card input, .account input[type="text"], .account input[type="email"], .account input[type="password"] {
+	background: #FFFFFF; /* Pure White */
+	border: 1px solid #A9A9A9; /* Medium Gray */
+	color: #555555; /* Charcoal Gray */
+	border-radius: 6px;
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+}
+.auth-card input:focus, .account input:focus {
+	border-color: #333333; /* Graphite */
+	outline: none;
+	box-shadow: 0 0 0 2px #D3D3D3; /* Cool Gray */
+}
+.auth-card .btn, .account .btn {
+	background: #333333; /* Graphite */
+	color: #FFFFFF; /* Pure White */
+	border: none;
+	border-radius: 6px;
+	padding: 0.75rem 1.5rem;
+	font-weight: 600;
+	transition: background 0.2s;
+}
+.auth-card .btn:hover, .account .btn:hover {
+	background: #000000; /* Absolute Black */
+	color: #FFFFFF;
+}
+.auth-card .form-text, .account .form-text {
+	color: #A9A9A9; /* Medium Gray */
+}
+.auth-card .alert, .account .alert {
+	border-radius: 6px;
+	background: #D3D3D3; /* Cool Gray */
+	color: #333333; /* Graphite */
+	border: none;
+}
+.auth-card .form-check-input, .account .form-check-input {
+	border-radius: 4px;
+	border: 1px solid #A9A9A9; /* Medium Gray */
+}
+.auth-card .form-check-label, .account .form-check-label {
+	color: #555555; /* Charcoal Gray */
+}
+.auth-card .form-check-input:checked, .account .form-check-input:checked {
+	background-color: #333333; /* Graphite */
+	border-color: #333333;
+}
+.auth-divider {
+	border-top: 1px solid #D3D3D3; /* Cool Gray */
+	margin: 2rem 0;
+}
+.auth-card a, .account a {
+	color: #A9A9A9; /* Medium Gray */
+	text-decoration: underline;
+	font-size: 0.97em;
+}
+.auth-card a:hover, .account a:hover {
+	color: #333333; /* Graphite */
+}
+.account .container, .account .content, .account .main, .account .row {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+/* Minimal placeholder styles */
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+.navbar-brand { font-weight: 600; }
