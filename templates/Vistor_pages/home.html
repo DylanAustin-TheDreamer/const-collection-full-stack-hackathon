@@ -1,7 +1,34 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}Home | Const Collection{% endblock %}
 
 {% block content %}
-  <p>Welcome to Const Collection. This is the home page placeholder.</p>
+<div id="hero">
+<video id="hero" autoplay muted loop>
+    <source src="{% static 'videos/Hero.mp4' %}" type="video/mp4">
+  </video>
+</div>
+
+<div class="container d-flex flex-column align-items-center mt-2 text-center">
+  <p>Illuminated acrylic artist - Artist Name</p>
+  <br>
+  <p>I am a 'Mother' Artist - My art is for my daughters - to express love, resilience and compassion for their pain.
+    further pushing the boundries of what artistic expression can be, in creativity and philosophy. And most importantly,
+    the 'Way of seeing' in being a mother.</p>
+</div>
+
+<div style="box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);">
+</div>
+  
+
+  <div class="d-flex align-items-center justify-content-center" style="background-color: rgb(65, 65, 65); width: 100%;">
+    <div class="text-center" style="color: white; padding: 20px;">
+    <h1>Evening Garden Exihibition - 2025</h1>
+    <video class="video" style="padding: 20px;" controls>
+      <source src="{% static 'videos/GardenExCombined.mp4' %}" type="video/mp4">
+    </video>
+  </div>
+</div>
 {% endblock %}
