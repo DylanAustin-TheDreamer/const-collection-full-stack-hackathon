@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 from owner_app import views as owner_views
 from collections_app import views as collections_views
@@ -30,5 +30,8 @@ urlpatterns = [
     path('contact/', collections_views.contact, name='contact'),
     path('about/', owner_views.public_about, name='about'),
     path('web_build/', collections_views.web_build, name='web_build'),
+    # Unity WebGL file serving
+    re_path(r'^web_build/(?P<file_path>.*\.(js|wasm|data|js\.gz|wasm\.gz|data\.gz))$', 
+            collections_views.serve_unity_file, name='unity_file'),
     path('accounts/', include('allauth.urls')),
 ]

@@ -1,10 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse, Http404
 from django.db.models import Q
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from .models import Order, OrderItem
+import os
+import mimetypes
 
 
 def index(request):
@@ -986,5 +990,53 @@ def contact(request):
 
 def web_build(request):
     """Serve the Unity WebGL build"""
-    return render(request, 'web_build/index.html')
+    response = render(request, 'web_build/index.html')
+    # Add Unity-specific headers
+    response['Cross-Origin-Embedder-Policy'] = 'require-corp'
+    response['Cross-Origin-Opener-Policy'] = 'same-origin'
+    return response
+
+
+def serve_unity_file(request, file_path):
+    """Serve Unity WebGL files with proper MIME types and headers"""
+    # Build the full file path
+    build_dir = os.path.join(settings.BASE_DIR, 'templates', 'web_build')
+    full_path = os.path.join(build_dir, file_path)
+    
+    if not os.path.exists(full_path):
+        raise Http404("Unity file not found")
+    
+    # Determine content type based on file extension
+    content_type = 'application/octet-stream'
+    encoding = None
+    
+    if file_path.endswith('.wasm.gz'):
+        content_type = 'application/wasm'
+        encoding = 'gzip'
+    elif file_path.endswith('.data.gz'):
+        content_type = 'application/octet-stream'
+        encoding = 'gzip'
+    elif file_path.endswith('.js.gz'):
+        content_type = 'application/javascript'
+        encoding = 'gzip'
+    elif file_path.endswith('.js'):
+        content_type = 'application/javascript'
+    elif file_path.endswith('.wasm'):
+        content_type = 'application/wasm'
+    
+    # Read and serve the file
+    with open(full_path, 'rb') as f:
+        content = f.read()
+    
+    response = HttpResponse(content, content_type=content_type)
+    
+    # Add encoding header for gzipped files
+    if encoding:
+        response['Content-Encoding'] = encoding
+    
+    # Add Unity-specific headers
+    response['Cross-Origin-Embedder-Policy'] = 'require-corp'
+    response['Cross-Origin-Opener-Policy'] = 'same-origin'
+    
+    return response
 
