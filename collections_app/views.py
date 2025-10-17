@@ -989,10 +989,6 @@ def contact(request):
 
 
 def web_build(request):
-    """Serve the Unity WebGL build - just redirect to static files"""
-    from django.shortcuts import redirect
-    from django.conf import settings
-    
-    # Redirect to the static Unity build index.html
-    return redirect('/static/web_build/index.html')
+    """Serve the Unity WebGL build using Django template with proper static URLs"""
+    return render(request, 'web_build_index.html')
 
