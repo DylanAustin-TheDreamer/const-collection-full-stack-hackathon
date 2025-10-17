@@ -1,20 +1,20 @@
 from django.shortcuts import render
-from django.db import models
 
 
 def index(request):
+    # Use the canonical artwork templates for the store listing.
+    # Map the queryset into the context key expected by artwork_list.html (artworks).
     from collections_app.models import Art
 
     sale_items = (
-        Art.objects.filter(
-            models.Q(physical_available=True)
-            | models.Q(digital_available=True)
-        )
-        .select_related('collection', 'collection__artist')
+        Art.objects
+        .filter(is_available=True)
+        .select_related('collection__artist')
+        .order_by('-created_at')
     )
 
     return render(
         request,
-        'Vistor_pages/store.html',
-        {'sale_items': sale_items},
+        'Vistor_pages/artwork_list.html',
+        {'artworks': sale_items},
     )

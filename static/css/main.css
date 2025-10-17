@@ -1,177 +1,306 @@
-/* Minimal placeholder styles */
-body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-.navbar-brand { font-weight: 600; }
-
-.i {
-  font-size: 75px;
-  text-align: center;
-  margin: 0 20px;
-}
-.i:hover{
-    background-size: 400% 100%;
-    animation: gradientShift 2s ease infinite;
-    transform: translateY(-3px);
-}
-
-
-#intro > p{
-    font-size: 24px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: rgb(240, 240, 240);
-    font-weight: 500;
-}
-#intro > h2{
-    font-size: 32px;
-    color: rgb(240, 240, 240);
-    font-weight: 700;
-}
-.video {
-  width: 55%;
-  height: auto;
-  max-width: 100%;
-  box-shadow: 0 0 8px 8px rgba(0, 0, 0, 0.5);
-}
-
-#hero {
-    background: linear-gradient(90deg, #797979 0%, #3b8791 50% , #797979 100%);
-    width: 100%;
-    height: auto;
-}
-
-#multi-color {
-  background: linear-gradient(
-    90deg,
-    #5900be 0%,
-    #c48741 20%,
-    #41c497 50%,
-    #65f0ff 80%,
-    #ff66d9 100%
-  );
-
-  padding: 15px;
-}
-
-
-.card-color{
-    background: linear-gradient(
-        90deg,
-        #65f0ff 0%,
-        rgb(59, 59, 59) 25%,
-        rgb(54, 54, 54) 75%,
-        #ff66d9 100%
-    );
-}
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-  }
-
-  .featured-works-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: center;
-    margin-top: 20px;
-  }
-
-  .featured-text {
-    max-width: 100%;
-  }
-
-  .featured-text p {
-    font-size: 20px;
-    line-height: 1.6;
-    text-align: justify;
-    margin: 0;
-    font-weight: 500;
-    background-color: #5e5e5e;
-    padding: 15px;
-    border: 2px solid #3a3a3a;
-  }
-
-  .featured-image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-
-  .featured-image img {
-    width: auto;
-    height: 450px;
-    box-shadow: 0 0 8px 8px rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
-  }
-  #feature-card{
-    background: linear-gradient(
-        90deg,
-        #818181 -25%,
-        rgb(212, 212, 212) 100%
-    );
-    margin-bottom: 50px;
-    color: whitesmoke;
-  }
-
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .featured-works-grid {
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-    
-    .featured-image img {
-      height: 300px;
-    }
-  }
-  .my-card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 25px;
-  }
-  .my-card > img{
-    width: 200px;
-    height: 400px;
-    display: block;
-  }
-
-  .my-btn{
-    background-color: #5e5e5e;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    cursor: pointer;
+/* Store Card Add to Basket Button Placement */
+/* Store Card Styles */
+.store-card {
     position: relative;
-  }
-  
-  .my-btn:hover{
-    background: linear-gradient(
-      270deg,
-      #5900be 0%,
-      #65f0ff 50%,
-      #ff66d9 100%
-    );
-    background-size: 400% 100%;
-    animation: gradientShift 2s ease infinite;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  }
+    height: 100%;
+    border: 1px solid #D3D3D3;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+}
 
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+.store-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
 
-  .my-space-inbetween{
+.store-card .card-body {
+    padding: 1.5rem;
+}
+
+.store-card .card-title {
+    color: #333333;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.store-card .text-muted {
+    color: #555555 !important;
+    font-size: 0.9rem;
+}
+
+.store-card .price-info {
+    color: #333333;
+    font-size: 0.95rem;
+    margin: 1rem 0;
+}
+
+.store-card .price-info strong {
+    color: #000000;
+    font-weight: 600;
+}
+
+/* Store Card Buttons */
+.store-card .btn-outline-primary {
+    color: #333333;
+    border-color: #D3D3D3;
+    background: transparent;
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s;
+}
+
+.store-card .btn-outline-primary:hover {
+    background: #F5F5F5;
+    color: #000000;
+    border-color: #A9A9A9;
+}
+
+/* Card action buttons */
+.store-card .card-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
+    margin-top: 1rem;
+}
+
+.store-card .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid #D3D3D3;
+    color: #333333;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.store-card .btn:hover {
+    background: #F5F5F5;
+    color: #000000;
+    border-color: #A9A9A9;
+    transform: translateY(-1px);
+}
+
+/* Card Image */
+.store-card .card-img-top {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.store-card a:hover .card-img-top {
+    opacity: 0.9;
+}
+/* Minimalist Grayscale Palette for Auth Pages Only */
+.auth-card, .account .card {
+	background: #F5F5F5; /* Light Gray */
+	border: 1px solid #D3D3D3; /* Cool Gray */
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(51,51,51,0.04);
+	max-width: 400px;
+	margin: 40px auto;
+	padding: 2.5rem 2rem 2rem 2rem;
+}
+.auth-card h1, .auth-card h2, .auth-card h3, .auth-card h4, .auth-card h5, .auth-card h6,
+.account .card-title {
+	color: #333333; /* Graphite */
+	font-weight: 600;
+	margin-bottom: 1.5rem;
+}
+.auth-card label, .account label {
+	color: #555555; /* Charcoal Gray */
+	font-weight: 500;
+}
+.auth-card input, .account input[type="text"], .account input[type="email"], .account input[type="password"] {
+	background: #FFFFFF; /* Pure White */
+	border: 1px solid #A9A9A9; /* Medium Gray */
+	color: #555555; /* Charcoal Gray */
+	border-radius: 6px;
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+}
+.auth-card input:focus, .account input:focus {
+	border-color: #333333; /* Graphite */
+	outline: none;
+	box-shadow: 0 0 0 2px #D3D3D3; /* Cool Gray */
+}
+.auth-card .btn, .account .btn {
+	background: #333333; /* Graphite */
+	color: #FFFFFF; /* Pure White */
+	border: none;
+	border-radius: 6px;
+	padding: 0.75rem 1.5rem;
+	font-weight: 600;
+	transition: background 0.2s;
+}
+.auth-card .btn:hover, .account .btn:hover {
+	background: #000000; /* Absolute Black */
+	color: #FFFFFF;
+}
+.auth-card .form-text, .account .form-text {
+	color: #A9A9A9; /* Medium Gray */
+}
+.auth-card .alert, .account .alert {
+	border-radius: 6px;
+	background: #D3D3D3; /* Cool Gray */
+	color: #333333; /* Graphite */
+	border: none;
+}
+.auth-card .form-check-input, .account .form-check-input {
+	border-radius: 4px;
+	border: 1px solid #A9A9A9; /* Medium Gray */
+}
+.auth-card .form-check-label, .account .form-check-label {
+	color: #555555; /* Charcoal Gray */
+}
+.auth-card .form-check-input:checked, .account .form-check-input:checked {
+	background-color: #333333; /* Graphite */
+	border-color: #333333;
+}
+.auth-divider {
+	border-top: 1px solid #D3D3D3; /* Cool Gray */
+	margin: 2rem 0;
+}
+.auth-card a, .account a {
+	color: #A9A9A9; /* Medium Gray */
+	text-decoration: underline;
+	font-size: 0.97em;
+}
+.auth-card a:hover, .account a:hover {
+	color: #333333; /* Graphite */
+}
+.account .container, .account .content, .account .main, .account .row {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+/* Minimal placeholder styles */
+body { 
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; 
+	background: #FFFFFF;
+	color: #555555;
+}
+
+/* Compact Minimalist Navbar */
+.navbar {
+	background: #FFFFFF !important;
+	border-bottom: 1px solid #F5F5F5;
+	padding: 0.5rem 0;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.navbar-brand { 
+	font-weight: 600;
+	color: #333333 !important;
+	font-size: 1.1rem;
+	letter-spacing: 0.5px;
+}
+
+.navbar .nav-link {
+	color: #555555 !important;
+	font-size: 0.95rem;
+	padding: 0.4rem 0.8rem !important;
+	transition: color 0.2s;
+}
+
+.navbar .nav-link:hover {
+	color: #000000 !important;
+}
+
+.navbar .dropdown-menu {
+	border: 1px solid #D3D3D3;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	border-radius: 6px;
+	min-width: 160px;
+}
+
+.navbar .dropdown-item {
+	color: #555555;
+	font-size: 0.9rem;
+	padding: 0.5rem 1rem;
+}
+
+.navbar .dropdown-item:hover {
+	background: #F5F5F5;
+	color: #000000;
+}
+
+.navbar .dropdown-divider {
+	border-color: #D3D3D3;
+}
+
+/* Basket icon styling */
+.navbar .nav-link svg {
+	vertical-align: middle;
+}
+
+/* Toast Notifications Styling
+   A toast is a lightweight notification that appears temporarily
+   to provide feedback about an operation (like adding to basket) */
+
+/* Container for all toast messages
+   - Fixed position keeps it in view even when scrolling
+   - Bottom-right corner is a common, non-intrusive position
+   - High z-index ensures it appears above other content */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+/* Individual toast notification styling
+   - White background for readability
+   - Subtle border and shadow for depth
+   - Initially invisible (opacity: 0) and positioned below view
+   - Transform and transition for sliding animation */
+.toast {
+    background: #FFFFFF;
+    border: 1px solid #D3D3D3;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    min-width: 280px;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+}
+
+/* When toast becomes visible
+   - Full opacity and normal position
+   - Applied via JavaScript when toast appears */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Header section of toast
+   - Contains title and close button
+   - Subtle border separator */
+.toast-header {
+    background: transparent;
+    border-bottom: 1px solid #F5F5F5;
+    padding: 0.75rem 1rem;
+}
+
+/* Main content area of toast
+   - Contains the actual message */
+.toast-body {
+    padding: 0.75rem 1rem;
+    color: #333333;
+}
+
+/* Success toast variant
+   - Blue left border matches the primary button color
+   - Uses Bootstrap's primary blue color (#0d6efd) */
+.toast-success {
+    border-left: 4px solid #0d6efd;
+}
+
+/* Error toast variant
+   - Red left border indicates error or warning */
+.toast-error {
+    border-left: 4px solid #dc3545;
+}

@@ -1,39 +1,7 @@
-{% extends 'base.html' %}
+{% comment %}
+Backward-compatible wrapper for the store listing.
+This file remains to support any direct references to `Vistor_pages/store.html`.
+It simply includes the canonical artwork list template.
+{% endcomment %}
 
-{% block title %}Store | Const Collection{% endblock %}
-
-{% block content %}
-  <div class="container mt-4">
-    <h2>Store</h2>
-    {% if sale_items %}
-      <div class="row">
-        {% for art in sale_items %}
-          <div class="col-md-4 mb-3">
-            <div class="card h-100">
-              {% if art.image %}
-                <img src="{{ art.image.url }}" class="card-img-top" style="height:220px;object-fit:cover;" alt="{{ art.title }}">
-              {% endif %}
-              <div class="card-body">
-                <h5 class="card-title">{{ art.title }}</h5>
-                <p class="small text-muted">{{ art.collection.name }} — {{ art.collection.artist.name }}</p>
-
-                <div class="mb-2">
-                  {% if art.physical_available %}
-                    <div>Physical: <strong>${{ art.physical_price }}</strong></div>
-                  {% endif %}
-                  {% if art.digital_available %}
-                    <div>Digital: <strong>${{ art.digital_price }}</strong></div>
-                  {% endif %}
-                </div>
-
-                <a href="{% url 'collections_app:art_detail' art.pk %}" class="btn btn-sm btn-outline-primary">View</a>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p>No items for sale right now.</p>
-    {% endif %}
-  </div>
-{% endblock %}
+{% include 'Vistor_pages/artwork_list.html' %}

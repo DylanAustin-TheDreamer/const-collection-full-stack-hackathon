@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Search by Price | Const Collection{% endblock %}
+
+{% block content %}
+  <!-- 
+    ARTWORK PRICE SEARCH PAGE
+    Purpose: Help buyers find artworks within their budget
+    Filter and sort artworks by price range with size and medium display
+  -->
+  
+  <div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="display-5">Search Artworks by Price</h1>
+        <p class="lead text-muted">Find the perfect artwork within your budget</p>
+      </div>
+    </div>
+
+    <!-- Price Filter Form -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Filter by Price Range</h5>
+            <!-- Price search form -->
+            <form method="get" action="{% url 'collections_app:artwork_search_by_price' %}" class="row g-3">
+              
+              <!-- Minimum Price Input -->
+              <div class="col-md-3">
+                <label for="min_price" class="form-label">Minimum Price (USD)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="min_price" 
+                    name="min_price" 
+                    value="{{ min_price }}" 
+                    placeholder="0"
+                    step="0.01"
+                    min="0"
+                  >
+                </div>
+              </div>
+              
+              <!-- Maximum Price Input -->
+              <div class="col-md-3">
+                <label for="max_price" class="form-label">Maximum Price (USD)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="max_price" 
+                    name="max_price" 
+                    value="{{ max_price }}" 
+                    placeholder="10000"
+                    step="0.01"
+                    min="0"
+                  >
+                </div>
+              </div>
+              
+              <!-- Sort Order Selector -->
+              <div class="col-md-3">
+                <label for="sort" class="form-label">Sort By</label>
+                <select class="form-select" id="sort" name="sort">
+                  <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>
+                    Price: Low to High
+                  </option>
+                  <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>
+                    Price: High to Low
+                  </option>
+                </select>
+              </div>
+              
+              <!-- Search Button -->
+              <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                  Search
+                </button>
+              </div>
+            </form>
+            
+            <!-- Quick Price Range Buttons -->
+            <div class="mt-3">
+              <p class="mb-2 text-muted small">Quick filters:</p>
+              <div class="btn-group" role="group">
+                <a href="?max_price=500" class="btn btn-outline-secondary btn-sm">Under $500</a>
+                <a href="?min_price=500&max_price=1000" class="btn btn-outline-secondary btn-sm">$500 - $1,000</a>
+                <a href="?min_price=1000&max_price=5000" class="btn btn-outline-secondary btn-sm">$1,000 - $5,000</a>
+                <a href="?min_price=5000" class="btn btn-outline-secondary btn-sm">Over $5,000</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Results Summary -->
+    {% if min_price or max_price %}
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="alert alert-info">
+            <strong>Search Results:</strong>
+            Showing artworks 
+            {% if min_price %}from ${{ min_price }}{% endif %}
+            {% if min_price and max_price %}to{% endif %}
+            {% if max_price %}up to ${{ max_price }}{% endif %}
+            ({{ artworks|length }} found)
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Artworks Grid Display -->
+    <div class="row">
+      {% for artwork in artworks %}
+        <!-- Individual Artwork Card -->
+        <div class="col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            <!-- Artwork Image -->
+            {% if artwork.image %}
+              <img 
+                src="{{ artwork.image.url }}" 
+                class="card-img-top" 
+                alt="{{ artwork.title }}"
+                style="height: 250px; object-fit: cover;"
+              >
+            {% else %}
+              <!-- Placeholder if no image -->
+              <div 
+                class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                style="height: 250px;"
+              >
+                <span class="text-muted">No Image</span>
+              </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+              <!-- Artwork Title -->
+              <h5 class="card-title">{{ artwork.title }}</h5>
+              
+              <!-- Artist Name -->
+              <p class="card-text text-muted mb-2">
+                <small>by {{ artwork.artist.name }}</small>
+              </p>
+              
+              <!-- PRICE - Prominently displayed (main search criteria) -->
+              <div class="mb-3 p-3 bg-light rounded text-center">
+                <p class="mb-0 text-muted small">Price</p>
+                <p class="mb-0 text-success fw-bold fs-3">{{ artwork.get_price_display }}</p>
+              </div>
+              
+              <!-- Medium -->
+              <p class="card-text mb-1">
+                <strong>Medium:</strong>
+                <span class="badge bg-secondary">{{ artwork.medium|default:"Not specified" }}</span>
+              </p>
+              
+              <!-- Size -->
+              <p class="card-text mb-3">
+                <strong>Size:</strong>
+                <br>
+                <span class="text-muted small">{{ artwork.get_size_display }}</span>
+              </p>
+              
+              <!-- View Details Button -->
+              <div class="mt-auto">
+                <a 
+                  href="{% url 'collections_app:artwork_detail' artwork.pk %}" 
+                  class="btn btn-primary w-100"
+                >
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <!-- Message when no artworks found -->
+        <div class="col-12">
+          <div class="alert alert-warning text-center" role="alert">
+            <h4 class="alert-heading">No Artworks Found</h4>
+            <p>No artworks match your price criteria. Try adjusting your search range.</p>
+            <hr>
+            <a href="{% url 'collections_app:artwork_list' %}" class="btn btn-primary">
+              View All Artworks
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mt-4">
+      <div class="col-12 text-center">
+        <a 
+          href="{% url 'collections_app:artwork_list' %}" 
+          class="btn btn-outline-secondary"
+        >
+          ← Back to All Artworks
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
