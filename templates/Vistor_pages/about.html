@@ -1,17 +1,31 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}About | Const Collection{% endblock %}
 
 {% block content %}
-  <div class="container mt-4">
+<style>
+  @media (min-width: 768px) {
+    #about{
+      margin-right: 80px;
+    }
+    #pad{
+      padding: 50px;
+    }
+  }
+  </style>
+
+  <div class="container mt-4" id="about">
     {% if artist %}
       <div class="row align-items-center">
-        <div class="col-md-4">
+        <div class="col-md-4 text-center" id="pad">
           {% if artist.image %}
             <img src="{{ artist.image.url }}" class="img-fluid rounded" alt="{{ artist.name }}">
+            <img src="{% static 'collections_app/images/readme-images/Cecilia.png' %}" class="img-fluid mt-3" alt="Cecilia K. artwork">
           {% endif %}
         </div>
-        <div class="col-md-8">
+        
+          <div class="col-md-8"  id="pad">
           <h2>{{ artist.name }}</h2>
           <div class="about-bio">{{ artist.bio|linebreaks }}</div>
           <p><strong>Email:</strong> <a href="mailto:{{ artist.email }}">{{ artist.email }}</a></p>
@@ -21,7 +35,47 @@
         </div>
       </div>
     {% else %}
-      <p>No artist profile available.</p>
+      <div class="text-center">
+        <p>No artist profile available.</p>
+      </div>
     {% endif %}
+  </div>
+
+  <!-- for the press articles -->
+  <div style=" text-align: center; margin-top: 80px; margin-bottom: 40px; border: 1px solid #313131; border-bottom: 1px solid #313131;">
+      <h3 style="text-align: center;">Press</h3>
+  </div>
+ 
+
+  <div class="container mt-4">
+      <div class="row align-items-center">
+        <div class="col-md-8"  id="pad">
+          <div class="about-bio">
+            <h4>Biographies</h4>
+            <p style="color: rgb(170, 146, 8); font-weight: 500; word-wrap: break-word;">
+              Marcus Bussey (PhD) is a Senior Lecturer in History and Futures at the
+            University of the Sunshine Coast, Australia. He has a keen interest in
+            anticipatory aesthetics and phenomenologies of grace.</p>
+
+            <p>Cecilia Kristoffersson is an artist and art educator born and raised in
+            Zimbabwe, now living in Southern Sweden. Through her paintings, Cecilia
+            aims to foster a dialogue of a new female revolution that anchors itself in our
+            understanding of our spiritual DNA and experiences. Experiences that bond
+            grandmothers, mothers and daughters in the pathway of life; past, future and
+            present.
+            </p>
+            <h4>Abstract</h4>
+            <p>This poem is a reflection on the contradictions inherent to futures work.
+            Pasts, presents and futures fold in on each other and this is reflected in the
+            deliberately tribal image offered by Kristoffersson. In both image and poem
+            lies biography and memory both personal and also epochal. Time is sticky
+            and we must deal with that as best we can.</p>
+          </div>
+          <p><strong>Link to publishing site:</strong> <a href="mailto:{{ artist.email }}" style="word-wrap: break-word;">https://journals.sagepub.com/doi/10.1177/19467567241249718?fbclid=IwZXh0bgNhZW0CMTEAAR0b8St-9YYaGWXtIBYr7v60BIFnOcaDywxTktMRZp9YjYsNKvkTEdCSupU_aem_Abz19IRIZZBVT-eyDzcIfX-sgz6phGMS4iipBgZociqNRJdMTHPY44yMkQvwRcLG50QubZIKYTfRqFbvlWr5fdJU</a></p>
+        </div>
+      <div class="col-md-4 text-center"  id="pad">
+            <img src="{% static 'images/past-future-present.jpg' %}" class="img-fluid rounded" alt="{{ artist.name }}">
+        </div>
+    </div>
   </div>
 {% endblock %}

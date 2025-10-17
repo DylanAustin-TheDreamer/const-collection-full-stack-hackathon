@@ -1,15 +1,45 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse, Http404
 from django.db.models import Q
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from .models import Order, OrderItem
+import os
+import mimetypes
 
 
 def index(request):
     # Serve the homepage at root by rendering Vistor_pages/home.html
-    return render(request, 'Vistor_pages/home.html')
+    from .models import Media
+    
+    context = {}
+    try:
+        # Get the hero media (should be a video)
+        hero_media = Media.objects.filter(hero=True).first()
+        
+        # Get the secondary media (second_section video)
+        secondary_media = Media.objects.filter(second_section=True).first()
+        
+        if hero_media and hero_media.file:
+            context['hero_video'] = hero_media.file.url
+        else:
+            context['hero_video'] = None  # Or a fallback static video
+            
+        if secondary_media and secondary_media.file:
+            context['secondary_video'] = secondary_media.file.url
+        else:
+            context['secondary_video'] = None  # Or a fallback static video
+            
+    except Exception as e:
+        # Handle any database errors gracefully
+        context['hero_video'] = None
+        context['secondary_video'] = None
+        print(f"Media error: {e}")  # For debugging
+    
+    return render(request, 'Vistor_pages/home.html', context)
 
 
 def gallery(request):
@@ -1039,6 +1069,8 @@ def contact(request):
             'zip_code': contact_info.zip_code,
             'phone': contact_info.phone,
             'email': contact_info.email,
+            'curator_name': contact_info.curator_name,
+            'curator_email': contact_info.curator_email,
             'opening_hours': contact_info.opening_hours,
         }
     

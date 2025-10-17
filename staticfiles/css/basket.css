@@ -1,0 +1,243 @@
+/* Basket Page Minimalist Styling */
+.basket-container {
+    background-color: #ffffff;
+}
+
+/* Header styling */
+.basket-header h1 {
+    color: #000000;
+    font-weight: 300;
+}
+
+/* Card styling */
+.basket-card {
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+    box-shadow: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.basket-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Table styling */
+.basket-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.basket-table th {
+    background-color: #f8f8f8;
+    color: #000000;
+    font-weight: 500;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.basket-table td {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Quantity controls */
+.quantity-control {
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+}
+
+.quantity-control:hover {
+    background-color: #f8f8f8;
+}
+
+/* Accent stripe */
+.accent-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, 
+        #ff6b6b 0%, 
+        #4ecdc4 50%, 
+        #45b7d1 100%
+    );
+    margin: 0 0 2rem 0;
+    width: 200px;
+}
+
+/* Artwork name and price styling - dark ocean blue */
+.basket-table td a,
+.basket-table td strong {
+    color: #0d4f6d !important;
+}
+
+.basket-table td a:hover {
+    color: #0a3d54 !important;
+}
+
+/* Price values in dark ocean blue */
+.basket-table .text-primary,
+#basket-subtotal,
+#basket-total {
+    color: #0d4f6d !important;
+}
+
+/* Buttons styling */
+.btn-minimal {
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.btn-minimal:hover {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.btn-minimal-danger {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.btn-minimal-danger:hover {
+    background-color: #ff6b6b;
+    color: #ffffff;
+}
+
+/* Summary card */
+.summary-card {
+    background-color: #ffffff;
+    border: 2px solid #000000;
+}
+
+.summary-header {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.summary-body {
+    padding: 2rem 1.5rem;
+}
+
+/* Summary rows */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-size: 0.95rem;
+}
+
+.summary-label {
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+}
+
+.summary-value {
+    color: #000000;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+/* Summary divider */
+.summary-divider {
+    height: 1px;
+    background-color: #000000;
+    margin: 1rem 0;
+}
+
+/* Total row */
+.summary-total {
+    padding: 1rem 0 1.5rem 0;
+}
+
+.summary-total .summary-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.summary-total .summary-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Summary actions */
+.summary-actions {
+    margin: 1.5rem 0;
+}
+
+.summary-actions .btn {
+    padding: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.summary-note {
+    text-align: center;
+    margin-top: 0.75rem;
+    color: #666666;
+}
+
+.summary-note small {
+    font-size: 0.75rem;
+}
+
+/* Summary security */
+.summary-security {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+    color: #666666;
+}
+
+.summary-security i {
+    margin-right: 0.25rem;
+}
+
+/* Shipping info */
+.shipping-info {
+    border: 1px solid #000000;
+    background-color: #ffffff;
+}
+
+.shipping-info-content {
+    padding: 1.5rem;
+}
+
+.shipping-info-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.shipping-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.shipping-info-list li {
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    color: #666666;
+    position: relative;
+    padding-left: 1.25rem;
+}
+
+.shipping-info-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #000000;
+}
+
+/* Empty basket styling */
+.empty-basket-icon {
+    color: #e0e0e0;
+    font-size: 4rem;
+}

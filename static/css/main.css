@@ -383,7 +383,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .navbar-brand { font-weight: 600; }
 
 .i {
-  font-size: 75px;
+  font-size: 67.5px;  /* 10% smaller than 75px */
   text-align: center;
   margin: 0 20px;
 }
@@ -391,6 +391,11 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     background-size: 400% 100%;
     animation: gradientShift 2s ease infinite;
     transform: translateY(-3px);
+}
+
+footer{
+  border-top: #333333 2px solid;
+  color: white;
 }
 
 
@@ -458,7 +463,6 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     text-align: justify;
     margin: 0;
     font-weight: 500;
-    background-color: #5e5e5e;
     padding: 15px;
     border: 2px solid #3a3a3a;
   }
@@ -477,7 +481,8 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
   #feature-card{
     background: linear-gradient(
         90deg,
-        #818181 -25%,
+        #838383 0%,
+        #838383 50%,
         rgb(212, 212, 212) 100%
     );
     margin-bottom: 50px;
@@ -1132,6 +1137,19 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
   }
   .gallery-list { gap: 28px; }
 }
+  
+  /* Footer contact button - 20% smaller, same spacing as icons */
+  .footer-contact-btn {
+    font-size: 18px;  /* Increased for better readability */
+    font-weight: 600;  /* Bold for better visibility */
+    padding: 12px 18px;  /* Narrower horizontal padding */
+    margin: 0 20px;  /* Same margin as social icons */
+    height: 60px;  /* Match the height of social icons (75px * 0.8) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;  /* Rounded corners like Font Awesome square icons */
+  }
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }

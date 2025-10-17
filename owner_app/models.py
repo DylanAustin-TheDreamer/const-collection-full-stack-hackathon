@@ -26,6 +26,8 @@ class Contact(models.Model):
     zip_code = models.CharField(max_length=20)
     phone = models.CharField(max_length=30)
     email = models.EmailField()
+    curator_name = models.CharField(max_length=200, blank=True)
+    curator_email = models.EmailField(blank=True)
     opening_hours = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

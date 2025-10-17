@@ -15,8 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 from owner_app import views as owner_views
 from collections_app import views as collections_views
 from allauth.urls import path as allauth_path
@@ -29,5 +31,11 @@ urlpatterns = [
     path('owner/', include('owner_app.urls')),
     path('contact/', collections_views.contact, name='contact'),
     path('about/', owner_views.public_about, name='about'),
+
     path('accounts/', include('allauth.urls')),
 ]
+
+# Serve static files during development and ensure Unity files are served
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0] if settings.STATICFILES_DIRS else None)
