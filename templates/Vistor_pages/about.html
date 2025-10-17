@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}About | Const Collection{% endblock %}
 
@@ -8,7 +9,8 @@
       <div class="row align-items-center">
         <div class="col-md-4">
           {% if artist.image %}
-            <img src="{{ artist.image.url }}" class="img-fluid rounded" alt="{{ artist.name }}">
+            <img src="{{ artist.image.url }}" class="img-fluid rounded d-block mx-auto" alt="{{ artist.name }}">
+            <img src="{% static 'collections_app/images/readme-images/Cecilia.png' %}" class="img-fluid mt-3 d-block mx-auto" alt="Cecilia K. artwork">
           {% endif %}
         </div>
         <div class="col-md-8">
