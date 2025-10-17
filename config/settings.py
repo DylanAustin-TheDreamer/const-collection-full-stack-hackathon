@@ -224,14 +224,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -265,29 +257,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 if 'CLOUDINARY_URL' in os.environ:
     # Use the CLOUDINARY_URL if available (most common format)
     cloudinary.config()
-    # Explicitly set the config as backup
-    cloudinary.config(
-        cloud_name='dece3gnhm',
-        api_key='832681451742447',
-        api_secret='1XTFspXWu98Gs8G7YtAUNmAVC6U',
-        secure=True,
-    )
 else:
     # Fallback to individual environment variables
     cloudinary.config(
-        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        api_key=os.environ.get('CLOUDINARY_API_KEY'),
-        api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'dece3gnhm'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY', '832681451742447'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET', '1XTFspXWu98Gs8G7YtAUNmAVC6U'),
         secure=True,  # Always use HTTPS
     )
-
-import os
-
-# Cloudinary credentials from env
-CLOUDINARY = {
-    'cloud_name': os.getenv("dece3gnhm"),
-    'api_secret': os.getenv("pineappleJuiceis...mkay"),
-}
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'  # Django won't serve these in production; Cloudinary URLs will be returned for uploaded files
