@@ -57,11 +57,11 @@
       }
 
       var buildUrl = "{% static 'web_build/Build' %}";
-      var loaderUrl = buildUrl + "/Builds.loader.js";
+      var loaderUrl = "{% static 'web_build/Build/Builds.loader.js' %}";
       var config = {
-        dataUrl: buildUrl + "/Builds.data.gz",
-        frameworkUrl: buildUrl + "/Builds.framework.js.gz",
-        codeUrl: buildUrl + "/Builds.wasm.gz",
+        dataUrl: "{% static 'web_build/Build/Builds.data.gz' %}",
+        frameworkUrl: "{% static 'web_build/Build/Builds.framework.js.gz' %}",
+        codeUrl: "{% static 'web_build/Build/Builds.wasm.gz' %}",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Gallery-Project",
