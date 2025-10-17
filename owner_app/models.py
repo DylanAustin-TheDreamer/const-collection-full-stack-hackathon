@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from cloudinary.models import CloudinaryField
 
 
@@ -40,6 +41,23 @@ class Messages(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=30, blank=True)
     message = models.TextField()
+    # If the visitor was authenticated, store the user who sent the message.
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='sent_messages',
+    )
+    # The owner/recipient user who should see/reply to this message.
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='received_messages',
+    )
+    unread = models.BooleanField(default=True)
     subject = models.CharField(
         max_length=20,
         choices=[
@@ -57,4 +75,29 @@ class Messages(models.Model):
     class Meta:
         verbose_name = 'Message'
         verbose_name_plural = 'Messages'
+
+
+class MessageReply(models.Model):
+    """Replies to a Messages row. Owners can reply; replies may be sent
+    via email (for anonymous visitors) or stored internally when the
+    sender is a registered user.
+    """
+    message = models.ForeignKey(
+        Messages, on_delete=models.CASCADE, related_name='replies'
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+    via_email = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Reply to {self.message_id} by {self.sender or 'email'}"
+
+    class Meta:
+        ordering = ('sent_at',)
 

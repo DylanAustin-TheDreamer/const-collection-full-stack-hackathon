@@ -4,69 +4,127 @@
 
 {% block content %}
   <div class="container mt-4">
-    <h2>Gallery</h2>
-    <div class="row">
+    <!-- Debug styles removed. To re-enable temporary layout debugging add a small
+         inline <style> block here or reintroduce `.debug-layout` rules in
+         `static/css/main.css` while debugging. -->
+    {# Debug inline styles removed. Add ?debug_layout=1 handling back here if needed. #}
+  <h2>Gallery</h2>
+  <hr class="collection-divider page-title-divider" />
+    <div class="gallery-list">
       {% for collection in collections %}
-        <div class="col-md-6 mb-4">
-          <div class="card">
+        <section class="collection-section mb-5">
+          <div class="row align-items-center">
             {% if collection.cover_image %}
-              {% with url=collection.cover_image.url %}
-                {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
-                  <video class="card-img-top" controls>
-                    <source src="{{ url }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                  </video>
-                {% else %}
-                  <img src="{{ url }}" class="card-img-top" alt="{{ collection.name }}">
-                {% endif %}
-              {% endwith %}
+              <div class="col-12 col-md-6 col-lg-7 d-flex flex-column collection-left collection-left-col">
+            {% else %}
+              <div class="col-12 d-flex flex-column collection-left">
             {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ collection.name }}</h5>
-              <p class="card-text">By {{ collection.artist.name }}</p>
-              <p>
-                <a class="btn btn-outline-secondary" data-bs-toggle="collapse" href="#desc-{{ collection.id }}" role="button" aria-expanded="false" aria-controls="desc-{{ collection.id }}">
-                  About
-                </a>
-                <a class="btn btn-primary" href="{% url 'collections_app:collection_detail' collection.id %}">View full collection</a>
-              </p>
-
-              <div class="collapse" id="desc-{{ collection.id }}">
-                <div class="card card-body">
-                  {{ collection.description }}
+              <div class="left-top">
+                <div class="row">
+                  <div class="col-12">
+                      <h3 class="collection-title">{{ collection.name }}</h3>
+                      <div class="collection-actions mb-2">
+                        <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#desc-{{ collection.id }}" role="button" aria-expanded="false" aria-controls="desc-{{ collection.id }}">
+                          About
+                        </a>
+                        <a class="btn btn-primary" href="{% url 'collections_app:collection_detail' collection.id %}">View full collection</a>
+                      </div>
+                      <p class="collection-artist mt-2">By {{ collection.artist.name }}</p>
+                  </div>
                 </div>
               </div>
 
-              {% if collection.arts.all %}
-                <div id="carousel-{{ collection.id }}" class="carousel slide mt-3" data-bs-ride="carousel">
-                  <div class="carousel-inner">
-                    {% for art in collection.arts.all|slice:":4" %}
-                      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        {% if art.image %}
-                          <img src="{{ art.image.url }}" class="d-block w-100" alt="{{ art.title }}">
-                        {% endif %}
-                        <div class="carousel-caption d-none d-md-block">
-                          <h5>{{ art.title }}</h5>
-                        </div>
-                      </div>
-                    {% endfor %}
+              <div class="left-bottom mt-2">
+                  <!-- artist moved into left-top beneath the buttons -->
+
+                <div class="collapse" id="desc-{{ collection.id }}">
+                  <div class="card card-body mb-3">
+                    {{ collection.description }}
                   </div>
-                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ collection.id }}" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                  </button>
-                  <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ collection.id }}" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                  </button>
                 </div>
-              {% endif %}
+
+                {% comment %} Carousel moved into left-bottom so left has two rows and right cover spans both rows {% endcomment %}
+                {% if collection.arts.all %}
+                  <div class="collection-carousel mt-2">
+                    <div id="carousel-{{ collection.id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500" data-bs-wrap="true">
+                      <div class="carousel-inner">
+                        {% for art in collection.arts.all|slice:":8" %}
+                          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            {% if art.image %}
+                              <img src="{{ art.image.url }}" class="d-block w-100" alt="{{ art.title }}">
+                            {% endif %}
+                            <div class="carousel-caption d-none d-md-block">
+                              <h5>{{ art.title }}</h5>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                      <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ collection.id }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                      </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ collection.id }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                      </button>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
             </div>
+
+            {% if collection.cover_image %}
+              <div class="col-12 col-md-6 col-lg-5 collection-cover-col">
+                {% with url=collection.cover_image.url %}
+                  <div class="collection-cover">
+                      {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+                      <video class="collection-cover-media" autoplay muted playsinline loop preload="metadata">
+                        <source src="{{ url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                      </video>
+                    {% else %}
+                      <img src="{{ url }}" class="collection-cover-media" alt="{{ collection.name }}">
+                    {% endif %}
+                  </div>
+                {% endwith %}
+              </div>
+            {% endif %}
           </div>
-        </div>
+
+          
+        </section>
+        {% if not forloop.last %}
+          <hr class="collection-divider" />
+        {% endif %}
       {% empty %}
         <p>No collections yet.</p>
       {% endfor %}
     </div>
   </div>
+
+  <!-- Always show 'More art' CTA at the end of the gallery -->
+  <div class="container mt-4 mb-5">
+    <div class="row">
+      <div class="col-12 text-center">
+        <h4>Interested in these artworks?</h4>
+        <a href="{% url 'collections_app:artwork_list' %}" class="btn btn-primary btn-lg mt-3">
+          Browse Our Store →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('debug_layout') === '1') {
+          document.body.classList.add('debug-layout');
+        }
+      } catch (e) {
+        // ignore in old browsers
+      }
+    })();
+  </script>
+
 {% endblock %}

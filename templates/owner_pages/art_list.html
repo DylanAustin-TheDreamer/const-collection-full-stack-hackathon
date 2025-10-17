@@ -5,35 +5,46 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h1>Artwork</h1>
       {% if request.user.is_superuser %}
-        <a class="btn btn-success" href="{% url 'owner_app:create_art' %}">Add New Artwork</a>
+        <a class="btn btn-primary" href="{% url 'owner_app:create_art' %}">Add New Artwork</a>
       {% endif %}
     </div>
 
-    <div class="row">
-      {% for art in arts %}
-        <div class="col-md-4 mb-3">
-          <div class="card">
-            {% if art.image %}
-              <img src="{{ art.image.url }}" class="card-img-top" alt="{{ art.title }}">
-            {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ art.title }}</h5>
-              <p class="card-text">Collection: {{ art.collection.name }}</p>
-              {% if request.user.is_superuser %}
-                <div class="mt-2">
-                  <a class="btn btn-sm btn-outline-secondary" href="{% url 'owner_app:edit_art' art.pk %}">Edit</a>
-                  <form method="post" action="{% url 'owner_app:delete_art' art.pk %}" style="display:inline-block; margin-left:6px;">
+    {% for group in grouped_collections %}
+      <h4 class="mt-4">{{ group.collection.name }}</h4>
+      <div class="row mb-3">
+        {% for art in group.arts %}
+          <div class="col-6 col-sm-4 col-md-3 mb-3">
+            <div class="card small-card h-100">
+              {% if art.image %}
+                <img src="{{ art.image.url }}" class="card-img-top" alt="{{ art.title }}" style="height:140px; object-fit:cover;">
+              {% else %}
+                <div class="card-img-top bg-light" style="height:140px;"></div>
+              {% endif %}
+              <div class="card-body p-2 d-flex flex-column">
+                <h6 class="card-title mb-1">{{ art.title }}</h6>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <div class="d-flex gap-1">
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'owner_app:edit_art' art.pk %}">Edit</a>
+                    <form method="post" action="{% url 'owner_app:delete_art' art.pk %}" style="display:inline-block;">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                  </div>
+                  <form method="post" action="{% url 'owner_app:toggle_featured_art' art.pk %}">
                     {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="featured-{{ art.pk }}" name="is_featured" {% if art.is_featured %}checked{% endif %} onchange="this.form.submit()">
+                      <label class="form-check-label small ms-1" for="featured-{{ art.pk }}">Featured</label>
+                    </div>
                   </form>
                 </div>
-              {% endif %}
+              </div>
             </div>
           </div>
-        </div>
-      {% empty %}
-        <p>No artworks yet.</p>
-      {% endfor %}
-    </div>
+        {% empty %}
+          <p class="text-muted">No artworks in this collection yet.</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
   </div>
 {% endblock %}

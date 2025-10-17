@@ -1,5 +1,6 @@
 <!doctype html>
 {% load static %}
+{% load nav_tags %}
 <html lang="en">
   <head>
 
@@ -15,9 +16,9 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 
-<body>
+<body{% if request.GET.debug_layout == '1' %} class="debug-layout"{% endif %}>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light">
+        <nav class="navbar navbar-expand-lg navbar-light navbar-sticky">
             <div class="container">
                 <a class="navbar-brand" href="{% url 'collections_app:index' %}">Const Collection</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -26,12 +27,27 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'collections_app:gallery' %}">Gallery</a>
+                        {% url 'collections_app:gallery' as gallery_url %}
+                        {% url 'collections_app:artwork_list' as store_url %}
+                        {% url 'events_app:index' as events_url %}
+                        {% url 'about' as about_url %}
+                        {% url 'contact' as contact_url %}
+
+                        <li class="nav-item">
+                            <a class="nav-link {% nav_active gallery_url %}" href="{{ gallery_url }}">Gallery</a>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'store_app:index' %}">Store</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'events_app:index' %}">Events</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link {% nav_active store_url %}" href="{{ store_url }}">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% nav_active events_url %}" href="{{ events_url }}">Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% nav_active about_url %}" href="{{ about_url }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% nav_active contact_url %}" href="{{ contact_url }}">Contact</a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
                         {% if user.is_authenticated %}
@@ -52,34 +68,47 @@
                                 data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ user.username }}
                             </a>
+                            {% url 'collections_app:user_dashboard' as dashboard_url %}
+                            {% url 'collections_app:messages' as messages_url %}
+                            {% url 'collections_app:manage_media' as manage_media_url %}
+                            {% url 'owner_app:art_list' as manage_art_url %}
+                            {% url 'owner_app:collections_list' as manage_collections_url %}
+                            {% url 'owner_app:exhibitions_list' as manage_exhibitions_url %}
+                            {% url 'owner_app:edit_artist' as edit_artist_url %}
+                            {% url 'account_logout' as logout_url %}
+
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item"
-                                        href="{% url 'collections_app:user_dashboard' %}">Dashboard</a></li>
-                                {% if request.user.is_superuser %}
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                <li><a class="dropdown-item" class="nav-link"
-                    href="{% url 'collections_app:manage_media' %}">Manage Media</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:art_list' %}">Manage Art</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:create_art' %}">Add New Artwork</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:collections_list' %}">Manage Collections</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:create_collection' %}">Create Collection</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:exhibitions_list' %}">Manage Exhibitions</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:create_exhibition' %}">Create Exhibition</a></li>
-                                <li><a class="dropdown-item" class="nav-link"
-                                        href="{% url 'owner_app:edit_artist' %}">Edit About</a></li>
-                                {% endif %}
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                <li><a class="dropdown-item {% nav_active dashboard_url %}"
+                    href="{{ dashboard_url }}">Dashboard</a></li>
+                                                                                                {% load messages_tags %}
+                                                                                                <li>
+                                                                                                    {% message_count as count %}
+                                                                                                    <a class="dropdown-item d-flex align-items-center {% nav_active messages_url %}" href="{{ messages_url }}">
+                                                                                                        <span>Messages</span>
+                                                                                                        {% if count|add:0 %}
+                                                                                                            <span class="badge bg-secondary ms-2">{{ count }}</span>
+                                                                                                        {% endif %}
+                                                                                                    </a>
+                                                                                                </li>
+                {% if request.user.is_superuser %}
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+        <li><a class="dropdown-item {% nav_active manage_media_url %}"
+            href="{{ manage_media_url }}">Manage Media</a></li>
+                <li><a class="dropdown-item {% nav_active manage_art_url %}"
+                    href="{{ manage_art_url }}">Manage Art</a></li>
+                <li><a class="dropdown-item {% nav_active manage_collections_url %}"
+                    href="{{ manage_collections_url }}">Manage Collections</a></li>
+                <li><a class="dropdown-item {% nav_active manage_exhibitions_url %}"
+                    href="{{ manage_exhibitions_url }}">Manage Exhibitions</a></li>
+                <li><a class="dropdown-item {% nav_active edit_artist_url %}"
+                    href="{{ edit_artist_url }}">Edit About</a></li>
+                {% endif %}
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item {% nav_active logout_url %}" href="{{ logout_url }}">Logout</a></li>
                             </ul>
                         </li>
                         {% else %}
@@ -110,6 +139,7 @@
         <!-- Font Awesome Icons -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
         <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/featured-carousel.js' %}"></script>
 
     </body>
 </html>
