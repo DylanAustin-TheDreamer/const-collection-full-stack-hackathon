@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from owner_app import views as owner_views
+from allauth.urls import path as allauth_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +32,5 @@ urlpatterns = [
         name='contact',
     ),
     path('about/', owner_views.public_about, name='about'),
+    path('accounts/', include('allauth.urls')),
 ]

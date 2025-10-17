@@ -25,4 +25,7 @@ urlpatterns = [
         name='assign_art',
     ),
     path('about/edit/', views.edit_artist, name='edit_artist'),
+    path('collections/', views.collections_list, name='collections_list'),
+    path('collections/create/', views.create_collection, name='create_collection'),
+    path('collections/<int:pk>/edit/', views.edit_collection, name='edit_collection'),
 ]

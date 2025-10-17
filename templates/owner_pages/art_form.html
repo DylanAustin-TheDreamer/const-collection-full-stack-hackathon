@@ -2,7 +2,7 @@
 
 {% block content %}
   <div class="container mt-4">
-    <h1>Add New Artwork</h1>
+    <h1>{% if edit %}Edit Artwork{% else %}Add New Artwork{% endif %}</h1>
     <p class="text-muted">You can create a new collection inline if needed.</p>
     <div class="card">
       <div class="card-body">
@@ -26,8 +26,132 @@
 
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-primary">Save</button>
+          <div class="row">
+            <div class="col-md-8">
+              <div class="mb-3">
+                {{ form.collection.label_tag }}
+                {{ form.collection }}
+                {{ form.collection.errors }}
+              </div>
+
+              <div class="mb-3">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+                {{ form.title.errors }}
+              </div>
+
+              <div class="mb-3">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                {{ form.description.errors }}
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  {{ form.medium.label_tag }}
+                  {{ form.medium }}
+                  {{ form.medium.errors }}
+                </div>
+                <div class="col-md-2 mb-3">
+                  {{ form.year_created.label_tag }}
+                  {{ form.year_created }}
+                  {{ form.year_created.errors }}
+                </div>
+                <div class="col-md-3 mb-3">
+                  {{ form.width_cm.label_tag }}
+                  {{ form.width_cm }}
+                  {{ form.width_cm.errors }}
+                </div>
+                <div class="col-md-3 mb-3">
+                  {{ form.height_cm.label_tag }}
+                  {{ form.height_cm }}
+                  {{ form.height_cm.errors }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                {{ form.image.label_tag }}
+                {{ form.image }}
+                {{ form.image.errors }}
+              </div>
+
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-light p-3">
+                  <h5>Store & Visibility</h5>
+
+                  <div class="mb-3">
+
+
+                  <div class="form-check mb-2">
+                    {{ form.is_featured }}
+                    {{ form.is_featured.label_tag }}
+                    {{ form.is_featured.errors }}
+                  </div>
+
+                  <hr />
+                  <h6>Per-format pricing</h6>
+                  <div class="mb-2">
+                    <div class="d-flex align-items-center">
+                      <div class="form-check me-2">
+                        {{ form.original_available }}
+                      </div>
+                      <div class="flex-grow-1">
+                        <label class="form-label">Original piece price</label>
+                        <div class="d-flex align-items-center">
+                          {{ form.original_price }}
+                          <div class="ms-2 small text-muted">{{ form.currency }}</div>
+                        </div>
+                        {{ form.original_price.errors }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <div class="d-flex align-items-center">
+                      <div class="form-check me-2">
+                        {{ form.poster_available }}
+                      </div>
+                      <div class="flex-grow-1">
+                        <label class="form-label">Printed poster price</label>
+                        <div class="d-flex align-items-center">
+                          {{ form.poster_price }}
+                          <div class="ms-2 small text-muted">{{ form.currency }}</div>
+                        </div>
+                        {{ form.poster_price.errors }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <div class="d-flex align-items-center">
+                      <div class="form-check me-2">
+                        {{ form.digital_available }}
+                      </div>
+                      <div class="flex-grow-1">
+                        <label class="form-label">Digital copy price</label>
+                        <div class="d-flex align-items-center">
+                          {{ form.digital_price }}
+                          <div class="ms-2 small text-muted">{{ form.currency }}</div>
+                        </div>
+                        {{ form.digital_price.errors }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    {{ form.depth_cm.label_tag }}
+                    {{ form.depth_cm }}
+                    {{ form.depth_cm.errors }}
+                  </div>
+
+                  <div class="mt-3">
+                    <button type="submit" class="btn btn-primary w-100">{% if edit %}Save changes{% else %}Create artwork{% endif %}</button>
+                  </div>
+                </div>
+            </div>
+          </div>
         </form>
       </div>
     </div>

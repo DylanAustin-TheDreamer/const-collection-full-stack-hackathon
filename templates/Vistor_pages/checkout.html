@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout | Const Collection{% endblock %}
+
+{% block content %}
+  <!-- 
+    CHECKOUT PAGE
+    Purpose: Allow users to review their order and enter billing information
+    This is the final step before payment processing
+  -->
+  
+  <div class="container mt-5 mb-5">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="mb-4">Checkout</h1>
+        
+        <!-- Checkout Progress Indicator -->
+        <div class="mb-5">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="flex-fill text-center">
+              <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="bi bi-check"></i>
+              </div>
+              <div class="mt-2 small">Basket</div>
+            </div>
+            <div class="flex-fill border-top border-success"></div>
+            <div class="flex-fill text-center">
+              <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                2
+              </div>
+              <div class="mt-2 small fw-bold">Checkout</div>
+            </div>
+            <div class="flex-fill border-top"></div>
+            <div class="flex-fill text-center">
+              <div class="bg-light text-muted rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                3
+              </div>
+              <div class="mt-2 small text-muted">Payment</div>
+            </div>
+            <div class="flex-fill border-top"></div>
+            <div class="flex-fill text-center">
+              <div class="bg-light text-muted rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                4
+              </div>
+              <div class="mt-2 small text-muted">Confirmation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Left Column: Billing Information Form -->
+      <div class="col-lg-7 col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h4 class="card-title mb-4">Billing Information</h4>
+            
+            <!-- Billing Address Form -->
+            <form id="checkout-form" method="post" action="#">
+              {% csrf_token %}
+              
+              <!-- Contact Information -->
+              <div class="mb-4">
+                <h5 class="mb-3">Contact Details</h5>
+                
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email Address *</label>
+                  <input 
+                    type="email" 
+                    class="form-control" 
+                    id="email" 
+                    name="email" 
+                    value="{{ user.email }}"
+                    required
+                  >
+                  <div class="form-text">Order confirmation will be sent here</div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="first_name" class="form-label">First Name *</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="first_name" 
+                      name="first_name"
+                      value="{{ user.first_name }}"
+                      required
+                    >
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="last_name" class="form-label">Last Name *</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="last_name" 
+                      name="last_name"
+                      value="{{ user.last_name }}"
+                      required
+                    >
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="phone" class="form-label">Phone Number *</label>
+                  <input 
+                    type="tel" 
+                    class="form-control" 
+                    id="phone" 
+                    name="phone"
+                    placeholder="+1 (555) 123-4567"
+                    required
+                  >
+                </div>
+              </div>
+              
+              <hr class="my-4">
+              
+              <!-- Billing Address -->
+              <div class="mb-4">
+                <h5 class="mb-3">Billing Address</h5>
+                
+                <div class="mb-3">
+                  <label for="address_line1" class="form-label">Address Line 1 *</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="address_line1" 
+                    name="address_line1"
+                    placeholder="Street address, P.O. box"
+                    required
+                  >
+                </div>
+                
+                <div class="mb-3">
+                  <label for="address_line2" class="form-label">Address Line 2</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="address_line2" 
+                    name="address_line2"
+                    placeholder="Apartment, suite, unit, building, floor, etc."
+                  >
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="city" class="form-label">City *</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="city" 
+                      name="city"
+                      required
+                    >
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="state" class="form-label">State/Province *</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="state" 
+                      name="state"
+                      required
+                    >
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="postal_code" class="form-label">Postal/ZIP Code *</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="postal_code" 
+                      name="postal_code"
+                      required
+                    >
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="country" class="form-label">Country *</label>
+                    <select class="form-select" id="country" name="country" required>
+                      <option value="">Select a country</option>
+                      <option value="US">United States</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="CA">Canada</option>
+                      <option value="AU">Australia</option>
+                      <option value="FR">France</option>
+                      <option value="DE">Germany</option>
+                      <option value="IT">Italy</option>
+                      <option value="ES">Spain</option>
+                      <option value="NL">Netherlands</option>
+                      <option value="BE">Belgium</option>
+                      <!-- Add more countries as needed -->
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <hr class="my-4">
+              
+              <!-- Special Instructions -->
+              <div class="mb-4">
+                <label for="notes" class="form-label">Order Notes (Optional)</label>
+                <textarea 
+                  class="form-control" 
+                  id="notes" 
+                  name="notes" 
+                  rows="3"
+                  placeholder="Any special instructions or notes for this order"
+                ></textarea>
+              </div>
+              
+              <!-- Terms and Conditions -->
+              <div class="form-check mb-4">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  id="terms" 
+                  name="terms"
+                  required
+                >
+                <label class="form-check-label" for="terms">
+                  I agree to the <a href="#" target="_blank">Terms and Conditions</a> *
+                </label>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="d-flex justify-content-between">
+                <a href="{% url 'collections_app:basket' %}" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Back to Basket
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                  Proceed to Payment <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column: Order Summary -->
+      <div class="col-lg-5 col-md-6 mb-4">
+        <div class="card shadow-sm sticky-top" style="top: 20px;">
+          <div class="card-body">
+            <h4 class="card-title mb-4">Order Summary</h4>
+            
+            <!-- Basket Items -->
+            <div class="mb-3">
+              {% for item in basket.items.all %}
+                <div class="d-flex mb-3 pb-3 border-bottom">
+                  <!-- Artwork Image -->
+                  <div class="flex-shrink-0 me-3">
+                    {% if item.display_artwork.image %}
+                      <img 
+                        src="{{ item.display_artwork.image.url }}" 
+                        alt="{{ item.display_artwork.title }}"
+                        class="rounded"
+                        style="width: 80px; height: 80px; object-fit: cover;"
+                      >
+                    {% else %}
+                      <div 
+                        class="bg-light rounded d-flex align-items-center justify-content-center"
+                        style="width: 80px; height: 80px;"
+                      >
+                        <i class="bi bi-image text-muted"></i>
+                      </div>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Item Details -->
+                    <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ item.display_artwork.title }}</h6>
+                    <small class="text-muted d-block mb-2">
+                      by {{ item.display_artwork.artist.name }}
+                    </small>
+                    {% if item.variant %}
+                      <div class="small text-muted mb-2">Format: {{ item.variant.get_medium_display }}</div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="text-muted">Qty: {{ item.quantity }}</span>
+                      <span class="fw-bold">${{ item.get_subtotal|floatformat:2 }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <!-- Pricing Breakdown -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal ({{ basket.get_item_count }} item{{ basket.get_item_count|pluralize }}):</span>
+                <span>${{ subtotal }}</span>
+              </div>
+              
+              <div class="d-flex justify-content-between mb-2">
+                <span>Shipping:</span>
+                <span>
+                  {% if shipping_cost == 0 %}
+                    <span class="text-success">FREE</span>
+                  {% else %}
+                    ${{ shipping_cost }}
+                  {% endif %}
+                </span>
+              </div>
+              
+              <hr>
+              
+              <div class="d-flex justify-content-between mb-2">
+                <span class="fs-5 fw-bold">Total:</span>
+                <span class="fs-5 fw-bold text-success">${{ total }}</span>
+              </div>
+            </div>
+            
+            <!-- Security Badge -->
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-shield-check"></i>
+              <small>
+                <strong>Secure Checkout</strong><br>
+                Your payment information is encrypted and secure.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

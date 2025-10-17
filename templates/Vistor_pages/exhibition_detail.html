@@ -8,7 +8,16 @@
       <div class="col-md-8">
         <h2>{{ exhibition.title }}</h2>
         {% if exhibition.cover_image %}
-          <img src="{{ exhibition.cover_image.url }}" class="img-fluid mb-3" alt="{{ exhibition.title }} cover">
+          {% with url=exhibition.cover_image.url %}
+            {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+              <video class="img-fluid mb-3" controls>
+                <source src="{{ url }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            {% else %}
+              <img src="{{ url }}" class="img-fluid mb-3" alt="{{ exhibition.title }} cover">
+            {% endif %}
+          {% endwith %}
         {% endif %}
         <p class="text-muted">
           {% if exhibition.start_date %}{{ exhibition.start_date }}{% endif %}
