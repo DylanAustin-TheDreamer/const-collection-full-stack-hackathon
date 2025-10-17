@@ -57,7 +57,24 @@
         #45b7d1 100%
     );
     margin: 0 0 2rem 0;
-    width: 100px;
+    width: 200px;
+}
+
+/* Artwork name and price styling - dark ocean blue */
+.basket-table td a,
+.basket-table td strong {
+    color: #0d4f6d !important;
+}
+
+.basket-table td a:hover {
+    color: #0a3d54 !important;
+}
+
+/* Price values in dark ocean blue */
+.basket-table .text-primary,
+#basket-subtotal,
+#basket-total {
+    color: #0d4f6d !important;
 }
 
 /* Buttons styling */
@@ -120,7 +137,7 @@
 }
 
 .summary-value {
-    color: #000000;
+    color: #0d4f6d;
     font-weight: 500;
     font-size: 1rem;
 }
