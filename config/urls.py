@@ -31,10 +31,7 @@ urlpatterns = [
     path('owner/', include('owner_app.urls')),
     path('contact/', collections_views.contact, name='contact'),
     path('about/', owner_views.public_about, name='about'),
-    path('web_build/', collections_views.web_build, name='web_build'),
-    # Custom Unity file serving to handle MIME types properly
-    re_path(r'^static/web_build/(?P<file_path>.+)$', 
-            collections_views.serve_unity_static, name='unity_static'),
+
     path('accounts/', include('allauth.urls')),
 ]
 

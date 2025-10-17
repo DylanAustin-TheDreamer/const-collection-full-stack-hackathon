@@ -268,17 +268,6 @@ WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
 ]
 
 # Enable static file compression for better transfer efficiency
-
-# Unity WebGL MIME type configuration
-WHITENOISE_MIMETYPES = {
-    '.wasm': 'application/wasm',
-    '.data': 'application/octet-stream',
-    '.js': 'application/javascript',
-    '.gz': 'application/gzip',
-}
-
-# Add Unity files to skip compression since they're already compressed
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS.extend(['wasm', 'data'])
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
