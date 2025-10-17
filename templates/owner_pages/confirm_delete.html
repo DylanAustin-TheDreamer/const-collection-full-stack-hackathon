@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete | Owner{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Delete {{ type }}</h2>
+  <p>Are you sure you want to delete <strong>{{ object }}</strong>? This action cannot be undone.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Yes, delete</button>
+    <a class="btn btn-secondary" href="javascript:history.back()">Cancel</a>
+  </form>
+</div>
+{% endblock %}

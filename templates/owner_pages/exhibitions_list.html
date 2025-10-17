@@ -18,18 +18,23 @@
                 <div>
                   <a href="{% url 'owner_app:edit_exhibition' ex.pk %}"><strong>{{ ex.title }}</strong></a>
                   <div class="small text-muted">{{ ex.start_date }}
-                    {% if ex.end_date %} & {{ ex.end_date }}{% endif %}</div>
-                  <div class="small text-muted">
-                    From: {% if ex.start_time %} {{ ex.start_time }}{% endif %}
-                    {% if ex.end_time %} to {{ ex.end_time }}{% endif %}
+                      {% if ex.end_date %} & {{ ex.end_date }}{% endif %}</div>
+                    <div class="small text-muted">
+                        From: {% if ex.start_time %} {{ ex.start_time }}{% endif %}
+                        {% if ex.end_time %} to {{ ex.end_time }}{% endif %}
+                    </div>
+                    <span class="badge bg-secondary">Status: {{ ex.get_status_display }}</span>
                 </div>
-            </div>
-            <div class="text-end">
-              <span class="badge bg-secondary">{{ ex.get_status_display }}</span>
-              <div class="mt-2">
-                <a href="{% url 'owner_app:assign_art' ex.pk %}" class="btn btn-sm btn-outline-primary">Assign Art</a>
-              </div>
-              </div>
+                <div class="text-end">
+                    <div class="mt-2 d-flex flex-column gap-2 align-items-end">
+                        <a href="{% url 'owner_app:assign_art' ex.pk %}" class="btn btn-sm btn-outline-primary">Assign Art</a>
+                        <a href="{% url 'owner_app:assign_media' ex.pk %}" class="btn btn-sm btn-outline-secondary">Assign Media</a>
+                        <form method="post" action="{% url 'owner_app:delete_exhibition' ex.pk %}" style="display:inline-block; margin:0;">
+                          {% csrf_token %}
+                          <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
             </div>
           {% endfor %}
         </div>

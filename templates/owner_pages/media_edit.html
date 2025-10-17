@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Media | Owner | Const Collection{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-8">
+      <h2>Edit Media</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" href="{% url 'collections_app:manage_media' %}">Back</a>
+      </form>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

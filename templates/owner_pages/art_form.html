@@ -98,7 +98,8 @@
                         {{ form.original_available }}
                       </div>
                       <div class="flex-grow-1">
-                        <label class="form-label">Original piece price</label>
+                  <a class="btn btn-secondary" href="{% url 'owner_app:art_list' %}">Back</a>
+                </form>
                         <div class="d-flex align-items-center">
                           {{ form.original_price }}
                           <div class="ms-2 small text-muted">{{ form.currency }}</div>
@@ -146,8 +147,9 @@
                     {{ form.depth_cm.errors }}
                   </div>
 
-                  <div class="mt-3">
-                    <button type="submit" class="btn btn-primary w-100">{% if edit %}Save changes{% else %}Create artwork{% endif %}</button>
+                  <div class="mt-3 d-flex">
+                    <button type="submit" class="btn btn-primary">{% if edit %}Save changes{% else %}Create artwork{% endif %}</button>
+                    <a class="btn btn-secondary ms-2" href="{% url 'owner_app:art_list' %}">Back</a>
                   </div>
                 </div>
             </div>
