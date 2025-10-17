@@ -55,9 +55,31 @@ if env_path.exists():
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1',]
+# Add logging to catch errors in production
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'ERROR',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
+
+ALLOWED_HOSTS = ['localhost', 'herokuapp.com', '127.0.0.1', 'const-collection-0f06bd9d4705.herokuapp.com']
 CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
 
 # Application definition
@@ -224,14 +246,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -252,7 +266,7 @@ WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
 ]
 
 # Enable static file compression for better transfer efficiency
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -261,32 +275,33 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# File upload settings for large video files
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50485760  # 50MB in memory
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50485760  # 50MB max upload
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
 # Cloudinary Configuration
 if 'CLOUDINARY_URL' in os.environ:
     # Use the CLOUDINARY_URL if available (most common format)
     cloudinary.config()
-    # Explicitly set the config as backup
-    cloudinary.config(
-        cloud_name='dece3gnhm',
-        api_key='832681451742447',
-        api_secret='1XTFspXWu98Gs8G7YtAUNmAVC6U',
-        secure=True,
-    )
 else:
     # Fallback to individual environment variables
     cloudinary.config(
-        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        api_key=os.environ.get('CLOUDINARY_API_KEY'),
-        api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'dece3gnhm'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY', '832681451742447'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET', '1XTFspXWu98Gs8G7YtAUNmAVC6U'),
         secure=True,  # Always use HTTPS
     )
 
-import os
-
-# Cloudinary credentials from env
-CLOUDINARY = {
-    'cloud_name': os.getenv("dece3gnhm"),
-    'api_secret': os.getenv("pineappleJuiceis...mkay"),
+# Cloudinary upload settings for large video files
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dece3gnhm'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '832681451742447'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', '1XTFspXWu98Gs8G7YtAUNmAVC6U'),
+    'SECURE': True,
+    'CHUNK_SIZE': 6000000,  # 6MB chunks for large uploads
+    'TIMEOUT': 60,  # 60 second timeout
+    'RESOURCE_TYPE': 'auto',  # Detect file type automatically
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
