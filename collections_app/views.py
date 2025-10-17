@@ -989,85 +989,10 @@ def contact(request):
 
 
 def web_build(request):
-    """Serve the Unity WebGL build"""
-    response = render(request, 'web_build/index.html')
-    # Add Unity-specific headers
-    response['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    response['Cross-Origin-Opener-Policy'] = 'same-origin'
-    return response
-
-
-def serve_unity_file(request, file_path):
-    """Serve Unity WebGL files with proper MIME types and headers"""
-    # Skip the main index.html as it's handled by web_build view
-    if file_path == '' or file_path == 'index.html':
-        return web_build(request)
+    """Serve the Unity WebGL build - just redirect to static files"""
+    from django.shortcuts import redirect
+    from django.conf import settings
     
-    # Build the full file path
-    build_dir = os.path.join(settings.BASE_DIR, 'templates', 'web_build')
-    full_path = os.path.join(build_dir, file_path)
-    
-    # Debug: print the requested path
-    print(f"Unity file requested: {file_path}")
-    print(f"Full path: {full_path}")
-    print(f"File exists: {os.path.exists(full_path)}")
-    
-    if not os.path.exists(full_path):
-        # Try to list directory contents to help debug
-        dir_path = os.path.dirname(full_path)
-        if os.path.exists(dir_path):
-            print(f"Directory contents: {os.listdir(dir_path)}")
-        raise Http404(f"Unity file not found: {file_path}")
-    
-    # Determine content type based on file extension
-    content_type = 'application/octet-stream'
-    encoding = None
-    
-    # Unity-specific files
-    if file_path.endswith('.wasm.gz'):
-        content_type = 'application/wasm'
-        encoding = 'gzip'
-    elif file_path.endswith('.data.gz'):
-        content_type = 'application/octet-stream'
-        encoding = 'gzip'
-    elif file_path.endswith('.js.gz'):
-        content_type = 'application/javascript'
-        encoding = 'gzip'
-    elif file_path.endswith('.js'):
-        content_type = 'application/javascript'
-    elif file_path.endswith('.wasm'):
-        content_type = 'application/wasm'
-    # Standard web files
-    elif file_path.endswith('.css'):
-        content_type = 'text/css'
-    elif file_path.endswith('.html'):
-        content_type = 'text/html'
-    elif file_path.endswith('.png'):
-        content_type = 'image/png'
-    elif file_path.endswith('.jpg') or file_path.endswith('.jpeg'):
-        content_type = 'image/jpeg'
-    elif file_path.endswith('.ico'):
-        content_type = 'image/x-icon'
-    else:
-        # Use mimetypes to guess for other files
-        guessed_type, _ = mimetypes.guess_type(full_path)
-        if guessed_type:
-            content_type = guessed_type
-    
-    # Read and serve the file
-    with open(full_path, 'rb') as f:
-        content = f.read()
-    
-    response = HttpResponse(content, content_type=content_type)
-    
-    # Add encoding header for gzipped files
-    if encoding:
-        response['Content-Encoding'] = encoding
-    
-    # Add Unity-specific headers only for Unity files
-    if any(file_path.endswith(ext) for ext in ['.js', '.wasm', '.data', '.js.gz', '.wasm.gz', '.data.gz']):
-        response['Cross-Origin-Embedder-Policy'] = 'require-corp'
-        response['Cross-Origin-Opener-Policy'] = 'same-origin'
-    
-    return response
+    # Redirect to the static Unity build
+    return redirect('/static/web_build/')
 

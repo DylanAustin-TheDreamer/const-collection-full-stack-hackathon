@@ -30,8 +30,5 @@ urlpatterns = [
     path('contact/', collections_views.contact, name='contact'),
     path('about/', owner_views.public_about, name='about'),
     path('web_build/', collections_views.web_build, name='web_build'),
-    # Unity WebGL file serving - catch all files in web_build
-    re_path(r'^web_build/(?P<file_path>.+)$', 
-            collections_views.serve_unity_file, name='unity_file'),
     path('accounts/', include('allauth.urls')),
 ]
