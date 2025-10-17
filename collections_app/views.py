@@ -20,13 +20,19 @@ def index(request):
         secondary_media = Media.objects.filter(second_section=True).first()
         
         if hero_media and hero_media.file:
-            context['hero'] = hero_media.file.url
+            context['hero_video'] = hero_media.file.url
+        else:
+            context['hero_video'] = None  # Or a fallback static video
             
         if secondary_media and secondary_media.file:
-            context['secondary'] = secondary_media.file.url
+            context['secondary_video'] = secondary_media.file.url
+        else:
+            context['secondary_video'] = None  # Or a fallback static video
+            
     except Exception as e:
         # Handle any database errors gracefully
-        context['media_error'] = True
+        context['hero_video'] = None
+        context['secondary_video'] = None
         print(f"Media error: {e}")  # For debugging
     
     return render(request, 'Vistor_pages/home.html', context)
