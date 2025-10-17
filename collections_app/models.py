@@ -183,12 +183,7 @@ class Media(models.Model):
 
     # Minimal fields: file, media_type, caption. Other attachment fields
     # removed per request to keep Media standalone.
-    file = models.FileField(upload_to='media/', blank=True, null=True)
-    # Optional: store file content as binary for database storage
-    file_content = models.BinaryField(blank=True, null=True)
-    file_name = models.CharField(max_length=255, blank=True)
-    file_size = models.PositiveIntegerField(blank=True, null=True)
-    content_type = models.CharField(max_length=100, blank=True)
+    file = CloudinaryField(resource_type='auto', blank=True, null=True)
     media_type = models.CharField(
         max_length=16, choices=MEDIA_TYPE_CHOICES, default=IMAGE
     )
