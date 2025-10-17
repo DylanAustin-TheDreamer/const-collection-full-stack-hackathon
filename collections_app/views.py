@@ -983,3 +983,8 @@ def contact(request):
     
     return render(request, 'Vistor_pages/contact.html', context)
 
+
+def web_build(request):
+    """Serve the Unity WebGL build"""
+    return render(request, 'web_build/index.html')
+
