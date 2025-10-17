@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.db.models import Q
 from django.views.decorators.http import require_POST
 from .models import Order, OrderItem
@@ -35,6 +35,8 @@ def collection_detail(request, pk):
 def art_detail(request, pk):
     from .models import Art
 
+
+
     art = Art.objects.select_related('collection__artist').get(pk=pk)
 
     # For compatibility keep 'artwork' context key pointing to the Art instance
@@ -59,7 +61,7 @@ def artwork_list(request):
     - Optimizes database queries using select_related
     - Supports filtering and search functionality
     """
-    from .models import Art
+    from .models import Art, Collection, ArtVariant
 
     # Fetch all art rows (Art is canonical) and expose them as 'artworks' for templates
     # Prefetch variants so templates can show per-medium pricing without N+1
@@ -83,32 +85,42 @@ def artwork_list(request):
             Q(collection__artist__name__icontains=search_query)
         )
     
-    # Get filter parameters for price range (if provided)
-    min_price = request.GET.get('min_price', '')
-    max_price = request.GET.get('max_price', '')
-    
-    # Apply price filters if provided
-    if min_price:
-        artworks = artworks.filter(variants__price__gte=min_price)
-    if max_price:
-        artworks = artworks.filter(variants__price__lte=max_price)
-    
-    # Get filter parameter for medium (if provided)
-    medium_filter = request.GET.get('medium', '')
-    if medium_filter:
-        artworks = artworks.filter(medium__icontains=medium_filter)
+    # Filter by collection (if provided)
+    selected_collection = request.GET.get('collection', '')
+    if selected_collection:
+        artworks = artworks.filter(collection__id=selected_collection)
+
+    # Filter by available format (ArtVariant.medium)
+    selected_format = request.GET.get('format', '')
+    if selected_format:
+        artworks = artworks.filter(variants__medium=selected_format, variants__is_available=True)
     
     # Order artworks by creation date (newest first)
     artworks = artworks.order_by('-created_at')
     
     # Prepare context data to pass to the template
-    # compute cheapest available variant price for template
+    # Provide collections and format choices for the filter UI and featured artworks
+    collections = Collection.objects.select_related('artist').all()
+    format_choices = ArtVariant.MEDIUM_CHOICES
+    # Include featured artworks even when `Art.is_available` is False but the
+    # artwork has at least one available ArtVariant. Availability is often
+    # derived from variants, so this ensures featured pieces surface correctly.
+    featured_artworks = (
+        Art.objects
+        .filter(is_featured=True)
+        .filter(Q(is_available=True) | Q(variants__is_available=True))
+        .distinct()
+        .order_by('-created_at')[:6]
+    )
+
     context = {
         'artworks': artworks,
         'search_query': search_query,
-        'min_price': min_price,
-        'max_price': max_price,
-        'medium_filter': medium_filter,
+        'collections': collections,
+        'format_choices': format_choices,
+        'selected_collection': selected_collection,
+        'selected_format': selected_format,
+        'featured_artworks': featured_artworks,
     }
     
     # Render the artwork list template with the context data
@@ -819,6 +831,110 @@ def user_dashboard(request):
     })
 
 
+def manage_media(request):
+    """Simple view for superusers to add/manage Media entries outside admin.
+
+    This is intentionally lightweight: it displays a form for creating Media and
+    lists recent media items. The canonical admin is still recommended.
+    """
+    if not getattr(request.user, 'is_superuser', False):
+        return HttpResponseForbidden('Only superusers can access this page')
+
+    from .forms import MediaForm
+    from .models import Media
+
+    try:
+        if request.method == 'POST':
+            form = MediaForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                return redirect('collections_app:manage_media')
+        else:
+            form = MediaForm()
+
+        # Build a simple recent list using the current Media columns only.
+        recent_rows = list(
+            Media.objects.order_by('-created_at').values(
+                'id',
+                'file',
+                'media_type',
+                'caption',
+                'hero',
+                'second_section',
+                'third_section',
+                'created_at',
+            )[:50]
+        )
+
+        recent = []
+        for row in recent_rows:
+            recent.append(
+                {
+                    'id': row.get('id'),
+                    'has_file': bool(row.get('file')),
+                    'media_type': row.get('media_type'),
+                    'caption': row.get('caption'),
+                    'hero': bool(row.get('hero')),
+                    'second_section': bool(row.get('second_section')),
+                    'third_section': bool(row.get('third_section')),
+                    'created_at': row.get('created_at'),
+                }
+            )
+
+        return render(
+            request,
+            'owner_pages/media_manage.html',
+            {'form': form, 'recent': recent},
+        )
+    except Exception as exc:
+        # Catch-all so owners see a friendly page instead of a 500 while we
+        # investigate root causes (e.g. orphaned rows).
+        messages.error(request, f'Error loading media manager: {exc}')
+        form = MediaForm()
+        return render(
+            request,
+            'owner_pages/media_manage.html',
+            {'form': form, 'recent': []},
+        )
+
+
+def edit_media(request, pk):
+    """Edit an existing Media row (superuser-only)."""
+    if not getattr(request.user, 'is_superuser', False):
+        return HttpResponseForbidden('Only superusers can edit media')
+
+    from .models import Media
+    from .forms import MediaForm
+
+    media = get_object_or_404(Media, pk=pk)
+    if request.method == 'POST':
+        form = MediaForm(request.POST, request.FILES, instance=media)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Media updated')
+            return redirect('collections_app:manage_media')
+    else:
+        form = MediaForm(instance=media)
+
+    return render(request, 'owner_pages/media_edit.html', {'form': form, 'media': media})
+
+
+@login_required
+def delete_media(request, pk):
+    # restrict to superusers
+    if not getattr(request.user, 'is_superuser', False):
+        return HttpResponseForbidden('Only superusers can delete media')
+
+    from .models import Media
+    media = get_object_or_404(Media, pk=pk)
+    if request.method == 'POST':
+        media.delete()
+        return redirect('collections_app:manage_media')
+    return render(
+        request,
+        'owner_pages/confirm_delete.html',
+        {'object': media, 'type': 'Media'},
+    )
 def contact(request):
     """Contact page that displays contact information from the database."""
     from owner_app.models import Contact

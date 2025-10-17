@@ -612,3 +612,45 @@ class CollectionsAppSmokeTest(TestCase):
     def test_imports(self):
         from . import models
         self.assertIsNotNone(models)
+
+
+class MediaManageViewTest(TestCase):
+    """
+    Tests for the owner media manage POST flow, focused on homepage flag exclusivity.
+    """
+    def setUp(self):
+        from owner_app.models import ArtistProfile
+        self.artist = ArtistProfile.objects.create(name='Media Owner', email='m@example.com')
+        coll, _ = Collection.objects.get_or_create(artist=self.artist, name='Test')
+        self.art = Art.objects.create(collection=coll, title='Media Test Art')
+        self.client = Client()
+        # create and login a superuser to access the manage view
+        self.super = User.objects.create_superuser('su', 'su@example.com', 'pass')
+        self.client.login(username='su', password='pass')
+
+    def test_hero_flag_is_exclusive_on_post(self):
+        # create first media with hero=True
+        response1 = self.client.post(
+            reverse('collections_app:manage_media'),
+            data={'art': self.art.pk, 'media_type': 'image', 'caption': 'first', 'hero': 'on'}
+        )
+        self.assertIn(response1.status_code, (200, 302))
+
+        from .models import Media
+        m1 = Media.objects.filter(caption='first').first()
+        self.assertIsNotNone(m1)
+        self.assertTrue(m1.hero)
+
+        # create second media with hero=True, expecting the first to be cleared
+        response2 = self.client.post(
+            reverse('collections_app:manage_media'),
+            data={'art': self.art.pk, 'media_type': 'image', 'caption': 'second', 'hero': 'on'}
+        )
+        self.assertIn(response2.status_code, (200, 302))
+
+        m1.refresh_from_db()
+        m2 = Media.objects.filter(caption='second').first()
+        self.assertIsNotNone(m2)
+        # m2 should be hero, m1 should have been cleared by Media.save()
+        self.assertTrue(m2.hero)
+        self.assertFalse(m1.hero)

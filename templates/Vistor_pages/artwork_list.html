@@ -21,67 +21,62 @@
     <!-- Search and Filter Section -->
     <div class="row mb-4">
       <div class="col-12">
+        <div class="mb-3">
+          <h5 class="mb-2">Featured</h5>
+          <div id="featured-artworks" class="d-flex gap-3 overflow-auto pb-2">
+            {% if featured_artworks %}
+              {% for fa in featured_artworks %}
+                <a href="{% url 'collections_app:artwork_detail' fa.pk %}" class="text-decoration-none">
+                  <div style="width:160px;">
+                    {% if fa.image %}
+                      <img src="{{ fa.image.url }}" class="img-fluid rounded mb-1" alt="{{ fa.title }}" style="height:100px; object-fit:cover; width:100%;">
+                    {% else %}
+                      <div class="bg-light rounded mb-1" style="height:100px;"></div>
+                    {% endif %}
+                    <div class="small text-dark">{{ fa.title }}</div>
+                  </div>
+                </a>
+              {% endfor %}
+            {% else %}
+              <div class="text-muted">No featured artworks yet. Use the "Featured" toggle in the owner UI to showcase pieces here.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-12">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Search & Filter</h5>
-            <!-- Search form to filter artworks by various criteria -->
-            <form method="get" action="{% url 'collections_app:artwork_list' %}" class="row g-3">
-              
-              <!-- Search by title, medium, or artist -->
+            <!-- Search form: keep search box, add collection and format filters -->
+            <form id="artwork-filters-form" method="get" action="{% url 'collections_app:artwork_list' %}" class="row g-3">
               <div class="col-md-4">
                 <label for="search" class="form-label">Search</label>
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  id="search" 
-                  name="search" 
-                  value="{{ search_query }}" 
-                  placeholder="Search by title, medium, or artist"
-                >
+                <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}" placeholder="Search by title or artist">
               </div>
-              
-              <!-- Filter by minimum price -->
-              <div class="col-md-2">
-                <label for="min_price" class="form-label">Min Price (USD)</label>
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="min_price" 
-                  name="min_price" 
-                  value="{{ min_price }}" 
-                  placeholder="0"
-                  step="0.01"
-                >
+
+              <div class="col-md-4">
+                <label for="collection" class="form-label">Collection</label>
+                <select id="collection" name="collection" class="form-select">
+                  <option value="">All Collections</option>
+                  {% for c in collections %}
+                    <option value="{{ c.pk }}" {% if selected_collection|default:'' == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }} — {{ c.artist.name }}</option>
+                  {% endfor %}
+                </select>
               </div>
-              
-              <!-- Filter by maximum price -->
-              <div class="col-md-2">
-                <label for="max_price" class="form-label">Max Price (USD)</label>
-                <input 
-                  type="number" 
-                  class="form-control" 
-                  id="max_price" 
-                  name="max_price" 
-                  value="{{ max_price }}" 
-                  placeholder="10000"
-                  step="0.01"
-                >
-              </div>
-              
-              <!-- Filter by medium -->
+
               <div class="col-md-3">
-                <label for="medium" class="form-label">Medium</label>
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  id="medium" 
-                  name="medium" 
-                  value="{{ medium_filter }}" 
-                  placeholder="e.g., Oil, Acrylic, Digital"
-                >
+                <label for="format" class="form-label">Available Format</label>
+                <select id="format" name="format" class="form-select">
+                  <option value="">Any Format</option>
+                  {% for key,label in format_choices %}
+                    <option value="{{ key }}" {% if selected_format == key %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
               </div>
-              
-              <!-- Submit button -->
+
               <div class="col-md-1 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">Filter</button>
               </div>
@@ -162,7 +157,7 @@
               <!-- View Details Button -->
               <div class="mt-auto">
                 <a 
-                  href="{% url 'collections_app:artwork_detail' artwork.pk %}" 
+                  href="{% url 'collections_app:artwork_detail' artwork.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" 
                   class="btn btn-primary w-100"
                 >
                   View Details

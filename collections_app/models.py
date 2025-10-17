@@ -3,6 +3,7 @@ from django.db.models import PROTECT
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from cloudinary.models import CloudinaryField
+# contenttypes removed for simplified Media model
 
 
 class Collection(models.Model):
@@ -42,9 +43,9 @@ class Art(models.Model):
     # These remain in the model temporarily so migrations and the DB
     # stay compatible during the phased rollout. They will be removed
     # by an explicit Phase-B migration when ready.
-        # Note: legacy per-medium fields (physical_available/digital_available
-        # and physical_price/digital_price) were removed in the Phase-B
-        # migration; variants (ArtVariant) are now the source of truth.
+    # Note: legacy per-medium fields (physical_available/digital_available
+    # and physical_price/digital_price) were removed in the Phase-B
+    # migration; variants (ArtVariant) are now the source of truth.
 
     # --- ECOMMERCE / METADATA FIELDS (new, nullable) ---
     # unified price field (we'll map artwork.price to this by default)
@@ -90,8 +91,10 @@ class Art(models.Model):
 
     @property
     def artist(self):
-        """Compatibility property so templates expecting artwork.artist work on Art.
-        Returns the ArtistProfile linked via the Art's collection."""
+        """Compatibility property so templates expecting artwork.artist
+        work on Art. Returns the ArtistProfile linked via the
+        Art's collection.
+        """
         return getattr(self.collection, 'artist', None)
 
     def get_size_display(self):
@@ -145,7 +148,112 @@ class ArtVariant(models.Model):
         unique_together = ('art', 'medium')
 
     def __str__(self):
-        return f"{self.get_medium_display()} — {self.art.title}"
+        # Defensive: avoid dereferencing the related descriptor which will
+        # raise Art.DoesNotExist when the FK points to a missing row. Use
+        # the stored art_id and a safe filter lookup for the title.
+        art_title = None
+        art_id = getattr(self, 'art_id', None)
+        if art_id is not None:
+            from .models import Art as _Art
+
+            art_title = _Art.objects.filter(pk=art_id).values_list(
+                'title', flat=True
+            ).first()
+        return f"{self.get_medium_display()} — {art_title or '(art missing)'}"
+
+
+class Media(models.Model):
+    """Media attached to an Art or optionally a specific ArtVariant.
+
+    Files are stored via CloudinaryField (project already uses Cloudinary).
+    This model centralizes images, videos, PDFs, etc. related to an artwork.
+    """
+
+    IMAGE = 'image'
+    VIDEO = 'video'
+    PDF = 'pdf'
+    OTHER = 'other'
+
+    MEDIA_TYPE_CHOICES = [
+        (IMAGE, 'Image'),
+        (VIDEO, 'Video'),
+        (PDF, 'Document (PDF)'),
+        (OTHER, 'Other'),
+    ]
+
+    # Minimal fields: file, media_type, caption. Other attachment fields
+    # removed per request to keep Media standalone.
+    file = CloudinaryField(resource_type='auto', blank=True, null=True)
+    media_type = models.CharField(
+        max_length=16, choices=MEDIA_TYPE_CHOICES, default=IMAGE
+    )
+    caption = models.CharField(max_length=255, blank=True)
+    # legacy flags removed: is_primary and ordering
+    PLACEMENT_ART = 'art'
+    PLACEMENT_HOMEPAGE = 'homepage'
+    PLACEMENT_COLLECTION = 'collection'
+    PLACEMENT_ARTIST = 'artist'
+    PLACEMENT_PAGE = 'page'
+    PLACEMENT_CHOICES = [
+        (PLACEMENT_ART, 'Artwork'),
+        (PLACEMENT_HOMEPAGE, 'Homepage'),
+        (PLACEMENT_COLLECTION, 'Collection'),
+        (PLACEMENT_ARTIST, 'Artist'),
+        (PLACEMENT_PAGE, 'Custom Page'),
+    ]
+    # placement removed
+    # Three exclusive homepage/exhibit placement flags. Only one Media row
+    # may have each flag True at a time; enforcement is performed in save().
+    hero = models.BooleanField(
+        default=False, help_text='Primary hero media on homepage'
+    )
+    second_section = models.BooleanField(
+        default=False, help_text='Secondary homepage section'
+    )
+    third_section = models.BooleanField(
+        default=False, help_text='Tertiary homepage section'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Media'
+        verbose_name_plural = 'Media'
+
+    def __str__(self):
+        # Defensive: avoid directly accessing self.art which would trigger a
+        # DB lookup and can raise if the referenced Art row is missing. Use
+        # art_id and a safe filter to get the title when available.
+        # art was removed; show a concise description instead
+        return f"Media ({self.get_media_type_display()})"
+
+    def _clear_flag(self, field_name):
+        """Clear the given boolean flag on other Media rows.
+
+        This enforces uniqueness of hero/second_section/third_section.
+        """
+        if getattr(self, field_name):
+            # Set others to False atomically
+            Media.objects.filter(**{field_name: True}).exclude(
+                pk=self.pk
+            ).update(**{field_name: False})
+
+    def save(self, *args, **kwargs):
+        # If this instance is being set as a hero/second_section/third_section,
+        # clear that flag from other rows first to maintain uniqueness.
+        # We rely on the DB-level update() to do this efficiently.
+        # Note: this is a best-effort concurrency-safe approach; for absolute
+        # safety you'd add DB constraints where supported.
+        for flag in ('hero', 'second_section', 'third_section'):
+            if getattr(self, flag):
+                # Clear the flag on other rows before saving this one.
+                Media.objects.filter(**{flag: True}).exclude(
+                    pk=self.pk
+                ).update(**{flag: False})
+
+        super().save(*args, **kwargs)
+
 
 # ============================================================================
 # BASKET MODELS - Shopping cart functionality for purchasing artworks

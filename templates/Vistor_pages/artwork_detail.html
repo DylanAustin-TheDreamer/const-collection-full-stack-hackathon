@@ -139,7 +139,7 @@
           {% endif %}
 
           <!-- Back Button -->
-          <a href="{% url 'collections_app:artwork_list' %}" 
+          <a href="{% url 'collections_app:artwork_list' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" 
              class="btn btn-link text-muted w-100">
             ← Back to Artworks
           </a>

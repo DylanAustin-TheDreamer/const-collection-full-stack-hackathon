@@ -3,7 +3,7 @@ from .models import ArtistProfile, Contact
 from .forms import ArtistProfileForm, ContactForm
 from collections_app.forms import ArtForm
 from collections_app.forms_collection import CollectionForm
-from collections_app.models import Art
+from collections_app.models import Art, Media
 from collections_app.models import Collection
 from events_app.forms import ExhibitionForm
 from events_app.models import Exhibition
@@ -124,6 +124,19 @@ def edit_art(request, pk):
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def delete_art(request, pk):
+    art = Art.objects.get(pk=pk)
+    if request.method == 'POST':
+        art.delete()
+        return redirect('owner_app:art_list')
+    return render(
+        request,
+        'owner_pages/confirm_delete.html',
+        {'object': art, 'type': 'Art'},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
 def exhibitions_list(request):
     exhibitions = Exhibition.objects.order_by('-start_date')
     return render(
@@ -180,6 +193,19 @@ def edit_collection(request, pk):
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def delete_collection(request, pk):
+    collection = Collection.objects.get(pk=pk)
+    if request.method == 'POST':
+        collection.delete()
+        return redirect('owner_app:collections_list')
+    return render(
+        request,
+        'owner_pages/confirm_delete.html',
+        {'object': collection, 'type': 'Collection'},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
 def create_exhibition(request):
     if request.method == 'POST':
         form = ExhibitionForm(request.POST, request.FILES)
@@ -207,6 +233,19 @@ def edit_exhibition(request, pk):
         request,
         'owner_pages/exhibition_form.html',
         {'form': form, 'exhibition': exhibition},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def delete_exhibition(request, pk):
+    exhibition = Exhibition.objects.get(pk=pk)
+    if request.method == 'POST':
+        exhibition.delete()
+        return redirect('owner_app:exhibitions_list')
+    return render(
+        request,
+        'owner_pages/confirm_delete.html',
+        {'object': exhibition, 'type': 'Exhibition'},
     )
 
 
@@ -253,6 +292,48 @@ def assign_art(request, exhibition_pk):
         {
             'exhibition': exhibition,
             'all_art': all_art,
+            'existing_ids': existing_ids,
+        },
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def assign_media(request, exhibition_pk):
+    """Allow owner to select Media rows to include in an exhibition."""
+    from events_app.models import ExhibitionMedia
+
+    exhibition = Exhibition.objects.get(pk=exhibition_pk)
+
+    all_media = Media.objects.order_by('-created_at').all()
+
+    existing_ids = set(
+        exhibition.exhibition_media.values_list('media_id', flat=True)
+    )
+
+    if request.method == 'POST':
+        selected = request.POST.getlist('media')
+        selected_ids = set(int(i) for i in selected)
+
+        # add newly selected
+        for media_id in selected_ids - existing_ids:
+            ExhibitionMedia.objects.get_or_create(
+                exhibition=exhibition, media_id=media_id
+            )
+
+        # remove unselected
+        for media_id in existing_ids - selected_ids:
+            ExhibitionMedia.objects.filter(
+                exhibition=exhibition, media_id=media_id
+            ).delete()
+
+        return redirect('owner_app:exhibitions_list')
+
+    return render(
+        request,
+        'owner_pages/assign_media.html',
+        {
+            'exhibition': exhibition,
+            'all_media': all_media,
             'existing_ids': existing_ids,
         },
     )

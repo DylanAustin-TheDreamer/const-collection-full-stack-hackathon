@@ -38,6 +38,10 @@
           <td>{{ c.artist.name }}</td>
           <td>
             <a class="btn btn-sm btn-secondary" href="{% url 'owner_app:edit_collection' c.pk %}">Edit</a>
+            <form method="post" action="{% url 'owner_app:delete_collection' c.pk %}" style="display:inline-block; margin-left:6px;">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+            </form>
           </td>
         </tr>
       {% empty %}
