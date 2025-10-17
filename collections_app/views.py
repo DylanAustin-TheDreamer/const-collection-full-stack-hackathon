@@ -935,4 +935,23 @@ def delete_media(request, pk):
         'owner_pages/confirm_delete.html',
         {'object': media, 'type': 'Media'},
     )
+def contact(request):
+    """Contact page that displays contact information from the database."""
+    from owner_app.models import Contact
+    
+    contact_info = Contact.objects.first()
+    
+    context = {}
+    if contact_info:
+        context = {
+            'address_line_1': contact_info.address_line_1,
+            'address_line_2': contact_info.address_line_2,
+            'city': contact_info.city,
+            'zip_code': contact_info.zip_code,
+            'phone': contact_info.phone,
+            'email': contact_info.email,
+            'opening_hours': contact_info.opening_hours,
+        }
+    
+    return render(request, 'Vistor_pages/contact.html', context)
 

@@ -90,7 +90,7 @@
               </div>
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Address</h5>
-                <p class="text-muted mb-0">123 Art Gallery Lane<br>Creative District<br>City, State 12345</p>
+                <p class="text-muted mb-0">{{ address_line_1 }}<br>{{ address_line_2 }}<br>{{ city }}, {{ zip_code }}</p>
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@
               </div>
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Phone</h5>
-                <p class="text-muted mb-0">+1 (555) 123-4567</p>
+                <p class="text-muted mb-0">{{ phone }}</p>
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@
               </div>
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Email</h5>
-                <p class="text-muted mb-0">info@constcollection.com</p>
+                <p class="text-muted mb-0">{{ email }}</p>
               </div>
             </div>
           </div>
@@ -135,9 +135,13 @@
               </div>
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Opening Hours</h5>
+                {% if opening_hours %}
+                <p class="text-muted mb-1">{{ opening_hours }}</p>
+                {% else %}
                 <p class="text-muted mb-1">Tuesday - Friday: 10:00 AM - 6:00 PM</p>
                 <p class="text-muted mb-1">Saturday - Sunday: 11:00 AM - 5:00 PM</p>
                 <p class="text-muted mb-0">Monday: Closed</p>
+                {% endif %}
               </div>
             </div>
           </div>
