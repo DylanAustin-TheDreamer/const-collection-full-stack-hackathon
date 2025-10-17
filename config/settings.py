@@ -32,10 +32,7 @@ if str(REPO_ROOT) not in sys.path:
 env_path = REPO_ROOT / "env.py"
 if env_path.exists():
     import env  # noqa
-    # Defensive: if env.py did not populate DATABASE_URL (or other vars),
-    # execute it directly to ensure os.environ is set. This handles cases
-    # where import caching or package paths prevent the simple import from
-    # running the file as expected.
+
     try:
         # runpy is safe here — it executes the file in a fresh namespace
         # and will set os.environ as env.py intends.
@@ -332,3 +329,18 @@ STRIPE_LOGGING_ENABLED = DEBUG
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Email backend
+# In development we prefer the console backend to avoid attempting to open
+# network SMTP connections (which causes ConnectionRefusedError when no SMTP
+# server is running). In production, set EMAIL_BACKEND via environment.
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # Use environment-configured backend in production (e.g. SMTP or any
+    # transactional provider). Leave unset here so deployments can define it.
+    EMAIL_BACKEND = os.environ.get(
+        'EMAIL_BACKEND',
+        'django.core.mail.backends.smtp.EmailBackend',
+    )

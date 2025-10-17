@@ -183,12 +183,53 @@ body {
 	color: #555555;
 }
 
+/* Define a site-level hairline color variable so our dividers have an explicit
+   fallback color. Sites/themes that already provide --hairline-color will
+   override this. The default is a subtle dark hairline for light themes. */
+:root {
+  --hairline-color: #555555;
+}
+
 /* Compact Minimalist Navbar */
 .navbar {
 	background: #FFFFFF !important;
 	border-bottom: 1px solid #F5F5F5;
 	padding: 0.5rem 0;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Sticky navbar helpers
+   - .navbar-sticky: fixes the navbar to the top of the viewport
+   - Uses a CSS variable --navbar-height which is measured as an estimated
+   height for the collapsed/expanded navbar. We also set top padding on
+   main to ensure page content is not obscured by the fixed navbar. */
+:root {
+  --navbar-height: 64px; /* fallback value; adjusted on large screens via media queries */
+}
+
+.navbar-sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030; /* above content but below modals/toasts */
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* When navbar is fixed we need the main content to start below it. Use padding on main. */
+main {
+  padding-top: var(--navbar-height);
+}
+
+/* On small screens the navbar toggler increases navbar height when expanded.
+   Provide a slightly larger fallback to accommodate the taller mobile navbar. */
+@media (max-width: 767px) {
+  :root { --navbar-height: 112px; }
+}
+
+@media (min-width: 768px) {
+  :root { --navbar-height: 64px; }
 }
 
 .navbar-brand { 
@@ -207,6 +248,25 @@ body {
 
 .navbar .nav-link:hover {
 	color: #000000 !important;
+}
+
+/* Active nav link styling */
+.navbar .nav-link.active {
+  color: #0d6efd !important; /* Bootstrap primary blue */
+  font-weight: 700;
+  border-bottom: 2px solid rgba(13,110,253,0.15);
+}
+
+/* Make dropdown active items match nav-link.active (text-only highlight)
+   Avoid Bootstrap's default .dropdown-item.active background which makes
+   the text unreadable when the whole item is highlighted. */
+.navbar .dropdown-item.active,
+.navbar .dropdown-item.active:focus,
+.navbar .dropdown-item.active:hover {
+  background: transparent !important;
+  color: #0d6efd !important; /* match nav-link active color */
+  font-weight: 700;
+  box-shadow: none !important;
 }
 
 .navbar .dropdown-menu {
@@ -438,16 +498,55 @@ footer{
     .featured-image img {
       height: 300px;
     }
+    }
+
+  /* Smaller about/description text on small screens inside collection sections */
+  @media (max-width: 768px) {
+    .collection-section .card.card-body {
+      font-size: 0.9rem; /* smaller on mobile */
+      line-height: 1.3;
+      padding: 0.6rem 0.75rem;
+    }
   }
-  .my-card {
+    .my-card {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 25px;
   }
-  .my-card > img{
-    width: 200px;
-    height: 400px;
-    display: block;
-  }
+    .my-card > img{
+      width: 200px;
+      height: 400px;
+      display: block;
+    }
+
+    /* Featured thumbnails in artwork listing */
+
+    /* Make featured thumbnails match the store card image height */
+
+    .featured-thumb {
+      width: 260px; /* downscaled */
+      flex: 0 0 auto; /* keep size in horizontal scroller */
+      text-align: center;
+    }
+
+    .featured-thumb-img {
+      width: 260px;
+      height: 180px; /* downscaled */
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      display: block;
+    }
+
+    .featured-thumb-img:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .featured-thumb-placeholder {
+      width: 360px;
+      height: 250px;
+    }
   .my-btn{
     background-color: #5e5e5e;
     border: none;
@@ -474,6 +573,570 @@ footer{
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   }
+
+/* Gallery: full-width collection sections */
+.gallery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* Subtle horizontal divider between collection sections */
+.collection-divider {
+  border: none;
+  height: 1px;
+  /* use a hairline variable when available, otherwise fallback to a neutral dark line */
+  background: var(--hairline-color, rgba(0,0,0,0.12));
+  /* add a lightweight border-top fallback so the rule is visible even when
+     some themes/setups override background or the variable resolves to a
+     matching page color */
+  border-top: 1px solid var(--hairline-color, rgba(0,0,0,0.12));
+  display: block;
+  margin: 24px 0;
+  width: 100%;
+}
+
+/* Page title divider: shorter and centered under the main page heading */
+.page-title-divider {
+  width: 60%;
+  max-width: 720px;
+  height: 2px;
+  background: var(--hairline-color, rgba(0,0,0,0.12));
+  border-top: 2px solid var(--hairline-color, rgba(0,0,0,0.12));
+  display: block;
+  margin: 12px auto 20px;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .page-title-divider { width: 80%; margin-top: 10px; margin-bottom: 16px; }
+}
+
+/* If the page or theme exposes a --hairline-color variable, the dividers will
+   follow it. We avoid forcing colors via prefers-color-scheme so the site
+   (or a theme class) can control the exact appearance. */
+
+/* Small safe tweak: when the user's OS/browser is in dark mode we use a light
+   hairline so the divider remains visible against dark backgrounds. This only
+   applies if the browser reports prefers-color-scheme: dark. If you have a
+   site-level theme class (for example `.theme-dark`) we can prefer that
+   instead of this media query — tell me if you want that behavior. */
+
+
+.collection-section {
+  width: 100%;
+  height: 90vh; /* slightly shorter viewport per collection */
+  min-height: 90vh;
+  display: block;
+}
+
+.collection-cover {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.collection-cover-media {
+  width: 100%;
+  height: auto;
+  max-height: 300px; /* further downscaled */
+  object-fit: contain; /* show full image scaled to fit */
+  object-position: center center;
+  display: block;
+}
+
+.collection-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+/* Two-column layout: left info, right cover */
+.collection-section .row {
+  align-items: stretch;
+  height: 100%; /* make the inner row fill the section height */
+  margin: 0; /* remove row gutters affecting height */
+}
+
+/* Always keep two-column layout and let content scale inside it.
+   The row becomes a non-wrapping flex container so columns won't stack;
+   the cover column uses a fixed percentage while the left column grows. */
+.collection-section > .row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+/* Left column grows to fill remaining space; when no cover exists it will take full width. */
+.collection-section > .row > .collection-left {
+  flex: 1 1 58% !important;
+  max-width: 100% !important; /* allow full width when cover absent */
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+/* Cover column fixed proportion so left always scales to remaining width */
+.collection-section > .row > .collection-cover-col {
+  flex: 0 0 42% !important;
+  max-width: 42% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.collection-section .collection-body {
+  padding-right: 16px;
+  height: 100%;
+}
+
+.collection-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start; /* align media to the top so it lines up with row border */
+  justify-content: center;
+  padding-top: 0; /* ensure no extra gap */
+}
+
+.collection-cover-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* show full image/video scaled to fit the column */
+  object-position: top center; /* align the visible image to the top */
+  display: block;
+  margin: 0; /* remove any accidental offsets */
+}
+
+/* Make image elements scale to fill the column vertically while preserving aspect ratio */
+.collection-cover-media {
+  width: auto;      /* allow width to adjust when height is constrained */
+  max-width: 100%;  /* but never overflow the column */
+  height: 100%;     /* force image to match column height */
+}
+
+/* Make sure carousel area fills its container and images scale within it */
+.collection-left .left-bottom .collection-carousel,
+.collection-carousel .carousel,
+.collection-carousel .carousel-inner,
+.collection-carousel .carousel-item {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.collection-carousel .carousel-item img,
+.collection-carousel .carousel-item video {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Left column two-row layout */
+.collection-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.collection-left .left-top {
+  flex: 0 0 auto; /* small fixed area for title/buttons */
+}
+
+.collection-left .left-bottom {
+  flex: 1 1 auto; /* grow to fill remaining height */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+/* Make the right cover column match the left height */
+.collection-section > .row > .col-md-7 {
+  display: flex;
+  height: 100%;
+}
+
+/* Backwards-compatible selectors: ensure any right-column variant stretches to full height
+   (covers legacy `.col-md-7` and the new `.collection-cover-col`). */
+.collection-section > .row > .collection-cover-col,
+.collection-section > .row > .col-md-7 {
+  display: flex !important;
+  height: 100% !important;
+  align-items: stretch !important;
+}
+
+.collection-cover-col {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.collection-cover-col .collection-cover,
+.collection-section > .row > .col-md-7 .collection-cover {
+  width: 100% !important;
+  height: 100% !important;
+  align-self: stretch !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+}
+
+.collection-cover-col .collection-cover .collection-cover-media,
+.collection-section > .row > .col-md-7 .collection-cover .collection-cover-media,
+.collection-cover-col .collection-cover video.collection-cover-media,
+.collection-section > .row > .col-md-7 .collection-cover video.collection-cover-media {
+  height: 100% !important;
+  width: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: top center !important;
+}
+
+.collection-section > .row > .col-md-7 .collection-cover {
+  width: 100%;
+  align-self: stretch;
+  height: 100%;
+}
+
+/* Slightly wider left column and thinner right column on large screens */
+@media (min-width: 992px) {
+  .collection-left-col { flex: 0 0 58% !important; max-width: 58% !important; }
+  .collection-cover-col { flex: 0 0 42% !important; max-width: 42% !important; }
+  /* Ensure the cover column keeps flex layout for vertical stretching */
+  .collection-cover-col { display: flex !important; align-items: stretch !important; }
+  .collection-cover-col .collection-cover { width: 100%; height: 100%; }
+}
+
+/* Ensure video elements also scale to fit and are centered */
+.collection-cover video.collection-cover-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+  display: block;
+  margin: 0;
+}
+
+/* Ensure the carousel inside the left-bottom fills the remaining left column height */
+.collection-left .left-bottom .collection-carousel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Allow flex children to shrink correctly: set min-height:0 on flex parents so children
+   can use 100% height. This prevents unexpected overflow/collapsing in some browsers. */
+.collection-left .left-bottom,
+.collection-left .left-bottom .collection-carousel,
+.collection-carousel .carousel,
+.collection-carousel .carousel-inner,
+.collection-carousel .carousel-item {
+  min-height: 0 !important;
+}
+
+.collection-carousel .carousel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-carousel .carousel-inner {
+  height: 100%;
+  /* keep carousel viewport clipped so only active item is visible */
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-carousel .carousel-item {
+  height: 100%;
+  /* let Bootstrap control visibility (active/next/prev), avoid forcing display values */
+  position: relative;
+}
+
+/* Explicitly hide non-active carousel items to prevent stacking during our flex/height hacks */
+.collection-carousel .carousel-inner .carousel-item { display: block; }
+.collection-carousel .carousel-inner .carousel-item:not(.active) { display: none; }
+
+.collection-carousel .carousel-item img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain; /* keep full image visible */
+}
+
+/* Center the cover media vertically within the right column */
+.collection-section > .row > .col-md-7 {
+  align-items: center;
+}
+
+.collection-carousel .carousel {
+  height: 100%;
+}
+
+.collection-carousel .carousel-inner { height: 100%; }
+.collection-carousel .carousel-item { height: 100%; }
+
+.collection-carousel .carousel-item img {
+  height: 100% !important;            /* fill vertical space */
+  width: auto !important;             /* preserve aspect ratio */
+  max-width: 100% !important;         /* avoid overflowing horizontally */
+  object-fit: contain !important;     /* keep image visible, centered */
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Strong override to remove any earlier max-height caps and ensure carousel imgs fill height */
+.collection-section .carousel .carousel-item img,
+.collection-carousel .carousel-item img {
+  max-height: none !important;
+  height: 100% !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 768px) {
+  .collection-cover-media { max-height: 240px; }
+  .collection-carousel .carousel-item img { max-height: 180px; }
+}
+
+/* Manage Media thumbnail grid (owner pages) */
+.manage-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.manage-media-thumb {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.manage-media-thumb .card-img-top {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.manage-media-thumb .card-body {
+  padding: 0.75rem;
+}
+.manage-media-thumb .card-body .btn { padding: 0.25rem 0.6rem; }
+.manage-media-thumb .card-body .text-truncate { max-width: 100%; }
+
+/* Larger cards and extra spacing for collection detail page */
+.collection-detail-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: start;
+}
+.collection-detail-img {
+  width: 100%;
+  height: 100%; /* let the media area control height */
+  object-fit: contain; /* fill the card area */
+  display: block;
+}
+
+@media (min-width: 992px) {
+  .collection-detail-img { height: 260px; }
+}
+
+/* Make the card media fill the card and overlay the title */
+.collection-card-fill {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f7f7f7;
+  min-height: 260px; /* ensure reasonable card height */
+  display: flex;
+  align-items: center;
+  padding: 0; /* remove default card padding so media can reach the edges */
+  box-sizing: border-box;
+  width: 100%;
+}
+.collection-card-fill .card-media {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.collection-card-fill .card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.collection-detail-grid > * { width: 100%; box-sizing: border-box; }
+.collection-detail-grid .card,
+.collection-card-fill { box-sizing: border-box; }
+
+@media (max-width: 420px) {
+  .collection-detail-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+}
+.collection-card-fill .card-overlay-title {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);
+  color: #fff;
+}
+.collection-card-fill .card-title { margin: 0; font-size: 1rem; }
+
+@media (max-width: 768px) {
+  .collection-card-fill { min-height: 180px; }
+}
+
+/* Fix: ensure cover column stacks and media fits on small screens to avoid overflow */
+@media (max-width: 991px) {
+  /* Allow stacking and remove row negative margins which can cause overflow */
+  .collection-section > .row { flex-wrap: wrap !important; margin-left: 0 !important; margin-right: 0 !important; }
+
+  /* Make columns full width on small screens */
+  .collection-section > .row > .collection-left,
+  .collection-section > .row > .collection-cover-col,
+  .collection-section > .row > .col-md-7 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Ensure the cover box itself won't overflow and uses box-sizing */
+  .collection-cover {
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Force media to fit within the cover: width 100%, auto height */
+  .collection-cover .collection-cover-media,
+  .collection-cover img.collection-cover-media,
+  .collection-cover video.collection-cover-media,
+  .collection-section .collection-cover-media {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 420px !important;
+    object-fit: contain !important;
+    display: block !important;
+    position: relative !important;
+  }
+
+  /* Keep the 90vh section height on small screens but allow internal scrolling
+     so content won't overflow the viewport (covers are hidden on mobile). */
+  .collection-section {
+    height: 90vh !important;
+    min-height: 90vh !important;
+    overflow: hidden !important; /* prevent the section itself from extending */
+  }
+
+  .collection-left, .collection-cover-col, .collection-cover {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Make only the left-bottom area scrollable so the section stays fixed at 90vh */
+  .collection-left {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .collection-left .left-bottom {
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* smooth scrolling on iOS */
+  }
+  /* Hide the cover column entirely on small screens so it doesn't cause layout problems */
+  .collection-cover-col, .collection-cover {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  /* Left column should take full width when cover is hidden */
+  .collection-left, .collection-left-col {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+.collection-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  color: #222;
+  display: block;
+  padding: 6px 0; /* small vertical padding so title isn't flush against borders/buttons */
+}
+
+/* Place the subtle centered underline under the title+artist block (.left-top).
+   This ensures the rule appears after the "By ..." artist line rather than
+   immediately after the title text. */
+.left-top {
+  position: relative; /* anchor for the pseudo-element */
+  padding: 8px 0 10px 0; /* add top and bottom padding to give breathing room around title and artist */
+}
+
+.left-top::after {
+  content: "";
+  display: block;
+  width: 75%;
+  height: 2px;
+  background-color: rgba(0,0,0,0.12);
+  margin: 8px auto 0; /* space above and center horizontally */
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  /* Slightly narrower underline on small screens so it doesn't overwhelm the title */
+  .left-top::after { width: 60%; }
+}
+
+.collection-artist {
+  margin: 0;
+  color: #666;
+}
+
+.collection-actions .btn {
+  min-width: 120px;
+}
+
+/* Make carousel sit full-width beneath the collection info */
+.collection-section .carousel {
+  margin-top: 16px;
+}
+
+/* Constrain the carousel images inside collection sections */
+.collection-section .carousel .carousel-item img {
+  max-height: 220px; /* keep carousel thumbnails small */
+  object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .collection-cover-media {
+    max-height: 360px;
+  }
+  .gallery-list { gap: 28px; }
+}
   
   /* Footer contact button - 20% smaller, same spacing as icons */
   .footer-contact-btn {
@@ -492,6 +1155,128 @@ footer{
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
+  
+  /* Make featured thumbs smaller on narrow screens */
+  @media (max-width: 768px) {
+    .featured-thumb {
+      width: 220px;
+    }
+
+    .featured-thumb-img, .featured-thumb-placeholder {
+      width: 220px;
+      height: 160px;
+    }
+  }
+
+/* Featured carousel styles for store page */
+.featured-carousel {
+  width: 100%;
+  padding: 10px 40px; /* space for controls */
+}
+
+.featured-track {
+  scroll-behavior: smooth;
+  gap: 56px; /* increased spacing between cards */
+}
+
+.featured-card-wrapper {
+  padding: 16px;
+}
+
+  .featured-card {
+    width: 320px;
+    height: 360px; /* further downscaled */
+    background: #000; /* background for letterboxing */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Reserve space for the caption under the media to keep it readable */
+.featured-card-caption {
+  height: 56px;
+  padding: 8px 10px;
+  background: #fff;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featured-media {
+  width: 100%;
+  height: calc(100% - 56px); /* media fills remaining height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000; /* letterboxing background */
+}
+
+.featured-card-img {
+  /* default behaviour: contain */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #111;
+}
+
+.featured-card-img--fit-height {
+  height: 100%;
+  width: auto;
+  object-fit: cover; /* ensure image fills height, leaving bars on sides if needed */
+}
+
+/* Ensure images are centered inside the media area */
+.featured-card-img, .featured-card-img--fit-height {
+  display: block;
+  margin: 0 auto;
+  object-position: center center;
+}
+
+.featured-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #eee;
+}
+
+/* Caption spacing */
+.featured-card-caption.small { font-size: 0.9rem; }
+
+/* Layout: show 3 cards per view on large screens, 1 on small */
+@media (min-width: 992px) {
+  .featured-track {
+    display: flex;
+    gap: 56px;
+  }
+  .featured-card-wrapper {
+    flex: 0 0 auto;
+    width: calc((100% - 48px) / 3); /* three cards visible with gap */
+  }
+  .featured-card {
+    width: 100%;
+    height: 360px; /* fixed height so captions line up (downscaled) */
+    max-height: 360px;
+  }
+  .featured-card-img { max-height: 100%; }
+}
+
+@media (max-width: 991px) {
+  .featured-track {
+    display: flex;
+    gap: 32px;
+  }
+  .featured-card-wrapper { width: 100%; flex: 0 0 100%; }
+  .featured-card { width: 100%; height: 300px; }
+  .featured-card-img { max-height: 100%; }
+}
+
+/* Carousel controls styling (simple) */
+.carousel-control-prev, .carousel-control-next {
+  display: none !important; /* hide controls as requested */
+}
   .my-space-inbetween{
     display: flex;
     justify-content: space-between;
@@ -499,3 +1284,11 @@ footer{
     flex-wrap: wrap;
     gap: 10px;
   }
+  
+/* Debug layout outlines
+   - Toggle by adding `debug-layout` to the <body> tag in your templates or via JS:
+     document.body.classList.add('debug-layout')
+*/
+/* Debug layout rules removed — re-enable temporary debugging by adding a small
+   inline style block in the template or by reintroducing a `.debug-layout` block
+   here if you need to visually inspect layout again. */

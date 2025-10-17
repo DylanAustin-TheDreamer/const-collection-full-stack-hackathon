@@ -4,25 +4,73 @@
 
 {% block content %}
   <div class="container mt-4">
-    <h2>{{ collection.name }}</h2>
-    <p>By {{ collection.artist.name }}</p>
-    <p>{{ collection.description }}</p>
+      
+    <h2>{{ collection.name }}</h2><p class="collection-artist mt-1">By {{ collection.artist.name }}</p>
+    <hr class="collection-divider page-title-divider" />
+    <div class="collection-section">
+      <div class="row">
+        {% if collection.cover_image %}
+          <div class="col-12 col-md-7 d-flex flex-column collection-left collection-left-col">
+        {% else %}
+          <div class="col-12 d-flex flex-column collection-left">
+        {% endif %}
+            <div class="left-top">
+              <div class="row">
+                <div class="col-12">
+                    <div class="collection-actions mb-2">
+                        <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#desc-{{ collection.id }}" role="button" aria-expanded="false" aria-controls="desc-{{ collection.id }}">
+                            About
+                        </a>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    <div class="row">
-      {% for art in collection.arts.all %}
-        <div class="col-md-3 mb-3">
-          <div class="card">
-            {% if art.image %}
-              <img src="{{ art.image.url }}" class="card-img-top" alt="{{ art.title }}">
-            {% endif %}
-            <div class="card-body">
-              <h6 class="card-title">{{ art.title }}</h6>
+            <div class="left-bottom mt-2">
+              <div class="collapse" id="desc-{{ collection.id }}">
+                <div class="card card-body mb-3">
+                  {{ collection.description }}
+                </div>
+              </div>
+
+              <div class="row g-4 collection-detail-grid">
+                {% for art in collection.arts.all %}
+                  <div class="col-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="card collection-card-fill">
+                      {% if art.image %}
+                        <div class="card-media">
+                          <img src="{{ art.image.url }}" class="collection-detail-img" alt="{{ art.title }}">
+                        </div>
+                      {% endif %}
+                      <div class="card-overlay-title">
+                        <h6 class="card-title">{{ art.title }}</h6>
+                      </div>
+                    </div>
+                  </div>
+                {% empty %}
+                  <p>No art in this collection.</p>
+                {% endfor %}
+              </div>
             </div>
           </div>
-        </div>
-      {% empty %}
-        <p>No art in this collection.</p>
-      {% endfor %}
+
+        {% if collection.cover_image %}
+          <div class="col-12 col-md-5 collection-cover-col">
+            {% with url=collection.cover_image.url %}
+              <div class="collection-cover">
+                {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+                  <video class="collection-cover-media" autoplay muted playsinline loop preload="metadata">
+                    <source src="{{ url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                {% else %}
+                  <img src="{{ url }}" class="collection-cover-media" alt="{{ collection.name }}">
+                {% endif %}
+              </div>
+            {% endwith %}
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}

@@ -63,8 +63,35 @@ def edit_artist(request):
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
 def art_list(request):
-    arts = Art.objects.select_related('collection', 'collection__artist').all()
-    return render(request, 'owner_pages/art_list.html', {'arts': arts})
+    # Group arts by collection for owner listing
+    collections = (
+        Collection.objects.prefetch_related('arts')
+        .select_related('artist')
+        .all()
+    )
+    # Prepare a mapping of collection -> arts queryset
+    grouped = []
+    for coll in collections:
+        grouped.append({'collection': coll, 'arts': coll.arts.all()})
+    return render(
+        request,
+        'owner_pages/art_list.html',
+        {'grouped_collections': grouped},
+    )
+
+
+@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+def toggle_featured_art(request, pk):
+    """Toggle the is_featured flag for an Art (owner action).
+
+    This is a simple POST endpoint that flips the boolean and redirects
+    back to the owner art list.
+    """
+    art = Art.objects.get(pk=pk)
+    if request.method == 'POST':
+        art.is_featured = not art.is_featured
+        art.save()
+    return redirect('owner_app:art_list')
 
 
 @user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')

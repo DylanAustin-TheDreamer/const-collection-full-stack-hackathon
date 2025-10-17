@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages | Owner | Const Collection{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Messages</h2>
+      <p class="text-muted">Site messages and visitor inquiries. This is a lightweight inbox view.</p>
+
+      <div class="list-group">
+        {% for msg in inbox %}
+          <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+              <div>
+                <h5 class="mb-1"><a href="{% url 'collections_app:message_detail' msg.id %}">{{ msg.subject }}</a></h5>
+                <p class="mb-1 small">From: {{ msg.name }} &lt;{{ msg.email }}&gt;</p>
+                <p class="mb-1">{{ msg.message|linebreaksbr }}</p>
+              </div>
+              <div class="text-end ms-3">
+                <div class="small text-muted">{{ msg.sent_at }}</div>
+                {% if msg.unread %}
+                  <div class="badge bg-primary mt-2">Unread</div>
+                {% endif %}
+                <form method="post" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="mark_read" value="{{ msg.id }}">
+                  <button type="submit" class="btn btn-sm btn-outline-secondary">Mark read</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="alert alert-secondary">No messages</div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

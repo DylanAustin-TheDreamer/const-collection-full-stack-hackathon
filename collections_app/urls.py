@@ -7,6 +7,7 @@ urlpatterns = [
     # Existing URL patterns for collections and art
     path('', views.index, name='index'),
     path('gallery/', views.gallery, name='gallery'),
+    path('gallery/debug/', views.gallery_debug, name='gallery_debug'),
     path(
         'collection/<int:pk>/', views.collection_detail, name='collection_detail'
     ),
@@ -33,6 +34,7 @@ urlpatterns = [
 
     # Media management (superuser-only)
     path('media/manage/', views.manage_media, name='manage_media'),
+    path('media/add/', views.add_media, name='add_media'),
     path('media/<int:pk>/edit/', views.edit_media, name='edit_media'),
     path('media/<int:pk>/delete/', views.delete_media, name='delete_media'),
     
@@ -69,4 +71,6 @@ urlpatterns = [
     
     # User dashboard
     path('dashboard/', views.user_dashboard, name='user_dashboard'),
+    path('messages/', views.messages_view, name='messages'),
+    path('messages/<int:pk>/', views.message_detail, name='message_detail'),
 ]

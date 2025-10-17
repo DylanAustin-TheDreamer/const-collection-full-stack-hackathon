@@ -23,20 +23,28 @@
       <div class="col-12">
         <div class="mb-3">
           <h5 class="mb-2">Featured</h5>
-          <div id="featured-artworks" class="d-flex gap-3 overflow-auto pb-2">
+          <div id="featured-carousel" class="featured-carousel position-relative">
             {% if featured_artworks %}
-              {% for fa in featured_artworks %}
-                <a href="{% url 'collections_app:artwork_detail' fa.pk %}" class="text-decoration-none">
-                  <div style="width:160px;">
-                    {% if fa.image %}
-                      <img src="{{ fa.image.url }}" class="img-fluid rounded mb-1" alt="{{ fa.title }}" style="height:100px; object-fit:cover; width:100%;">
-                    {% else %}
-                      <div class="bg-light rounded mb-1" style="height:100px;"></div>
-                    {% endif %}
-                    <div class="small text-dark">{{ fa.title }}</div>
+              <button type="button" class="carousel-control-prev btn btn-outline-secondary position-absolute" data-action="prev" aria-label="Previous">‹</button>
+              <div class="featured-track d-flex gap-3 overflow-hidden">
+                {% for fa in featured_artworks %}
+                  <div class="featured-card-wrapper flex-shrink-0">
+                    <a href="{% url 'collections_app:artwork_detail' fa.pk %}" class="text-decoration-none">
+                      <div class="featured-card">
+                        <div class="featured-media d-flex align-items-center justify-content-center">
+                          {% if fa.image %}
+                            <img src="{{ fa.image.url }}" alt="{{ fa.title }}" class="featured-card-img featured-card-img--fit-height">
+                          {% else %}
+                            <div class="featured-card-placeholder"></div>
+                          {% endif %}
+                        </div>
+                        <div class="featured-card-caption text-dark text-truncate">{{ fa.title }}</div>
+                      </div>
+                    </a>
                   </div>
-                </a>
-              {% endfor %}
+                {% endfor %}
+              </div>
+              <button type="button" class="carousel-control-next btn btn-outline-secondary position-absolute" data-action="next" aria-label="Next">›</button>
             {% else %}
               <div class="text-muted">No featured artworks yet. Use the "Featured" toggle in the owner UI to showcase pieces here.</div>
             {% endif %}

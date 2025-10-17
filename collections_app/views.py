@@ -44,11 +44,53 @@ def index(request):
 
 def gallery(request):
     from .models import Collection
-    collections = Collection.objects.select_related('artist').prefetch_related(
-        'arts'
+    # Ensure any collection literally named "More art" appears at the end of the list
+    from django.db.models import Case, When, IntegerField, Value
+    collections = (
+        Collection.objects
+        .select_related('artist')
+        .prefetch_related('arts')
+        .annotate(
+            _is_more=Case(
+                When(name__iexact='more art', then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        )
+        .order_by('_is_more')
     )
     return render(
         request, 'Vistor_pages/gallery.html', {'collections': collections}
+    )
+
+
+def gallery_debug(request):
+    """Render the gallery with debug layout forced on (for local debugging).
+
+    Visit /gallery/debug/ to see debug outlines and banner when debugging.
+    """
+    from .models import Collection
+    from django.db.models import Case, When, IntegerField, Value
+    collections = (
+        Collection.objects
+        .select_related('artist')
+        .prefetch_related('arts')
+        .annotate(
+            _is_more=Case(
+                When(name__iexact='more art', then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        )
+        .order_by('_is_more')
+    )
+    return render(
+        request,
+        'Vistor_pages/gallery.html',
+        {
+            'collections': collections,
+            'debug_layout': True,
+        },
     )
 
 
@@ -870,18 +912,9 @@ def manage_media(request):
     if not getattr(request.user, 'is_superuser', False):
         return HttpResponseForbidden('Only superusers can access this page')
 
-    from .forms import MediaForm
     from .models import Media
 
     try:
-        if request.method == 'POST':
-            form = MediaForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save()
-                return redirect('collections_app:manage_media')
-        else:
-            form = MediaForm()
-
         # Build a simple recent list using the current Media columns only.
         recent_rows = list(
             Media.objects.order_by('-created_at').values(
@@ -911,21 +944,71 @@ def manage_media(request):
                 }
             )
 
+        # Also pass a full, ordered list of Media model instances.
+        # Order: hero, second, third, then the rest.
+        all_media_qs = list(Media.objects.order_by('-created_at').all())
+        heroes = [m for m in all_media_qs if getattr(m, 'hero', False)]
+        seconds = [
+            m for m in all_media_qs
+            if (getattr(m, 'second_section', False)
+                and not getattr(m, 'hero', False))
+        ]
+        thirds = [
+            m for m in all_media_qs
+            if (
+                getattr(m, 'third_section', False)
+                and not getattr(m, 'hero', False)
+                and not getattr(m, 'second_section', False)
+            )
+        ]
+        rest = [
+            m for m in all_media_qs
+            if not (
+                getattr(m, 'hero', False)
+                or getattr(m, 'second_section', False)
+                or getattr(m, 'third_section', False)
+            )
+        ]
+        media = heroes + seconds + thirds + rest
+
         return render(
             request,
             'owner_pages/media_manage.html',
-            {'form': form, 'recent': recent},
+            {'recent': recent, 'media': media},
         )
     except Exception as exc:
         # Catch-all so owners see a friendly page instead of a 500 while we
         # investigate root causes (e.g. orphaned rows).
         messages.error(request, f'Error loading media manager: {exc}')
-        form = MediaForm()
         return render(
             request,
             'owner_pages/media_manage.html',
-            {'form': form, 'recent': []},
+            {'recent': [], 'media': []},
         )
+
+
+def add_media(request):
+    """Separate page for adding a new Media entry (superuser-only).
+
+    This replaces the previous inline form on the manage page so the manage
+    screen matches other admin/list pages and keeps a single responsibility.
+    """
+    if not getattr(request.user, 'is_superuser', False):
+        return HttpResponseForbidden('Only superusers can access this page')
+
+    from .forms import MediaForm
+    from .models import Media
+
+    if request.method == 'POST':
+        form = MediaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Media added')
+            return redirect('collections_app:manage_media')
+    else:
+        form = MediaForm()
+
+    return render(request, 'owner_pages/media_add.html', {'form': form})
 
 
 def edit_media(request, pk):
@@ -946,7 +1029,11 @@ def edit_media(request, pk):
     else:
         form = MediaForm(instance=media)
 
-    return render(request, 'owner_pages/media_edit.html', {'form': form, 'media': media})
+    return render(
+        request,
+        'owner_pages/media_edit.html',
+        {'form': form, 'media': media},
+    )
 
 
 @login_required
@@ -965,6 +1052,8 @@ def delete_media(request, pk):
         'owner_pages/confirm_delete.html',
         {'object': media, 'type': 'Media'},
     )
+
+
 def contact(request):
     """Contact page that displays contact information from the database."""
     from owner_app.models import Contact
@@ -985,8 +1074,201 @@ def contact(request):
             'opening_hours': contact_info.opening_hours,
         }
     
+    # Handle form POST for visitor messages. The template contains a plain
+    # HTML form; when posted we'll persist a Messages row so owners can
+    # respond. Keep this lightweight and avoid requiring a dedicated form
+    # class for now.
+    from owner_app.models import Messages as MsgModel
+    from django.contrib.auth import get_user_model
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone', '')
+        subject = request.POST.get('subject', 'general')
+        message_body = request.POST.get('message', '')
+
+        # Determine sender (if authenticated) and owner (site owner)
+        sender = (
+            request.user
+            if getattr(request, 'user', None) and request.user.is_authenticated
+            else None
+        )
+
+        # Choose a sensible owner fallback sequence for anonymous posts:
+        # 1) first superuser, 2) first staff user, 3) first active user, 4) None
+        User = get_user_model()
+        owner = None
+        try:
+            owner = User.objects.filter(is_superuser=True).order_by('id').first()
+            if not owner:
+                owner = User.objects.filter(is_staff=True).order_by('id').first()
+            if not owner:
+                owner = User.objects.filter(is_active=True).order_by('id').first()
+        except Exception:
+            owner = None
+
+        try:
+            MsgModel.objects.create(
+                name=name or 'Anonymous',
+                email=email or '',
+                phone=phone or '',
+                message=message_body or '',
+                subject=subject or 'general',
+                sender=sender,
+                owner=owner,
+            )
+        except Exception:
+            # Avoid failing the request on DB issues; log could be added.
+            pass
+
+        # Redirect back to contact page with a success flash message.
+        from django.contrib import messages as dj_messages
+        dj_messages.success(request, 'Your message has been sent. Thank you!')
+        return redirect('contact')
+
     return render(request, 'Vistor_pages/contact.html', context)
 
 
+@login_required
+def messages_view(request):
+    """Simple messages inbox placeholder for owners/users.
 
+    Currently this renders a placeholder list. We can later wire this to a
+    Message model or an external mailbox.
+    """
+    from owner_app.models import Messages as MsgModel
+
+    # Handle marking a message as read via POST or GET for convenience.
+    if request.method == 'POST' and 'mark_read' in request.POST:
+        try:
+            mid = int(request.POST.get('mark_read'))
+            MsgModel.objects.filter(pk=mid).update(unread=False)
+            return redirect('collections_app:messages')
+        except Exception:
+            pass
+
+    # Optional GET param to mark a specific message as read and view it.
+    read_id = request.GET.get('read')
+    if read_id:
+        try:
+            msg = MsgModel.objects.get(pk=int(read_id), owner=request.user)
+            msg.unread = False
+            msg.save(update_fields=['unread'])
+        except MsgModel.DoesNotExist:
+            msg = None
+    else:
+        msg = None
+
+    # Only show messages assigned to this owner. Order unread first, then
+    # most recent.
+    inbox = list(
+        MsgModel.objects.filter(owner=request.user)
+        .order_by('-unread', '-sent_at')[:200]
+    )
+
+    return render(
+        request,
+        'owner_pages/messages.html',
+        {'inbox': inbox, 'message': msg},
+    )
+
+
+@login_required
+def message_detail(request, pk):
+    """Display a single message detail for owners.
+
+    Marks the message read when viewed. Supports POST to mark a message
+    unread (via `action=mark_unread`).
+    """
+    from owner_app.models import Messages as MsgModel
+
+    # Only owners (superuser or staff) should access this. Using
+    # login_required keeps it simple; admin permissions can be added later.
+    try:
+        msg = MsgModel.objects.get(pk=pk, owner=request.user)
+    except MsgModel.DoesNotExist:
+        return redirect('collections_app:messages')
+
+    # Handle POST actions: mark_unread or reply
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'mark_unread':
+            msg.unread = True
+            msg.save(update_fields=['unread'])
+            return redirect('collections_app:messages')
+
+        if action == 'reply':
+            body = request.POST.get('body', '').strip()
+            if body:
+                # Defer importing the reply model until needed
+                from owner_app.models import MessageReply
+                # If the original sender is a registered user, store the
+                # reply internally and associate the replying user.
+                if getattr(msg, 'sender', None):
+                    MessageReply.objects.create(
+                        message=msg,
+                        sender=(
+                            request.user
+                            if getattr(request, 'user', None)
+                            and request.user.is_authenticated
+                            else None
+                        ),
+                        body=body,
+                        via_email=False,
+                    )
+                else:
+                    # Anonymous visitor — send an email and record the reply
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+
+                    subject = (
+                        "Reply from "
+                        + (
+                            request.user.get_full_name()
+                            or request.user.username
+                        )
+                    )
+                    full_body = body + "\n\nReply sent via site owner"
+                    try:
+                        send_mail(
+                            subject,
+                            full_body,
+                            settings.DEFAULT_FROM_EMAIL,
+                            [msg.email],
+                            fail_silently=False,
+                        )
+                        MessageReply.objects.create(
+                            message=msg,
+                            sender=(
+                                request.user
+                                if getattr(request, 'user', None)
+                                and request.user.is_authenticated
+                                else None
+                            ),
+                            body=body,
+                            via_email=True,
+                        )
+                    except Exception:
+                        # Sending email failed; still save an internal record
+                        MessageReply.objects.create(
+                            message=msg,
+                            sender=(
+                                request.user
+                                if getattr(request, 'user', None)
+                                and request.user.is_authenticated
+                                else None
+                            ),
+                            body=body,
+                            via_email=True,
+                        )
+
+            return redirect('collections_app:message_detail', pk=pk)
+
+    # Mark as read when viewed if it's unread
+    if getattr(msg, 'unread', False):
+        msg.unread = False
+        msg.save(update_fields=['unread'])
+
+    return render(request, 'owner_pages/message_detail.html', {'message': msg})
 
