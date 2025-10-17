@@ -275,6 +275,11 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# File upload settings for large video files
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50485760  # 50MB in memory
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50485760  # 50MB max upload
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
 # Cloudinary Configuration
 if 'CLOUDINARY_URL' in os.environ:
     # Use the CLOUDINARY_URL if available (most common format)
@@ -287,6 +292,17 @@ else:
         api_secret=os.environ.get('CLOUDINARY_API_SECRET', '1XTFspXWu98Gs8G7YtAUNmAVC6U'),
         secure=True,  # Always use HTTPS
     )
+
+# Cloudinary upload settings for large video files
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dece3gnhm'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '832681451742447'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', '1XTFspXWu98Gs8G7YtAUNmAVC6U'),
+    'SECURE': True,
+    'CHUNK_SIZE': 6000000,  # 6MB chunks for large uploads
+    'TIMEOUT': 60,  # 60 second timeout
+    'RESOURCE_TYPE': 'auto',  # Detect file type automatically
+}
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'  # Django won't serve these in production; Cloudinary URLs will be returned for uploaded files
