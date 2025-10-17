@@ -965,6 +965,8 @@ def contact(request):
             'zip_code': contact_info.zip_code,
             'phone': contact_info.phone,
             'email': contact_info.email,
+            'curator_name': contact_info.curator_name,
+            'curator_email': contact_info.curator_email,
             'opening_hours': contact_info.opening_hours,
         }
     

@@ -30,6 +30,8 @@ class ContactForm(forms.ModelForm):
             'zip_code',
             'phone',
             'email',
+            'curator_name',
+            'curator_email',
             'opening_hours',
         )
 
