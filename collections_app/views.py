@@ -9,25 +9,11 @@ from .models import Order, OrderItem
 
 def index(request):
     # Serve the homepage at root by rendering Vistor_pages/home.html
-    from .models import Media
-    
-    context = {}
-    try:
-        # Get the hero media (should be a video)
-        hero_media = Media.objects.filter(hero=True).first()
-        
-        # Get the secondary media (second_section video)
-        secondary_media = Media.objects.filter(second_section=True).first()
-        
-        if hero_media and hero_media.file:
-            context['hero'] = hero_media.file.url
-            
-        if secondary_media and secondary_media.file:
-            context['secondary'] = secondary_media.file.url
-    except Exception as e:
-        # Handle Cloudinary errors gracefully when using placeholder credentials
-        context['media_error'] = True
-    
+    # Using static files for videos instead of database media
+    context = {
+        'hero_video': 'videos/hero-video.mp4',  # Put your video in static/videos/
+        'secondary_video': 'videos/secondary-video.mp4',  # Put your video in static/videos/
+    }
     return render(request, 'Vistor_pages/home.html', context)
 
 
