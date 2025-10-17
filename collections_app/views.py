@@ -11,18 +11,22 @@ def index(request):
     # Serve the homepage at root by rendering Vistor_pages/home.html
     from .models import Media
     
-    # Get the hero media (should be a video)
-    hero_media = Media.objects.filter(hero=True).first()
-    
-    # Get the secondary media (second_section video)
-    secondary_media = Media.objects.filter(second_section=True).first()
-    
     context = {}
-    if hero_media and hero_media.file:
-        context['hero'] = hero_media.file.url
+    try:
+        # Get the hero media (should be a video)
+        hero_media = Media.objects.filter(hero=True).first()
         
-    if secondary_media and secondary_media.file:
-        context['secondary'] = secondary_media.file.url
+        # Get the secondary media (second_section video)
+        secondary_media = Media.objects.filter(second_section=True).first()
+        
+        if hero_media and hero_media.file:
+            context['hero'] = hero_media.file.url
+            
+        if secondary_media and secondary_media.file:
+            context['secondary'] = secondary_media.file.url
+    except Exception as e:
+        # Handle Cloudinary errors gracefully when using placeholder credentials
+        context['media_error'] = True
     
     return render(request, 'Vistor_pages/home.html', context)
 
