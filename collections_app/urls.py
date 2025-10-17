@@ -30,6 +30,11 @@ urlpatterns = [
     
     # Search and filter artworks by price range
     path('artworks/search/price/', views.artwork_search_by_price, name='artwork_search_by_price'),
+
+    # Media management (superuser-only)
+    path('media/manage/', views.manage_media, name='manage_media'),
+    path('media/<int:pk>/edit/', views.edit_media, name='edit_media'),
+    path('media/<int:pk>/delete/', views.delete_media, name='delete_media'),
     
     # ============================================================================
     # BASKET URL PATTERNS - Shopping cart functionality

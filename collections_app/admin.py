@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import Collection, Art, Basket, BasketItem, Order, OrderItem
 from .models import ArtVariant
+from .models import Media
 
 
 @admin.register(Collection)
@@ -66,9 +67,61 @@ class ArtInline(admin.TabularInline):
 # import order issues
 CollectionAdmin.inlines = [ArtInline]
 
-# Attach ArtVariantInline to ArtAdmin so variants can be edited in the Art admin
+# Attach ArtVariantInline to ArtAdmin so variants can be edited there
 # Ensure we're concatenating tuples to match Django's expected type
 ArtAdmin.inlines = getattr(ArtAdmin, 'inlines', ()) + (ArtVariantInline,)
+
+
+# Media no longer has an art FK; do not attach as an inline to ArtAdmin.
+
+
+# Register Media at top-level so admins can manage Media independently
+@admin.register(Media)
+class MediaAdmin(admin.ModelAdmin):
+    """Admin for standalone Media management and flag verification."""
+
+    list_display = (
+        'id',
+        'preview',
+        'media_type',
+        'caption',
+        'hero',
+        'second_section',
+        'third_section',
+        'created_at',
+    )
+    list_filter = (
+        'media_type',
+        'hero',
+        'second_section',
+        'third_section',
+    )
+    search_fields = ('caption',)
+    readonly_fields = ('preview', 'created_at', 'updated_at')
+    fields = (
+        'file',
+        'preview',
+        'media_type',
+        'caption',
+        'hero',
+        'second_section',
+        'third_section',
+    )
+
+    def preview(self, obj):
+        if obj and getattr(obj, 'file', None):
+            try:
+                return format_html(
+                    '<img src="{}" style="max-height:100px;" />',
+                    obj.file.url,
+                )
+            except Exception:
+                return ''
+        return ''
+
+    preview.short_description = 'Preview'
+
+    # removed art/variant/content_type/ordering/is_primary from admin
 
 
 # Artwork admin removed — Artwork model has been consolidated into Art

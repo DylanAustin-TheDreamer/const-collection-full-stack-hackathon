@@ -44,3 +44,21 @@ class ExhibitionArt(models.Model):
 
     def __str__(self):
         return f"{self.exhibition.title} - {self.art.title}"
+
+
+class ExhibitionMedia(models.Model):
+
+    exhibition = models.ForeignKey(
+        Exhibition, on_delete=models.CASCADE, related_name='exhibition_media'
+    )
+    media = models.ForeignKey(
+        'collections_app.Media',
+        on_delete=models.CASCADE,
+        related_name='exhibitions',
+    )
+
+    class Meta:
+        unique_together = ('exhibition', 'media')
+
+    def __str__(self):
+        return f"{self.exhibition.title} - Media {self.media.pk}"

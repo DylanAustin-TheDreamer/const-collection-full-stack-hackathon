@@ -212,6 +212,75 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
+ * Hydration fallback for artwork list page.
+ * Some browsers (or navigation patterns) load a cached snapshot that can
+ * omit server-rendered dynamic blocks. If the featured block or filters
+ * are missing after navigation, fetch the list page and patch the DOM
+ * non-destructively.
+ */
+function hydrateArtworkListIfNeeded() {
+    try {
+        const featured = document.getElementById('featured-artworks');
+        const filters = document.getElementById('artwork-filters-form');
+        // if both exist, nothing to do
+        if (featured && filters) return;
+
+        // build the URL for the current list (preserve current querystring)
+        const url = new URL(window.location.href);
+        // ensure we're on the artwork list route (quick safety)
+        if (!url.pathname.endsWith('/artworks/') && !url.pathname.endsWith('/artworks')) return;
+
+        fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.text())
+            .then(html => {
+                // parse returned HTML and extract the parts we need
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const remoteFeatured = doc.getElementById('featured-artworks');
+                const remoteFilters = doc.getElementById('artwork-filters-form');
+
+                if (remoteFeatured && !featured) {
+                    // insert featured block at the same position as in template: before the filters row
+                    const containerRow = document.querySelector('.container > .row.mb-4');
+                    if (containerRow) {
+                        containerRow.parentNode.insertBefore(remoteFeatured, containerRow.nextSibling);
+                    } else {
+                        // fallback: append to top of container
+                        const container = document.querySelector('.container');
+                        if (container) container.insertBefore(remoteFeatured, container.firstChild);
+                    }
+                }
+
+                if (remoteFilters && !filters) {
+                    // find the card that previously contained the filters and insert
+                    const card = document.querySelector('.card .card-body');
+                    if (card) {
+                        // replace inner HTML of card-body with the remote content of the form area
+                        const remoteForm = remoteFilters.cloneNode(true);
+                        // try to find the form wrapper inside card-body
+                        const existingForm = card.querySelector('form');
+                        if (existingForm) {
+                            existingForm.parentNode.replaceChild(remoteForm, existingForm);
+                        } else {
+                            card.appendChild(remoteForm);
+                        }
+                    }
+                }
+            })
+            .catch(err => {
+                // non-fatal
+                console.debug('hydrateArtworkListIfNeeded error:', err);
+            });
+    } catch (e) {
+        console.debug('hydrateArtworkListIfNeeded exception', e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    hydrateArtworkListIfNeeded();
+});
+
+/**
  * Basket quantity helpers
  */
 function updateQuantity(itemId) {

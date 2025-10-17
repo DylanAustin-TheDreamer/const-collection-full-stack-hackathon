@@ -7,8 +7,17 @@
     <h1>Edit About</h1>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      {{ form.as_p }}
-      <button class="btn btn-primary" type="submit">Save</button>
+      {{ artist_form.as_p }}
+      <button class="btn btn-primary" type="submit" name="artist_submit">Save Artist Info</button>
+    </form>
+    
+    <br><hr><br>
+    
+    <h1>Edit Contact Information</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ contact_form.as_p }}
+      <button class="btn btn-success" type="submit" name="contact_submit">Save Contact Info</button>
     </form>
   </div>
 {% endblock %}

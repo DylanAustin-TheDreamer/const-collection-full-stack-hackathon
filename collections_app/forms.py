@@ -1,17 +1,56 @@
 from django import forms
 from .models import Art, ArtVariant
+from .models import Media
+
+
+class MediaForm(forms.ModelForm):
+    class Meta:
+        model = Media
+        fields = [
+            'file',
+            'media_type',
+            'hero',
+            'second_section',
+            'third_section',
+            'caption',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Small UX tweaks
+        if 'media_type' in self.fields:
+            self.fields['media_type'].widget.attrs.update(
+                {'class': 'form-select'}
+            )
+        # new homepage flags (checkboxes)
+        for flag in ('hero', 'second_section', 'third_section'):
+            if flag in self.fields:
+                self.fields[flag].widget = forms.CheckboxInput()
+                self.fields[flag].widget.attrs.update(
+                    {'class': 'form-check-input'}
+                )
+        if 'caption' in self.fields:
+            self.fields['caption'].widget.attrs.update(
+                {'class': 'form-control'}
+            )
 
 
 class ArtForm(forms.ModelForm):
     # Per-medium fields for owner to set availability and price per format
     original_available = forms.BooleanField(required=False, initial=False)
-    original_price = forms.DecimalField(required=False, max_digits=10, decimal_places=2)
+    original_price = forms.DecimalField(
+        required=False, max_digits=10, decimal_places=2
+    )
 
     poster_available = forms.BooleanField(required=False, initial=False)
-    poster_price = forms.DecimalField(required=False, max_digits=10, decimal_places=2)
+    poster_price = forms.DecimalField(
+        required=False, max_digits=10, decimal_places=2
+    )
 
     digital_available = forms.BooleanField(required=False, initial=False)
-    digital_price = forms.DecimalField(required=False, max_digits=10, decimal_places=2)
+    digital_price = forms.DecimalField(
+        required=False, max_digits=10, decimal_places=2
+    )
 
     class Meta:
         model = Art
@@ -122,16 +161,28 @@ class ArtForm(forms.ModelForm):
             )
 
         # Style per-medium price inputs
-        for key in ('original_price', 'poster_price', 'digital_price'):
+        for key in (
+            'original_price',
+            'poster_price',
+            'digital_price',
+        ):
             if key in self.fields:
-                self.fields[key].widget.attrs.update({'class': 'form-control', 'style': 'max-width:180px;'})
+                self.fields[key].widget.attrs.update(
+                    {'class': 'form-control', 'style': 'max-width:180px;'}
+                )
 
         # Ensure per-medium checkboxes use form-check-input
-        for key in ('original_available', 'poster_available', 'digital_available'):
+        for key in (
+            'original_available',
+            'poster_available',
+            'digital_available',
+        ):
             if key in self.fields:
                 self.fields[key].widget = forms.CheckboxInput()
                 css = self.fields[key].widget.attrs.get('class', '')
-                self.fields[key].widget.attrs.update({'class': (css + ' form-check-input').strip()})
+                self.fields[key].widget.attrs.update(
+                    {'class': (css + ' form-check-input').strip()}
+                )
 
     def save(self, commit=True):
         # Save Art instance first
@@ -141,7 +192,9 @@ class ArtForm(forms.ModelForm):
         def upsert_variant(medium_const, avail_field, price_field):
             avail = self.cleaned_data.get(avail_field, False)
             price = self.cleaned_data.get(price_field, None)
-            variant, _ = ArtVariant.objects.get_or_create(art=art, medium=medium_const)
+            variant, _ = ArtVariant.objects.get_or_create(
+                art=art, medium=medium_const
+            )
             variant.is_available = bool(avail)
             # allow None for price
             variant.price = price if price is not None else None
@@ -149,12 +202,22 @@ class ArtForm(forms.ModelForm):
             variant.currency = getattr(art, 'currency', 'USD') or 'USD'
             variant.save()
 
-        upsert_variant(ArtVariant.ORIGINAL, 'original_available', 'original_price')
-        upsert_variant(ArtVariant.POSTER, 'poster_available', 'poster_price')
-        upsert_variant(ArtVariant.DIGITAL, 'digital_available', 'digital_price')
+        upsert_variant(
+            ArtVariant.ORIGINAL, 'original_available', 'original_price'
+        )
+        upsert_variant(
+            ArtVariant.POSTER, 'poster_available', 'poster_price'
+        )
+        upsert_variant(
+            ArtVariant.DIGITAL, 'digital_available', 'digital_price'
+        )
 
         # Derive overall Art.is_available from any variant being available
-        any_avail = ArtVariant.objects.filter(art=art, is_available=True).exists()
+        any_avail = (
+            ArtVariant.objects.filter(
+                art=art, is_available=True
+            ).exists()
+        )
         if art.is_available != any_avail:
             art.is_available = any_avail
             # ensure change is saved when using commit=True
