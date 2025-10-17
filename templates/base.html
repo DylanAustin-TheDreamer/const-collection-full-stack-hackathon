@@ -4,6 +4,13 @@
   <head>
 
 <head>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicons/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'images/favicons/site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'images/favicons/favicon.ico' %}">
+    <!-- End Favicons -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Const Collection{% endblock %}</title>
@@ -19,7 +26,10 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'collections_app:index' %}">Const Collection</a>
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'collections_app:index' %}">
+                    Const Collection
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" style="height:56px; margin-left:14px;">
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
