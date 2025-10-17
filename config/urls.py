@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 from owner_app import views as owner_views
 from collections_app import views as collections_views
 from allauth.urls import path as allauth_path
@@ -32,3 +34,8 @@ urlpatterns = [
     path('web_build/', collections_views.web_build, name='web_build'),
     path('accounts/', include('allauth.urls')),
 ]
+
+# Serve static files during development and ensure Unity files are served
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0] if settings.STATICFILES_DIRS else None)
