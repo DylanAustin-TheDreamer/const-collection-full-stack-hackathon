@@ -30,10 +30,9 @@ class ArtAdmin(admin.ModelAdmin):
         'title',
         'collection',
         'year_created',
-        'physical_available',
-        'physical_price',
-        'digital_available',
-        'digital_price',
+        'is_available',
+        'price',
+        'is_featured',
         'image_preview',
     )
     search_fields = ('title', 'collection__name')
@@ -54,7 +53,7 @@ class ArtAdmin(admin.ModelAdmin):
 class ArtInline(admin.TabularInline):
     model = Art
     extra = 1
-    fields = ('title', 'image', 'physical_available', 'physical_price')
+    fields = ('title', 'image', 'is_available', 'price')
 
 
 # Attach the inline to the CollectionAdmin dynamically to avoid
