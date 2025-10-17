@@ -993,6 +993,6 @@ def web_build(request):
     from django.shortcuts import redirect
     from django.conf import settings
     
-    # Redirect to the static Unity build
-    return redirect('/static/web_build/')
+    # Redirect to the static Unity build index.html
+    return redirect('/static/web_build/index.html')
 
