@@ -55,7 +55,7 @@ if env_path.exists():
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', 'herokuapp.com', '127.0.0.1', 'const-collection-0f06bd9d4705.herokuapp.com']
 CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
