@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import ArtistProfile
-from .forms import ArtistProfileForm
+from .models import ArtistProfile, Contact
+from .forms import ArtistProfileForm, ContactForm
 from collections_app.forms import ArtForm
 from collections_app.forms_collection import CollectionForm
 from collections_app.models import Art
@@ -24,18 +24,40 @@ def public_about(request):
 @user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
 def edit_artist(request):
     artist = ArtistProfile.objects.first()
+    contact = Contact.objects.first()
+    
     if request.method == 'POST':
-        form = ArtistProfileForm(request.POST, request.FILES, instance=artist)
-        if form.is_valid():
-            form.save()
-            return redirect('about')
+        # Check which form was submitted
+        if 'artist_submit' in request.POST:
+            # Artist form was submitted
+            artist_form = ArtistProfileForm(request.POST, request.FILES, instance=artist)
+            if artist_form.is_valid():
+                artist_form.save()
+                return redirect('owner_app:edit_artist')
+            # If artist form is invalid, create contact form for display
+            contact_form = ContactForm(instance=contact)
+        elif 'contact_submit' in request.POST:
+            # Contact form was submitted
+            contact_form = ContactForm(request.POST, instance=contact)
+            if contact_form.is_valid():
+                contact_form.save()
+                return redirect('owner_app:edit_artist')
+            # If contact form is invalid, create artist form for display
+            artist_form = ArtistProfileForm(instance=artist)
     else:
-        form = ArtistProfileForm(instance=artist)
+        # GET request - show both forms
+        artist_form = ArtistProfileForm(instance=artist)
+        contact_form = ContactForm(instance=contact)
 
     return render(
         request,
         'owner_pages/edit_about.html',
-        {'form': form, 'artist': artist},
+        {
+            'artist_form': artist_form, 
+            'contact_form': contact_form,
+            'artist': artist,
+            'contact': contact,
+        },
     )
 
 
@@ -234,3 +256,5 @@ def assign_art(request, exhibition_pk):
             'existing_ids': existing_ids,
         },
     )
+
+

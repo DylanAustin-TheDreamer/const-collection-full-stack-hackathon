@@ -16,3 +16,13 @@ class ArtistProfileAdmin(admin.ModelAdmin):
         return ''
 
     image_preview.short_description = 'Image'
+
+# Additional admin registrations for Contact and Messages can be added similarly
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ('city', 'email', 'phone')
+    search_fields = ('city', 'email')
+
+class UserMessages(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'sent_at')
+    search_fields = ('name', 'email', 'subject')
+    list_filter = ('subject', 'sent_at')
