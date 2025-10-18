@@ -1,0 +1,22 @@
+{% load static %}
+{#
+  Reusable tinted logo include (mask / background variant).
+  Usage:
+    {% include 'includes/logo_tinted_mask.html' with size='140px' alt='Site logo' %}
+  Parameters:
+    size: CSS size for the logo (applies to --tint-size). Default '160px'.
+    alt: alternate text for screen readers. Default 'Logo'.
+    tint: optional CSS color value to override the scheme accent (defaults to var(--link-accent)).
+    mode: 'bg' renders the background-wrapped variant (default)
+#}
+
+{% with logo_size=size|default:'160px' logo_alt=alt|default:'Logo' tint_override=tint|default:'' mode_val=mode|default:'bg' %}
+  {# Use single quotes inside url() to avoid nested double-quote collisions #}
+  {% if mode_val == 'bg' %}
+    <div class="tint-mask-bg" style="--tint-size:{{ logo_size }};">
+      <div class="tint-mask logo-tinted" style="--tint-image:url('{% static 'images/transp-woman.png' %}'); {% if tint_override %}--tint: {{ tint_override }};{% endif %}" role="img" aria-label="{{ logo_alt }}"></div>
+    </div>
+  {% else %}
+    <div class="tint-mask logo-tinted" style="--tint-size:{{ logo_size }}; --tint-image:url('{% static 'images/transp-woman.png' %}'); {% if tint_override %}--tint: {{ tint_override }};{% endif %}" role="img" aria-label="{{ logo_alt }}"></div>
+  {% endif %}
+{% endwith %}

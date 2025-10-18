@@ -1,0 +1,47 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Tint Demo</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/schemes.css' %}">
+</head>
+<body style="background: var(--background); color: var(--text-primary); font-family: var(--font-body); padding:40px;">
+  <div style="max-width:1000px; margin:0 auto;">
+    <h1>Image Tint Demo</h1>
+  <p>Demonstrates mask, overlay and fallback tint techniques using the active scheme color (<code>--link-accent</code>).</p>
+    <div style="margin-bottom:18px;">
+      <strong>Debug:</strong>
+      <div>Static URL: <code>{% static 'images/transp-woman.png' %}</code></div>
+      <div style="margin-top:6px;">Direct image (raw):<br>
+        <img src="{% static 'images/transp-woman.png' %}" alt="raw debug" style="max-width:220px; border:1px solid var(--border); padding:6px; background:var(--card-surface);"/>
+      </div>
+    </div>
+    <div style="display:flex; gap:24px; align-items:flex-start;">
+      <div style="text-align:center;">
+        <div class="tint-mask-bg" style="--tint-size:260px;">
+          <div class="tint-mask logo-tinted" style="--tint-image:url('{% static 'images/transp-woman.png' %}');" role="img" aria-label="logo"></div>
+        </div>
+        <div style="margin-top:8px; font-size:0.9rem;">Mask (silhouette on page background / painted with --text-primary)</div>
+      </div>
+
+      <div style="text-align:center;">
+        <div class="tint-overlay" style="--tint-size:260px; --tint-image:url('{% static "images/transp-woman.png" %}');"></div>
+        <div style="margin-top:8px; font-size:0.9rem;">Overlay (color wash)</div>
+      </div>
+
+      <div style="text-align:center;">
+        <div class="tint-fallback" style="--tint-size:260px;">
+          <img src="{% static 'images/transp-woman.png' %}" alt="woman" />
+        </div>
+        <div style="margin-top:8px; font-size:0.9rem;">Fallback (filtered + overlay)</div>
+      </div>
+    </div>
+
+    <hr style="margin:28px 0; border-color:var(--border);"/>
+    <p style="font-size:0.9rem;color:var(--text-muted);">Tip: change the active theme from the dashboard to see how the image updates.</p>
+  </div>
+</body>
+</html>

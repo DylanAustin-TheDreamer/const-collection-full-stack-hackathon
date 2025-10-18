@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}My Dashboard | Const Collection{% endblock %}
 {% block content %}
 <div class="container mt-5 dashboard-page">
@@ -21,6 +22,7 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="card-title">Profile Info</h5>
+          {# logo moved to Recent Orders section per request #}
           <ul class="list-unstyled mb-0">
             <li><strong>Username:</strong> {{ user.username }}</li>
             <li><strong>Email:</strong> {{ user.email }}</li>
@@ -140,6 +142,7 @@
         </div>
       </div>
     </div>
+    {# Logo removed from dashboard body — header now contains the site logo to avoid duplication #}
   </div>
 </div>
 {% endblock %}
