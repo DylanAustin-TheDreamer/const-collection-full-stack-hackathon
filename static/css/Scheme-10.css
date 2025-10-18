@@ -1,0 +1,23 @@
+/* Scheme-10: Film Noir
+   - Background: #080808 (Very Dark Gray)
+   - Card Background: #3C3C3C (Medium Gray)
+   - Primary Text: #DCDCDC (Pale Ash Gray)
+   - Links/Accents: #A8906F (Faded Gold)
+   - CTA / Tertiary: #8B0000 (Moody Crimson)
+   - Heading font: Bebas Neue (strong sans)
+   - Body font: PT Sans
+*/
+:root {
+  --background: #080808;
+  --surface: var(--background);
+  --card-surface: #3C3C3C;
+  --text-primary: #DCDCDC;
+  --link-accent: #A8906F;
+  --cta-tertiary: #8B0000;
+
+  --font-heading: "Bebas Neue", sans-serif;
+  --font-body: "PT Sans", sans-serif;
+
+  --text-muted: rgba(220,220,220,0.8);
+  --border: rgba(255,255,255,0.06);
+}

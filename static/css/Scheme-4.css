@@ -1,0 +1,47 @@
+/* Scheme-4.css
+   Pop Art — Bold, graphic, high-saturation
+   - Main Background: #FFFFFF
+   - Card Background: #EEEEEE
+   - Primary Text: #000000
+   - Links/Accents: #FFEB3B (Electric Yellow)
+   - Tertiary/Buttons: #00BCD4 (Vibrant Cyan)
+   - Headings Font: Oswald
+   - Body Font: Roboto
+*/
+
+:root {
+  --background: #FFFFFF;
+  --text-primary: #000000;
+  /* Tweak: slightly deeper yellow for better contrast with pink accents */
+  --link-accent: #FBC02D;
+  --cta-tertiary: #00BCD4;
+
+  --font-heading: "Oswald", sans-serif;
+  --font-body: "Roboto", sans-serif;
+
+  --surface: var(--background);
+  --text-muted: rgba(0,0,0,0.6);
+  --border: rgba(0,0,0,0.08);
+  --card-surface: #EEEEEE;
+}
+
+.body-scheme-4 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-4 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-4 {
+  color: var(--link-accent);
+}
+
+.button-cta-4 {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}
