@@ -1,7 +1,13 @@
 from django.urls import path
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import StaticViewSitemap
 from . import views
 
 app_name = 'collections_app'
+
+sitemaps = {
+    'static': StaticViewSitemap,
+}
 
 urlpatterns = [
     # Existing URL patterns for collections and art
@@ -73,4 +79,10 @@ urlpatterns = [
     path('dashboard/', views.user_dashboard, name='user_dashboard'),
     path('messages/', views.messages_view, name='messages'),
     path('messages/<int:pk>/', views.message_detail, name='message_detail'),
+
+    # ============================================================================
+    # FOR SEO SITE MAP
+    # ============================================================================
+
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
