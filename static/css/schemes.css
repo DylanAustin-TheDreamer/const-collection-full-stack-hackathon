@@ -2428,3 +2428,41 @@ html body .col-md-5 .artwork-details {
 .form-text, .help-block, .form-help {
   color: var(--text-muted) !important;
 }
+
+/* Focused modal styling for the owner confirm-email modal. This is scoped to
+   the explicit modal class so it won't affect other modals on the site. */
+.cc-confirm-email-modal .modal-content {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+.cc-confirm-email-modal .cc-modal-btn-primary {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+}
+.cc-confirm-email-modal .cc-modal-btn-secondary {
+  background: var(--surface) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
+}
+
+/* Focused alert styling for owner message confirm/retry alerts */
+.cc-confirm-alert,
+.cc-retry-alert {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+.cc-confirm-alert .cc-alert-btn-primary,
+.cc-retry-alert .cc-alert-btn-primary {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+}
+.cc-confirm-alert .cc-alert-btn-secondary,
+.cc-retry-alert .cc-alert-btn-secondary {
+  background: var(--surface) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
+}

@@ -13,6 +13,42 @@
           <h3 class="card-title">{{ message.subject }}</h3>
           <p class="text-muted small">From: {{ message.name }} &lt;{{ message.email }}&gt; — {{ message.sent_at }}</p>
 
+          {# Confirmation prompt when replying to an anonymous sender (confirm_email=1) #}
+          {% if request.GET.confirm_email %}
+            <div class="alert alert-warning cc-confirm-alert">
+              <strong>Sender not registered.</strong>
+              This message sender has not registered an account, your reply will be sent via Email to
+              <em>{{ message.email }}</em>?
+              <div class="mt-2">
+                <form method="post" style="display:inline-block;">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="reply">
+                  <input type="hidden" name="confirm_send_to_email" value="1">
+                  <input type="hidden" name="body" value="{{ request.POST.body|default:'' }}">
+                  <button class="btn btn-sm btn-primary cc-alert-btn-primary" type="submit">Continue and Send Email</button>
+                </form>
+                <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary ms-2 cc-alert-btn-secondary">Cancel</a>
+              </div>
+            </div>
+          {% endif %}
+
+          {# Retry alert when a previous attempt to email failed (reply_failed_id in GET) #}
+          {% if request.GET.reply_failed_id %}
+            <div class="alert alert-danger cc-retry-alert">
+              <strong>Email send failed.</strong>
+              The reply was saved but sending the email failed. You can retry sending it now.
+              <div class="mt-2">
+                <form method="post" style="display:inline-block;">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="retry_reply">
+                  <input type="hidden" name="reply_id" value="{{ request.GET.reply_failed_id }}">
+                  <button class="btn btn-sm btn-danger cc-alert-btn-primary" type="submit">Retry Email</button>
+                </form>
+                <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary ms-2 cc-alert-btn-secondary">Dismiss</a>
+              </div>
+            </div>
+          {% endif %}
+
           {% if message.unread %}
             <div class="badge bg-primary mb-3">Unread</div>
           {% endif %}
@@ -25,6 +61,7 @@
             {% if message.replies.all %}
               <ul class="list-unstyled">
                 {% for reply in message.replies.all %}
+                <hr>
                   <li class="mb-3">
                     <div class="small text-muted">{{ reply.sent_at }} — {% if reply.sender %}{{ reply.sender.get_full_name|default:reply.sender.username }}{% else %}via email{% endif %}</div>
                     <div class="mt-1">{{ reply.body|linebreaksbr }}</div>
@@ -38,9 +75,10 @@
 
           <hr>
           <!-- Reply form -->
-          <form method="post" class="mt-4">
+          <form method="post" class="mt-4" id="reply-form" data-message-id="{{ message.pk }}" data-has-registered-sender="{% if message.sender %}1{% else %}0{% endif %}" data-recipient-email="{{ message.email|escapejs }}">
             {% csrf_token %}
             <input type="hidden" name="action" value="reply">
+            <input type="hidden" name="confirm_send_to_email" id="id_confirm_send_to_email" value="0">
             <div class="mb-3">
               <label for="reply-body" class="form-label">Reply</label>
               <textarea id="reply-body" name="body" rows="5" class="form-control" required></textarea>
@@ -51,10 +89,131 @@
               <button type="submit" name="action" value="mark_unread" class="btn btn-outline-secondary">Mark unread</button>
             </div>
           </form>
+
+          <!-- Confirmation modal for emailing anonymous visitors -->
+          <div class="modal fade cc-confirm-email-modal" id="confirmEmailModal" tabindex="-1" aria-labelledby="confirmEmailModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="confirmEmailModalLabel">Confirm send to visitor</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>The recipient <strong>{{ message.email }}</strong> is not a registered user. Do you want to send this reply as an email to that address?</p>
+                  <div class="mb-2">
+                    <label class="form-label">Reply preview</label>
+                    <textarea id="modal-reply-preview" class="form-control" rows="6" readonly></textarea>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" id="confirm-send-email" class="btn btn-primary">Continue and Send Email</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  var replyForm = document.getElementById('reply-form');
+  if (!replyForm) return;
+
+  var hasRegisteredSender = replyForm.dataset.hasRegisteredSender === '1';
+  var modalEl = document.getElementById('confirmEmailModal');
+  var modalReplyPreview = document.getElementById('modal-reply-preview');
+  var confirmFlag = document.getElementById('id_confirm_send_to_email');
+  var textarea = document.getElementById('reply-body');
+  var messageId = replyForm.dataset.messageId;
+  var recipientEmail = replyForm.dataset.recipientEmail || '';
+
+  // Draft persistence using localStorage keyed by message id
+  var draftKey = messageId ? 'cc:reply:draft:' + messageId : null;
+  function safeSetItem(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* ignore */ }
+  }
+  function safeGetItem(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeRemoveItem(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+  }
+
+  // Restore draft if present
+  if (textarea && draftKey) {
+    var existing = safeGetItem(draftKey);
+    if (existing && !textarea.value) {
+      textarea.value = existing;
+    }
+  }
+
+  // Debounce helper
+  function debounce(fn, wait) {
+    var t = null;
+    return function () {
+      var args = arguments;
+      var self = this;
+      clearTimeout(t);
+      t = setTimeout(function () { fn.apply(self, args); }, wait);
+    };
+  }
+
+  // Autosave draft on input
+  if (textarea && draftKey) {
+    var handleInput = debounce(function () {
+      safeSetItem(draftKey, textarea.value);
+    }, 300);
+    textarea.addEventListener('input', handleInput);
+  }
+
+  // Bootstrap 5 Modal
+  var bsModal = null;
+  if (modalEl && typeof bootstrap !== 'undefined') {
+    bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+  }
+
+  replyForm.addEventListener('submit', function (ev) {
+    // If the message has no registered sender, require confirmation.
+    if (!hasRegisteredSender) {
+      ev.preventDefault();
+      var body = document.getElementById('reply-body').value || '';
+      if (modalReplyPreview) modalReplyPreview.value = body;
+      if (bsModal) {
+        bsModal.show();
+      } else {
+        // If bootstrap isn't available, ask via window.confirm
+        if (confirm('Recipient is not a registered user. Send email to ' + recipientEmail + '?')) {
+          confirmFlag.value = '1';
+          // Clear draft before submitting to avoid stale data
+          if (draftKey) safeRemoveItem(draftKey);
+          replyForm.submit();
+        }
+      }
+      return;
+    }
+    // Otherwise, clear draft and let the form submit normally (registered users trigger server-side email)
+    if (draftKey) safeRemoveItem(draftKey);
+  });
+
+  var confirmSendBtn = document.getElementById('confirm-send-email');
+  if (confirmSendBtn) {
+    confirmSendBtn.addEventListener('click', function () {
+      // set the confirm flag and submit the form
+      if (confirmFlag) confirmFlag.value = '1';
+      if (bsModal) bsModal.hide();
+      // Clear draft before submitting so successful submit doesn't leave stale draft
+      if (draftKey) safeRemoveItem(draftKey);
+      replyForm.submit();
+    });
+  }
+  
+});
+</script>
 {% endblock %}

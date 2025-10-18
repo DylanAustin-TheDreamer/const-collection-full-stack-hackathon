@@ -6,9 +6,9 @@ from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.urls import reverse
+from django.core.mail import send_mail
 from .models import Order, OrderItem
-import os
-import mimetypes
 
 
 def index(request):
@@ -1214,25 +1214,70 @@ def message_detail(request, pk):
             if body:
                 # Defer importing the reply model until needed
                 from owner_app.models import MessageReply
+                from django.contrib import messages as dj_messages
+                from django.core.mail import send_mail
+                from django.conf import settings
                 # If the original sender is a registered user, store the
                 # reply internally and associate the replying user.
                 if getattr(msg, 'sender', None):
-                    MessageReply.objects.create(
+                    # Save an internal reply and attempt to email the registered
+                    # sender's account email so they receive the reply in their
+                    # inbox as well as in the site's message thread.
+                    replying_user = (
+                        request.user
+                        if getattr(request, 'user', None) and request.user.is_authenticated
+                        else None
+                    )
+
+                    # Create the internal reply first
+                    reply = MessageReply.objects.create(
                         message=msg,
-                        sender=(
-                            request.user
-                            if getattr(request, 'user', None)
-                            and request.user.is_authenticated
-                            else None
-                        ),
+                        sender=replying_user,
                         body=body,
                         via_email=False,
                     )
-                else:
-                    # Anonymous visitor — send an email and record the reply
-                    from django.core.mail import send_mail
-                    from django.conf import settings
 
+                    # If the original sender has a valid email, try to send the
+                    # reply by email. If sending succeeds, mark the stored
+                    # reply's via_email=True so the record reflects that an
+                    # email was dispatched.
+                    try:
+                        recipient_email = None
+                        # msg.sender may be a User instance or None; prefer msg.sender.email
+                        if getattr(msg, 'sender', None) and getattr(msg.sender, 'email', None):
+                            recipient_email = msg.sender.email
+                        # Fallback to the stored message.email field if available
+                        if not recipient_email and getattr(msg, 'email', None):
+                            recipient_email = msg.email
+
+                        if recipient_email:
+                            subject = (
+                                "Reply from "
+                                + (request.user.get_full_name() or request.user.username)
+                            )
+                            full_body = body + "\n\nReply sent via site owner"
+                            send_mail(
+                                subject,
+                                full_body,
+                                settings.DEFAULT_FROM_EMAIL,
+                                [recipient_email],
+                                fail_silently=False,
+                            )
+                            # mark reply as emailed
+                            reply.via_email = True
+                            reply.save(update_fields=['via_email'])
+                            dj_messages.success(request, 'Reply saved and emailed to the user.')
+                        else:
+                            dj_messages.warning(request, 'Reply saved but no recipient email was found.')
+                    except Exception:
+                        # Email sending failed; notify owner and provide retry link
+                        dj_messages.error(request, 'Reply saved but sending email failed. You can retry.')
+                        return redirect(f"{reverse('collections_app:message_detail', kwargs={'pk': pk})}?reply_failed_id={reply.pk}")
+                else:
+                    # Anonymous visitor — require explicit confirmation before creating
+                    # and emailing a reply. The client-side modal will submit
+                    # confirm_send_to_email=1 when the owner confirms.
+                    confirm = request.POST.get('confirm_send_to_email')
                     subject = (
                         "Reply from "
                         + (
@@ -1242,27 +1287,47 @@ def message_detail(request, pk):
                     )
                     full_body = body + "\n\nReply sent via site owner"
                     try:
-                        send_mail(
-                            subject,
-                            full_body,
-                            settings.DEFAULT_FROM_EMAIL,
-                            [msg.email],
-                            fail_silently=False,
-                        )
-                        MessageReply.objects.create(
-                            message=msg,
-                            sender=(
-                                request.user
-                                if getattr(request, 'user', None)
-                                and request.user.is_authenticated
-                                else None
-                            ),
-                            body=body,
-                            via_email=True,
-                        )
+                        # Only create/send the reply if the owner explicitly confirmed.
+                        if confirm == '1':
+                            send_mail(
+                                subject,
+                                full_body,
+                                settings.DEFAULT_FROM_EMAIL,
+                                [msg.email],
+                                fail_silently=False,
+                            )
+                            reply = MessageReply.objects.create(
+                                message=msg,
+                                sender=(
+                                    request.user
+                                    if getattr(request, 'user', None)
+                                    and request.user.is_authenticated
+                                    else None
+                                ),
+                                body=body,
+                                via_email=True,
+                            )
+                            dj_messages.success(
+                                request, 'Reply saved and emailed to visitor.'
+                            )
+                        else:
+                            # No confirmation provided: do not persist the reply.
+                            dj_messages.warning(
+                                request,
+                                'Visitor is not a registered user. Confirm sending '
+                                'email to that address to deliver this reply.',
+                            )
+                            confirm_url = (
+                                reverse(
+                                    'collections_app:message_detail',
+                                    kwargs={'pk': pk},
+                                )
+                                + '?confirm_email=1'
+                            )
+                            return redirect(confirm_url)
                     except Exception:
-                        # Sending email failed; still save an internal record
-                        MessageReply.objects.create(
+                        # Sending email failed; record the reply (via_email False)
+                        reply = MessageReply.objects.create(
                             message=msg,
                             sender=(
                                 request.user
@@ -1271,9 +1336,77 @@ def message_detail(request, pk):
                                 else None
                             ),
                             body=body,
-                            via_email=True,
+                            via_email=False,
                         )
+                        dj_messages.error(
+                            request,
+                            'Reply saved but email sending failed. '
+                            'You can retry.',
+                        )
+                        retry_url = (
+                            reverse(
+                                'collections_app:message_detail',
+                                kwargs={'pk': pk},
+                            )
+                            + '?reply_failed_id=' + str(reply.pk)
+                        )
+                        return redirect(retry_url)
+            return redirect('collections_app:message_detail', pk=pk)
 
+        if action == 'retry_reply':
+            # Attempt to resend a previously failed reply email
+            from django.contrib import messages as dj_messages
+            from django.core.mail import send_mail
+            from django.conf import settings
+            reply_id = request.POST.get('reply_id')
+            if reply_id:
+                try:
+                    reply = MessageReply.objects.get(
+                        pk=int(reply_id), message=msg
+                    )
+                    recipient_email = None
+                    if getattr(msg, 'sender', None) and getattr(
+                        msg.sender, 'email', None
+                    ):
+                        recipient_email = msg.sender.email
+                    if not recipient_email and getattr(msg, 'email', None):
+                        recipient_email = msg.email
+                    if recipient_email:
+                        username_label = (
+                            request.user.get_full_name()
+                            or request.user.username
+                        )
+                        subject = "Reply from " + username_label
+                        full_body = (
+                            reply.body + "\n\nReply sent via site owner"
+                        )
+                        try:
+                            send_mail(
+                                subject,
+                                full_body,
+                                settings.DEFAULT_FROM_EMAIL,
+                                [recipient_email],
+                                fail_silently=False,
+                            )
+                            reply.via_email = True
+                            reply.save(update_fields=['via_email'])
+                            dj_messages.success(
+                                request,
+                                'Email retry succeeded; user notified.',
+                            )
+                        except Exception:
+                            dj_messages.error(
+                                request,
+                                'Email retry failed. Please check your mail '
+                                'settings and try again.',
+                            )
+                    else:
+                        dj_messages.error(
+                            request,
+                            'No recipient email found for this message.',
+                        )
+                except MessageReply.DoesNotExist:
+                    dj_messages.error(request, 'Reply record not found.')
             return redirect('collections_app:message_detail', pk=pk)
 
     # Mark as read when viewed if it's unread
