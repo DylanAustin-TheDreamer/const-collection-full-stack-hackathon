@@ -29,11 +29,11 @@
   <a class="btn-back btn-back--owner" href="{% url 'owner_app:collections_list' %}">Cancel</a>
    </form>
 
-   <form method="post" action="{% url 'owner_app:delete_collection' collection.pk %}" class="mt-2">
-       {% csrf_token %}
-       <button class="btn btn-danger" type="submit">Delete Collection</button>
-   </form>
- 
-  </form>
+  {% if collection.pk %}
+    <form method="post" action="{% url 'owner_app:delete_collection' collection.pk %}" class="mt-2">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Delete Collection</button>
+    </form>
+  {% endif %}
 </div>
 {% endblock %}

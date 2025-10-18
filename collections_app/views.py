@@ -45,6 +45,14 @@ def index(request):
     return render(request, 'Vistor_pages/home.html', context)
 
 
+def tint_demo(request):
+    """Simple demo page to preview image tinting utilities.
+
+    URL: /debug/tint-demo/ (only intended for DEBUG/development use)
+    """
+    return render(request, 'debug/image_tint_demo.html', {})
+
+
 def gallery(request):
     from .models import Collection
     # Ensure any collection literally named "More art" appears at the end of the list
