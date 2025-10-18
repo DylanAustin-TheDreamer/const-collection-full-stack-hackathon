@@ -1,0 +1,46 @@
+/* Scheme-7.css
+   Nature — Grounding, organic earth tones
+   - Main Background: #495E42 (Moss Green)
+   - Card Background: #758D6E (Deep Khaki)
+   - Primary Text: #EBE3D7 (Natural Beige)
+   - Links/Accents: #D4AC0D (Subtle Gold/Yellow)
+   - Tertiary/Buttons: #B5651D (Terra Cotta/Rust)
+   - Headings Font: EB Garamond
+   - Body Font: Source Sans Pro
+*/
+
+:root {
+  --background: #495E42;
+  --text-primary: #EBE3D7;
+  --link-accent: #D4AC0D;
+  --cta-tertiary: #B5651D;
+
+  --font-heading: "EB Garamond", serif;
+  --font-body: "Source Sans Pro", sans-serif;
+
+  --surface: var(--background);
+  --text-muted: rgba(235,227,215,0.9);
+  --border: rgba(0,0,0,0.12);
+  --card-surface: #758D6E;
+}
+
+.body-scheme-7 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-7 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-7 {
+  color: var(--link-accent);
+}
+
+.button-cta-7 {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}

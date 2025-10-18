@@ -1,0 +1,54 @@
+/* Scheme-1.css
+   Color and typography tokens for the "Scheme 1" design system
+   - Background: Deep Charcoal Gray (#121212)
+   - Primary Text: Pure White (#FFFFFF)
+   - Links/Accents: Subtle Gold (#C7B198)
+   - Tertiary/Buttons: Muted Burnt Orange (#C25B39)
+   - Headings Font: Playfair Display (serif)
+   - Body Font: Montserrat (sans-serif)
+
+   Usage:
+   :root { --background: ... }
+   body { background: var(--background); color: var(--text-primary); font-family: var(--font-body); }
+*/
+
+:root {
+  /* Colors */
+  --background: #121212; /* Deep Charcoal Gray */
+  --text-primary: #FFFFFF; /* Pure White */
+  --link-accent: #C7B198; /* Subtle Gold */
+  --cta-tertiary: #C25B39; /* Muted Burnt Orange */
+
+  /* Typography (font-family names only) */
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Montserrat", sans-serif;
+
+  /* Optional semantic aliases */
+  --surface: var(--background);
+  --text-muted: rgba(255,255,255,0.75);
+  --border: rgba(255,255,255,0.08);
+  /* Card/Box surface token (for art/card panels) */
+  --card-surface: #282828; /* Warm Dark Gray */
+}
+
+/* Example utility classes to document usage (optional) */
+.body-scheme-1 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-1 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link {
+  color: var(--link-accent);
+}
+
+.button-cta {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}

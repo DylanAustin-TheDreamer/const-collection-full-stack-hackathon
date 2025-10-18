@@ -1,0 +1,50 @@
+/* Scheme-3.css
+   Color and typography tokens for the "Scheme 3" design system
+   - Background: Muted Taupe (#DCDAD4)
+   - Primary Text: Dark Brown/Mocha (#4E342E)
+   - Links/Accents: Pewter/Slate (#757575)
+   - Tertiary/Buttons: Rich Plum/Aubergine (#6A0DAD)
+   - Headings Font: Playfair Display (serif)
+   - Body Font: Montserrat (sans-serif)
+*/
+
+:root {
+  /* Colors */
+  --background: #DCDAD4; /* Muted Taupe */
+  --text-primary: #4E342E; /* Dark Brown / Mocha */
+  --link-accent: #757575; /* Pewter / Slate */
+  --cta-tertiary: #6A0DAD; /* Rich Plum / Aubergine */
+
+  /* Typography (font-family names only) */
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Montserrat", sans-serif;
+
+  /* Semantic aliases */
+  --surface: var(--background);
+  --text-muted: rgba(78,52,46,0.7);
+  --border: rgba(78,52,46,0.12);
+  /* Card/Box surface token (for art/card panels) */
+  --card-surface: #F7F4EF; /* Bone White - per user request */
+}
+
+/* Example utilities */
+.body-scheme-3 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-3 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-3 {
+  color: var(--link-accent);
+}
+
+.button-cta-3 {
+  background-color: var(--cta-tertiary);
+  color: #FFFFFF;
+  border: none;
+}
