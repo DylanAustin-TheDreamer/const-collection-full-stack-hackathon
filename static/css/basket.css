@@ -1,18 +1,18 @@
 /* Basket Page Minimalist Styling */
 .basket-container {
-    background-color: #ffffff;
+    background-color: var(--surface);
 }
 
 /* Header styling */
 .basket-header h1 {
-    color: #000000;
+    color: var(--text-primary);
     font-weight: 300;
 }
 
 /* Card styling */
 .basket-card {
-    border: 1px solid #e0e0e0;
-    background-color: #ffffff;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
     box-shadow: none;
     transition: box-shadow 0.3s ease;
 }
@@ -28,33 +28,34 @@
 }
 
 .basket-table th {
-    background-color: #f8f8f8;
-    color: #000000;
+    background-color: var(--surface);
+    color: var(--text-primary);
     font-weight: 500;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border);
 }
 
 .basket-table td {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border);
 }
 
 /* Quantity controls */
 .quantity-control {
-    border: 1px solid #e0e0e0;
-    background-color: #ffffff;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
 }
 
 .quantity-control:hover {
-    background-color: #f8f8f8;
+    background-color: var(--surface);
 }
 
 /* Accent stripe */
 .accent-stripe {
     height: 3px;
+    /* preserve decorative gradient but center on theme tertiary color for CTA */
     background: linear-gradient(90deg, 
-        #ff6b6b 0%, 
-        #4ecdc4 50%, 
-        #45b7d1 100%
+        var(--cta-tertiary) 0%, 
+        var(--link-accent) 50%, 
+        var(--cta-tertiary) 100%
     );
     margin: 0 0 2rem 0;
     width: 200px;
@@ -63,52 +64,64 @@
 /* Artwork name and price styling - dark ocean blue */
 .basket-table td a,
 .basket-table td strong {
-    color: #0d4f6d !important;
+    color: var(--link-accent) !important;
 }
 
 .basket-table td a:hover {
-    color: #0a3d54 !important;
+    color: var(--link-accent) !important;
 }
 
 /* Price values in dark ocean blue */
 .basket-table .text-primary,
 #basket-subtotal,
 #basket-total {
-    color: #0d4f6d !important;
+    color: var(--link-accent) !important;
 }
 
 /* Buttons styling */
 .btn-minimal {
-    background-color: #ffffff;
-    border: 1px solid #000000;
-    color: #000000;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    vertical-align: middle;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.45rem 1rem;
+    border-radius: 6px;
     transition: all 0.3s ease;
 }
 
 .btn-minimal:hover {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--text-primary);
+    color: var(--surface);
 }
 
 .btn-minimal-danger {
-    border-color: #ff6b6b;
-    color: #ff6b6b;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    vertical-align: middle;
+    padding: 0.45rem 1rem;
+    border-color: var(--danger);
+    color: var(--danger);
+    border-radius: 6px;
 }
 
 .btn-minimal-danger:hover {
-    background-color: #ff6b6b;
-    color: #ffffff;
+    background-color: rgba(220,53,69,0.12);
+    color: var(--surface);
 }
 
 /* Summary card */
 .summary-card {
-    background-color: #ffffff;
-    border: 2px solid #000000;
+    background-color: var(--surface);
+    border: 2px solid var(--border);
 }
 
 .summary-header {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--text-primary);
+    color: var(--surface);
     padding: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -130,14 +143,14 @@
 }
 
 .summary-label {
-    color: #666666;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.75rem;
 }
 
 .summary-value {
-    color: #000000;
+    color: var(--text-primary);
     font-weight: 500;
     font-size: 1rem;
 }
@@ -145,7 +158,7 @@
 /* Summary divider */
 .summary-divider {
     height: 1px;
-    background-color: #000000;
+    background-color: var(--border);
     margin: 1rem 0;
 }
 
@@ -178,7 +191,7 @@
 .summary-note {
     text-align: center;
     margin-top: 0.75rem;
-    color: #666666;
+    color: var(--text-muted);
 }
 
 .summary-note small {
@@ -189,8 +202,8 @@
 .summary-security {
     text-align: center;
     padding-top: 1rem;
-    border-top: 1px solid #e0e0e0;
-    color: #666666;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
 }
 
 .summary-security i {
@@ -199,8 +212,8 @@
 
 /* Shipping info */
 .shipping-info {
-    border: 1px solid #000000;
-    background-color: #ffffff;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
 }
 
 .shipping-info-content {
@@ -224,7 +237,7 @@
 .shipping-info-list li {
     padding: 0.5rem 0;
     font-size: 0.85rem;
-    color: #666666;
+    color: var(--text-muted);
     position: relative;
     padding-left: 1.25rem;
 }
@@ -233,11 +246,11 @@
     content: "•";
     position: absolute;
     left: 0;
-    color: #000000;
+    color: var(--text-primary);
 }
 
 /* Empty basket styling */
 .empty-basket-icon {
-    color: #e0e0e0;
+    color: var(--border);
     font-size: 4rem;
 }

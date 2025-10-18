@@ -1,0 +1,46 @@
+/* Scheme-5.css
+   Steampunk — Aged metallics and Victorian mechanics
+   - Main Background: #6B5950 (Warm Sepia Gray)
+   - Card Background: #5D4037 (Deep Mahogany)
+   - Primary Text: #F3E9D2 (Antique Cream)
+   - Links/Accents: #B87333 (Tarnished Copper)
+   - Tertiary/Buttons: #800020 (Deep Burgundy)
+   - Headings Font: Lora
+   - Body Font: Inconsolata
+*/
+
+:root {
+  --background: #6B5950;
+  --text-primary: #F3E9D2;
+  --link-accent: #B87333;
+  --cta-tertiary: #800020;
+
+  --font-heading: "Lora", serif;
+  --font-body: "Inconsolata", monospace;
+
+  --surface: var(--background);
+  --text-muted: rgba(243,233,210,0.85);
+  --border: rgba(0,0,0,0.18);
+  --card-surface: #5D4037;
+}
+
+.body-scheme-5 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-5 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-5 {
+  color: var(--link-accent);
+}
+
+.button-cta-5 {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}

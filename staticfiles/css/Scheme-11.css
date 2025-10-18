@@ -1,0 +1,23 @@
+/* Scheme-11: Miami Vice Retro
+   - Background: #C7B4C8 (Dusty Lilac)
+   - Card Background: #87CEEB (Pale Turquoise)
+   - Primary Text: #4B0082 (Deep Violet)
+   - Links/Accents: #FF69B4 (Neon Pink)
+   - CTA / Tertiary: #F0FF4F (Acid Yellow)
+   - Heading font: Anton (wide display)
+   - Body font: Quicksand (rounded)
+*/
+:root {
+  --background: #C7B4C8;
+  --surface: var(--background);
+  --card-surface: #87CEEB;
+  --text-primary: #4B0082;
+  --link-accent: #FF69B4;
+  --cta-tertiary: #F0FF4F;
+
+  --font-heading: "Anton", sans-serif;
+  --font-body: "Quicksand", sans-serif;
+
+  --text-muted: rgba(75,0,130,0.85);
+  --border: rgba(0,0,0,0.08);
+}

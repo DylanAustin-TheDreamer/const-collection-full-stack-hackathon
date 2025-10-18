@@ -1,8 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}My Dashboard | Const Collection{% endblock %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 dashboard-page">
   <h1 class="mb-4">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+  <!-- Theme selector (uses existing static/js/theme-toggle.js API)
+       Moved under Profile Info card and presented as a radial selector list. -->
+
+  <script>
+    function setSchemeInline(name) {
+      const target = name.startsWith('css/') ? name : ('css/' + name);
+      const link = document.getElementById('scheme-link');
+      if (!link) return;
+      const staticBase = window.STATIC_URL || '/static/';
+      link.href = staticBase + target.replace(/^css\//, 'css/');
+      try { localStorage.setItem('constcollection:scheme', target); } catch(e){}
+    }
+  </script>
   <div class="row">
     <div class="col-md-6 col-lg-4 mb-4">
       <div class="card shadow-sm">
@@ -15,6 +28,96 @@
             <li><strong>Last Name:</strong> {{ user.last_name }}</li>
             <li><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</li>
           </ul>
+          <p class="text-muted small mb-0">You can preview custom colour and font schemes below.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Custom styles selector (kept in the left column so Recent Orders stays right) -->
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Custom styles</h5>
+          <div class="mt-1 theme-radial-selector" aria-label="Theme selector">
+            <fieldset class="d-flex gap-2 align-items-center" style="flex-wrap:wrap;">
+              <legend class="visually-hidden">Choose color scheme</legend>
+                <label class="theme-option" title="Scheme 1">
+                  <input type="radio" name="scheme" value="Scheme-1.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">1</span>
+                </label>
+                <label class="theme-option" title="Scheme 2">
+                  <input type="radio" name="scheme" value="Scheme-2.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">2</span>
+                </label>
+                <label class="theme-option" title="Scheme 3">
+                  <input type="radio" name="scheme" value="Scheme-3.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">3</span>
+                </label>
+                <label class="theme-option" title="Scheme 4">
+                  <input type="radio" name="scheme" value="Scheme-4.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">4</span>
+                </label>
+                <label class="theme-option" title="Scheme 5">
+                  <input type="radio" name="scheme" value="Scheme-5.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">5</span>
+                </label>
+                <label class="theme-option" title="Scheme 6">
+                  <input type="radio" name="scheme" value="Scheme-6.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">6</span>
+                </label>
+                <label class="theme-option" title="Scheme 7">
+                  <input type="radio" name="scheme" value="Scheme-7.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">7</span>
+                </label>
+                <label class="theme-option" title="Scheme 8">
+                  <input type="radio" name="scheme" value="Scheme-8.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">8</span>
+                </label>
+                <label class="theme-option" title="Scheme 9">
+                  <input type="radio" name="scheme" value="Scheme-9.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">9</span>
+                </label>
+                <label class="theme-option" title="Scheme 10">
+                  <input type="radio" name="scheme" value="Scheme-10.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">10</span>
+                </label>
+                <label class="theme-option" title="Scheme 11">
+                  <input type="radio" name="scheme" value="Scheme-11.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">11</span>
+                </label>
+                <label class="theme-option" title="Scheme 12">
+                  <input type="radio" name="scheme" value="Scheme-12.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">12</span>
+                </label>
+                <label class="theme-option" title="Scheme 13">
+                  <input type="radio" name="scheme" value="Scheme-13.css" onchange="(window.ThemeToggle||{}).setScheme && window.ThemeToggle.setScheme(this.value)">
+                  <span class="theme-dot">13</span>
+                </label>
+            </fieldset>
+            <div class="mt-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="(window.ThemeToggle&&window.ThemeToggle.cycleScheme&&window.ThemeToggle.cycleScheme(), window.__refreshThemeRadial&&setTimeout(window.__refreshThemeRadial,120))">Next</button>
+            </div>
+          </div>
+          <script>
+            (function(){
+              function setCheckedFromLink(){
+                const link = document.getElementById('scheme-link');
+                if(!link) return;
+                const current = (link.getAttribute('href')||'').split('/').pop();
+                if(!current) return;
+                const radios = document.getElementsByName('scheme');
+                for(const r of radios){
+                  r.checked = (r.value === current);
+                }
+              }
+              // Initialize on load
+              document.addEventListener('DOMContentLoaded', setCheckedFromLink);
+              // Also poll once after a short delay in case theme toggle applies after load
+              setTimeout(setCheckedFromLink, 200);
+
+              // Expose a small helper to refresh the UI after external changes
+              window.__refreshThemeRadial = setCheckedFromLink;
+            })();
+          </script>
         </div>
       </div>
     </div>
@@ -40,3 +143,5 @@
   </div>
 </div>
 {% endblock %}
+
+<!-- Inline onclicks used above so we don't rely on an extra_js block in base.html -->

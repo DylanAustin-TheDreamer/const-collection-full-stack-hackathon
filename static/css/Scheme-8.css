@@ -1,0 +1,46 @@
+/* Scheme-8.css
+   Sci-Fi — Futuristic, high-tech, minimalist
+   - Main Background: #0C0C2C (Deep Midnight Blue)
+   - Card Background: #1A1A3A (Cool Black)
+   - Primary Text: #D4D9E2 (Cool Pale Gray)
+   - Links/Accents: #FF0066 (Cyber Pink)
+   - Tertiary/Buttons: #00FFFF (Electric Neon Blue)
+   - Headings Font: Michroma
+   - Body Font: Fira Sans
+*/
+
+:root {
+  --background: #0C0C2C;
+  --text-primary: #D4D9E2;
+  --link-accent: #FF0066;
+  --cta-tertiary: #00FFFF;
+
+  --font-heading: "Michroma", sans-serif;
+  --font-body: "Fira Sans", sans-serif;
+
+  --surface: var(--background);
+  --text-muted: rgba(212,217,226,0.85);
+  --border: rgba(255,255,255,0.04);
+  --card-surface: #1A1A3A;
+}
+
+.body-scheme-8 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-8 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-8 {
+  color: var(--link-accent);
+}
+
+.button-cta-8 {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}

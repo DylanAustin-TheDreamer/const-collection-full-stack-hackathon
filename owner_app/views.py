@@ -21,7 +21,7 @@ def public_about(request):
     return render(request, 'Vistor_pages/about.html', {'artist': artist})
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def edit_artist(request):
     artist = ArtistProfile.objects.first()
     contact = Contact.objects.first()
@@ -30,7 +30,11 @@ def edit_artist(request):
         # Check which form was submitted
         if 'artist_submit' in request.POST:
             # Artist form was submitted
-            artist_form = ArtistProfileForm(request.POST, request.FILES, instance=artist)
+            artist_form = ArtistProfileForm(
+                request.POST,
+                request.FILES,
+                instance=artist,
+            )
             if artist_form.is_valid():
                 artist_form.save()
                 return redirect('owner_app:edit_artist')
@@ -53,7 +57,7 @@ def edit_artist(request):
         request,
         'owner_pages/edit_about.html',
         {
-            'artist_form': artist_form, 
+            'artist_form': artist_form,
             'contact_form': contact_form,
             'artist': artist,
             'contact': contact,
@@ -61,7 +65,7 @@ def edit_artist(request):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def art_list(request):
     # Group arts by collection for owner listing
     collections = (
@@ -80,7 +84,7 @@ def art_list(request):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def toggle_featured_art(request, pk):
     """Toggle the is_featured flag for an Art (owner action).
 
@@ -94,7 +98,7 @@ def toggle_featured_art(request, pk):
     return redirect('owner_app:art_list')
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def create_art(request):
     # Support inline collection creation from the same page.
     collection_form = CollectionForm()
@@ -132,7 +136,7 @@ def create_art(request):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def edit_art(request, pk):
     art = Art.objects.get(pk=pk)
     if request.method == 'POST':
@@ -150,7 +154,7 @@ def edit_art(request, pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def delete_art(request, pk):
     art = Art.objects.get(pk=pk)
     if request.method == 'POST':
@@ -163,7 +167,7 @@ def delete_art(request, pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def exhibitions_list(request):
     exhibitions = Exhibition.objects.order_by('-start_date')
     return render(
@@ -173,7 +177,7 @@ def exhibitions_list(request):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def collections_list(request):
     """Owner view: list collections with edit links."""
     collections = Collection.objects.select_related('artist').all()
@@ -184,7 +188,7 @@ def collections_list(request):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def create_collection(request):
     if request.method == 'POST':
         form = CollectionForm(request.POST, request.FILES)
@@ -201,7 +205,7 @@ def create_collection(request):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def edit_collection(request, pk):
     collection = Collection.objects.get(pk=pk)
     if request.method == 'POST':
@@ -219,7 +223,7 @@ def edit_collection(request, pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def delete_collection(request, pk):
     collection = Collection.objects.get(pk=pk)
     if request.method == 'POST':
@@ -232,7 +236,7 @@ def delete_collection(request, pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def create_exhibition(request):
     if request.method == 'POST':
         form = ExhibitionForm(request.POST, request.FILES)
@@ -245,7 +249,7 @@ def create_exhibition(request):
     return render(request, 'owner_pages/exhibition_form.html', {'form': form})
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def edit_exhibition(request, pk):
     exhibition = Exhibition.objects.get(pk=pk)
     if request.method == 'POST':
@@ -263,7 +267,7 @@ def edit_exhibition(request, pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def delete_exhibition(request, pk):
     exhibition = Exhibition.objects.get(pk=pk)
     if request.method == 'POST':
@@ -276,7 +280,7 @@ def delete_exhibition(request, pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def assign_art(request, exhibition_pk):
     """Allow owner to select artworks to include in an exhibition.
 
@@ -324,7 +328,7 @@ def assign_art(request, exhibition_pk):
     )
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/admin/login/')
+@user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def assign_media(request, exhibition_pk):
     """Allow owner to select Media rows to include in an exhibition."""
     from events_app.models import ExhibitionMedia

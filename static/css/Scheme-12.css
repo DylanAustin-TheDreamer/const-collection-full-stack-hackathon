@@ -1,0 +1,23 @@
+/* Scheme-12: Monochromatic Blue
+   - Background: #151E3D (Dark Navy Blue)
+   - Card Background: #2C3E50 (Slate Blue)
+   - Primary Text: #ADD8E6 (Light Sky Blue)
+   - Links/Accents: #007FFF (Electric Cerulean)
+   - CTA / Tertiary: #009ACD (Deep Cyan)
+   - Heading font: Merriweather (serif)
+   - Body font: Open Sans
+*/
+:root {
+  --background: #151E3D;
+  --surface: var(--background);
+  --card-surface: #2C3E50;
+  --text-primary: #ADD8E6;
+  --link-accent: #007FFF;
+  --cta-tertiary: #009ACD;
+
+  --font-heading: "Merriweather", serif;
+  --font-body: "Open Sans", sans-serif;
+
+  --text-muted: rgba(173,216,230,0.85);
+  --border: rgba(255,255,255,0.06);
+}

@@ -1,0 +1,2126 @@
+/* Store Card Add to Basket Button Placement */
+/* Store Card Styles */
+.store-card {
+    position: relative;
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: var(--surface);
+}
+
+/* Apply scheme font variables globally so --font-body / --font-heading take effect.
+   Schemes define these variables in their own files (e.g., Scheme-1.css). When a
+   scheme file is loaded first, this rule (in the later-loaded schemes.css) will
+   read the variables and apply the fonts to the document body and headings.
+*/
+body {
+  font-family: var(--font-body, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial);
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: var(--font-heading, inherit);
+}
+
+/* -----------------------------
+   Theme token consumers
+   Ensure schemes' tokens (fonts, colors, surfaces) are applied to the
+   most common components so new schemes immediately take effect.
+   This block intentionally uses standard selectors and token fallbacks.
+   ----------------------------- */
+html, body {
+  background: var(--background, var(--surface));
+  color: var(--text-primary, #222);
+}
+
+/* Headings and lead text */
+h1,h2,h3,h4,h5,h6 {
+  font-family: var(--font-heading, inherit);
+  color: var(--text-primary, inherit);
+}
+
+/* Links and accents */
+a, .nav-link, a.scheme-link {
+  color: var(--link-accent, var(--text-primary));
+}
+
+/* Card surfaces and panels */
+.card, .card .card-body, .summary-card, .artwork-sidebar, .collection-card-fill {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border);
+}
+
+/* Primary CTA style (uses cta token when present) */
+.btn-primary, .button-cta {
+  background: var(--cta-tertiary, var(--text-primary));
+  color: var(--surface, #fff);
+  border-color: var(--cta-tertiary, var(--text-primary));
+}
+
+/* Ensure smaller accent elements use the link accent */
+.badge, .badge .bi, .toast-success {
+  background: var(--link-accent) !important;
+  color: var(--surface) !important;
+}
+
+/* Ensure scheme fonts apply broadly across UI components */
+/* Covers nav, buttons, cards, forms, lists, badges, and tables */
+body,
+button,
+input,
+select,
+textarea,
+a,
+label,
+.nav-link,
+.navbar,
+.card,
+.card *,
+.btn,
+.btn *,
+.list-group,
+.list-group-item,
+table,
+td,
+th,
+.badge,
+small,
+p,
+li {
+  font-family: var(--font-body, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial);
+}
+
+/* Bootstrap form controls sometimes set a specific font; override them to use scheme font */
+.form-control,
+.form-select,
+.form-check-label {
+  font-family: var(--font-body, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial) !important;
+}
+
+.store-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+.store-card .card-body {
+    padding: 1.5rem;
+}
+
+.store-card .card-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.store-card .text-muted {
+    color: var(--text-muted) !important;
+    font-size: 0.9rem;
+}
+
+.store-card .price-info {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin: 1rem 0;
+}
+
+.store-card .price-info strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Store Card Buttons */
+.store-card .btn-outline-primary {
+    color: var(--text-primary);
+    border-color: var(--border);
+    background: transparent;
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s;
+}
+
+.store-card .btn-outline-primary:hover {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+/* Card action buttons */
+.store-card .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.store-card .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.store-card .btn:hover {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border);
+    transform: translateY(-1px);
+}
+
+/* Contact page: make inline SVG icons use the scheme accent color */
+.card .bi, .card svg, .contact-icon,
+/* Also override Bootstrap utility classes like .text-primary when present on icons */
+.card .bi.text-primary, .card svg.text-primary, .card .bi.text-secondary, .card svg.text-secondary {
+  color: var(--link-accent) !important;
+  fill: currentColor !important; /* ensure fill follows currentColor */
+}
+
+/* Shop/store and featured cards: subtle scale + shadow on hover */
+.store-card,
+.featured-card {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  will-change: transform;
+}
+
+.store-card:hover,
+.featured-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+}
+
+/* -------------------------------------------------------------------------
+   Button tokens: centralize button colors so themes control primary/secondary
+   --btn-bg: primary filled button background
+   --btn-color: primary filled button text color
+   We default to --text-primary / --surface combos; schemes can override if needed.
+*/
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  vertical-align: middle;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  transition: all 0.18s ease;
+}
+
+/* Button baseline normalization: ensure all button-like elements share
+   the same alignment, line-height and minimum height so side-by-side
+   buttons (Save / Cancel / Continue) line up visually. */
+.btn,
+.btn-primary,
+.btn-back,
+.btn-back--owner,
+.btn-minimal,
+.btn-minimal-danger {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+  min-height: 36px !important; /* keeps a consistent touch target */
+}
+
+.btn:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+/* Ensure basket 'minimal' buttons show the intended primary fill on hover.
+   basket.css defines .btn-minimal:hover but schemes.css loads later and
+   the generic .btn:hover can override it. Add a targeted override here with
+   higher specificity and !important to restore the visible hover affordance. */
+.btn-minimal:hover,
+.btn-minimal:focus {
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border-color: var(--text-primary) !important;
+  transform: translateY(-1px);
+}
+
+.btn-minimal-danger:hover,
+.btn-minimal-danger:focus {
+  background: rgba(220,53,69,0.12) !important;
+  color: var(--surface) !important;
+  border-color: var(--danger) !important;
+}
+
+/* Filled primary button (used in auth and CTAs) */
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:active {
+  background: var(--text-primary);
+  color: var(--surface);
+  border-color: var(--text-primary);
+  /* Match owner cancel sizing: slightly tighter than default .btn */
+  padding: 0.375rem .75rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+}
+
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Prevent Bootstrap's default blue focus/active outline from flashing on click
+   Keep the active/focus states using the theme tokens instead. Targets: submit
+   buttons like Save/Create which often use .btn-primary */
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus-visible,
+.btn:active,
+.btn:focus,
+.btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important; /* remove default blue glow */
+  border-color: var(--text-primary) !important;
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+}
+
+/* Outline variants follow themed borders and text */
+.btn-outline-primary {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.btn-outline-primary:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.btn-outline-secondary,
+.btn-outline-secondary:hover {
+  color: var(--text-primary);
+  border-color: var(--border);
+  background: transparent;
+}
+
+/* Danger / delete buttons: keep a consistent red/warn color across schemes */
+:root {
+  /* Provide a danger token; schemes can override if they want a different hue */
+  --danger: #dc3545; /* Bootstrap danger fallback */
+}
+
+.btn-danger,
+.btn-danger:focus,
+.btn-danger:active,
+.btn-outline-danger,
+.btn-outline-danger:hover,
+.btn-minimal-danger,
+.button--danger {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  background: transparent !important;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:active,
+.btn-minimal-danger:hover {
+  background: rgba(220,53,69,0.12) !important; /* stronger red wash on hover for visibility */
+  color: var(--danger) !important;
+}
+
+/* More specific hover targets to ensure manage-card/basket delete buttons show highlight */
+.collection-actions .btn-outline-danger:hover,
+.manage-media-thumb .btn-outline-danger:hover,
+.collection-card-fill .btn-outline-danger:hover,
+.collection-section .btn-outline-danger:hover,
+.btn.btn-outline-danger.btn-sm:hover,
+.btn.btn-outline-danger:hover {
+  background: rgba(220,53,69,0.12) !important;
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
+/* Small buttons used in owner pages */
+.btn-sm {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* Decorative / site-specific button variants */
+.my-btn{
+  background-color: var(--text-muted);
+  border: none;
+  color: var(--surface);
+  padding: 15px 32px;
+  transition: all 0.3s ease;
+}
+
+.my-btn:hover{
+  background: linear-gradient(270deg, #5900be 0%, #65f0ff 50%, #ff66d9 100%);
+  background-size: 400% 100%;
+  animation: gradientShift 2s ease infinite;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer CTA button */
+.footer-contact-btn {
+  background: var(--text-primary);
+  color: var(--surface);
+  border: 1px solid var(--text-primary);
+}
+
+
+/* Card Image */
+.store-card .card-img-top {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.store-card a:hover .card-img-top {
+    opacity: 0.9;
+}
+/* Minimalist Grayscale Palette for Auth Pages Only */
+.auth-card, .account .card {
+	background: var(--surface); /* Light Gray */
+	border: 1px solid var(--border); /* Cool Gray */
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(51,51,51,0.04);
+	max-width: 400px;
+	margin: 40px auto;
+	padding: 2.5rem 2rem 2rem 2rem;
+}
+
+/* Artwork sidebar / add-to-basket styling: ensure the purchase form uses themed surface */
+.artwork-sidebar,
+.artwork-sidebar .price-section,
+.artwork-sidebar .list-group,
+#add-to-basket-form,
+#add-to-basket-form .list-group-item {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+/* Ensure add-to-basket buttons match themed hover affordance */
+.artwork-sidebar .btn-outline-primary:hover,
+.artwork-sidebar a.btn-outline-primary:hover,
+#add-to-basket-form .btn-outline-primary:hover {
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+/* Artwork detail page: right-column panels (artwork-details and quick info)
+   were using bg-white; scope to the artwork detail column so we don't
+   affect other .bg-white uses site-wide. */
+.col-md-5 .artwork-details,
+.col-md-5 .artwork-details.p-4,
+.col-md-5 > .mt-4.p-4.bg-white,
+.col-md-5 .bg-white {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+/* Buttons in the artwork details should follow themed hover affordance */
+.col-md-5 .btn-outline-primary:hover,
+.col-md-5 a.btn-outline-primary:hover,
+.col-md-5 .btn-outline-secondary:hover {
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+/* Standardize Back / Cancel buttons: make them the "inverted" (outline) variant
+   of the primary action so Cancel visually pairs with Save but as an outline.
+   - Outline uses primary text and border
+   - Hover/active flips to filled primary (same as .btn-primary) */
+.btn-back,
+a.btn-back,
+.btn-link.text-muted,
+a.btn-link.text-muted {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem 1rem; /* match .btn sizing */
+  color: var(--text-primary) !important; /* primary text for outline */
+  background: transparent;
+  border: 1px solid var(--text-primary) !important; /* outline uses primary */
+  text-decoration: none;
+  border-radius: 6px; /* match .btn radius */
+  transition: all 0.18s ease;
+}
+
+.btn-back:hover,
+a.btn-back:hover,
+.btn-link.text-muted:hover,
+a.btn-link.text-muted:hover {
+  background: var(--text-primary) !important; /* filled primary on hover */
+  color: var(--surface) !important; /* invert text color to surface */
+  border-color: var(--text-primary) !important;
+}
+
+/* Accessibility / focus: follow same treatment as .btn-primary */
+.btn-back:focus,
+.btn-back:active,
+a.btn-back:focus,
+a.btn-back:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: var(--text-primary) !important;
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+}
+
+/* Icon alignment fallback for links using icon fonts */
+.btn-back .bi,
+.btn-link.text-muted .bi {
+  vertical-align: -0.125em;
+}
+
+/* Owner-specific modifier: use when cancel/back appears in owner pages
+   This allows the basket/visitor buttons to have one visual rhythm while
+   owner pages can opt into a slightly tighter alignment. */
+.btn-back--owner,
+a.btn-back--owner {
+  padding: 0.375rem .75rem; /* slightly tighter */
+  border-radius: 6px;
+  gap: .4rem;
+  font-size: 0.95rem;
+}
+.auth-card h1, .auth-card h2, .auth-card h3, .auth-card h4, .auth-card h5, .auth-card h6,
+.account .card-title {
+	color: var(--text-primary); /* Graphite */
+	font-weight: 600;
+	margin-bottom: 1.5rem;
+}
+.auth-card label, .account label {
+	color: var(--text-muted); /* Charcoal Gray */
+	font-weight: 500;
+}
+.auth-card input, .account input[type="text"], .account input[type="email"], .account input[type="password"] {
+	background: var(--surface); /* Pure White */
+	border: 1px solid var(--border); /* Medium Gray */
+	color: var(--text-muted); /* Charcoal Gray */
+	border-radius: 6px;
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+}
+.auth-card input:focus, .account input:focus {
+	border-color: var(--text-primary); /* Graphite */
+	outline: none;
+	box-shadow: 0 0 0 2px var(--border); /* Cool Gray */
+}
+.auth-card .btn, .account .btn {
+	background: var(--text-primary); /* Graphite */
+	color: var(--surface); /* Pure White */
+	border: none;
+	border-radius: 6px;
+	padding: 0.75rem 1.5rem;
+	font-weight: 600;
+	transition: background 0.2s;
+}
+.auth-card .btn:hover, .account .btn:hover {
+	background: var(--text-primary); /* Absolute Black */
+	color: var(--surface);
+}
+.auth-card .form-text, .account .form-text {
+	color: var(--border); /* Medium Gray */
+}
+.auth-card .alert, .account .alert {
+	border-radius: 6px;
+	background: var(--border); /* Cool Gray */
+	color: var(--text-primary); /* Graphite */
+	border: none;
+}
+.auth-card .form-check-input, .account .form-check-input {
+	border-radius: 4px;
+	border: 1px solid var(--border); /* Medium Gray */
+}
+.auth-card .form-check-label, .account .form-check-label {
+	color: var(--text-muted); /* Charcoal Gray */
+}
+.auth-card .form-check-input:checked, .account .form-check-input:checked {
+	background-color: var(--text-primary); /* Graphite */
+	border-color: var(--text-primary);
+}
+.auth-divider {
+	border-top: 1px solid var(--border); /* Cool Gray */
+	margin: 2rem 0;
+}
+.auth-card a, .account a {
+	color: var(--border); /* Medium Gray */
+	text-decoration: underline;
+	font-size: 0.97em;
+}
+.auth-card a:hover, .account a:hover {
+	color: var(--text-primary); /* Graphite */
+}
+.account .container, .account .content, .account .main, .account .row {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+/* Minimal placeholder styles */
+body { 
+  font-family: var(--font-body, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+/* Ensure muted copy follows the theme token across the site */
+.text-muted,
+.muted,
+small,
+.small {
+  color: var(--text-muted) !important;
+}
+
+/* Ensure default paragraph and list text use primary text token unless overridden */
+p, li, span, a {
+  color: var(--text-primary);
+}
+
+/* Define a site-level hairline color variable so our dividers have an explicit
+   fallback color. Sites/themes that already provide --hairline-color will
+   override this. The default is a subtle dark hairline for light themes. */
+:root {
+  --hairline-color: var(--border);
+}
+
+/* Compact Minimalist Navbar */
+.navbar {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--border);
+	padding: 0.5rem 0;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Dashboard radial theme selector styles */
+.theme-radial-selector .theme-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-radial-selector input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.theme-radial-selector .theme-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: var(--card-surface);
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+.theme-radial-selector input[type="radio"]:checked + .theme-dot {
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06) inset;
+  border-color: var(--link-accent);
+  background: var(--link-accent);
+  color: var(--surface);
+}
+
+/* Sticky navbar helpers
+   - .navbar-sticky: fixes the navbar to the top of the viewport
+   - Uses a CSS variable --navbar-height which is measured as an estimated
+   height for the collapsed/expanded navbar. We also set top padding on
+   main to ensure page content is not obscured by the fixed navbar. */
+:root {
+  --navbar-height: 64px; /* fallback value; adjusted on large screens via media queries */
+}
+
+.navbar-sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030; /* above content but below modals/toasts */
+  background: var(--surface) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* When navbar is fixed we need the main content to start below it. Use padding on main. */
+main {
+  padding-top: var(--navbar-height);
+}
+
+/* On small screens the navbar toggler increases navbar height when expanded.
+   Provide a slightly larger fallback to accommodate the taller mobile navbar. */
+@media (max-width: 767px) {
+  :root { --navbar-height: 112px; }
+}
+
+@media (min-width: 768px) {
+  :root { --navbar-height: 64px; }
+}
+
+.navbar-brand { 
+	font-weight: 600;
+	color: var(--text-primary) !important;
+	font-size: 1.1rem;
+	letter-spacing: 0.5px;
+}
+
+.navbar .nav-link {
+	color: var(--text-muted) !important;
+	font-size: 0.95rem;
+	padding: 0.4rem 0.8rem !important;
+	transition: color 0.2s;
+}
+
+.navbar .nav-link:hover {
+	color: var(--text-primary) !important;
+}
+
+/* Ensure default (non-hover, non-active) nav links use the muted token so
+   they don't appear as if hovered due to competing rules from compiled CSS. */
+html body .navbar .nav-link {
+  color: var(--text-muted) !important;
+  background: transparent !important;
+}
+
+/* Active nav link styling */
+.navbar .nav-link.active {
+  color: var(--link-accent) !important;
+  font-weight: 700;
+  border-bottom: none; /* use left-accent instead of underline to match Messages */
+}
+
+/* Make dropdown active items match nav-link.active (text-only highlight)
+   Avoid Bootstrap's default .dropdown-item.active background which makes
+   the text unreadable when the whole item is highlighted. */
+.navbar .dropdown-item.active,
+.navbar .dropdown-item.active:focus,
+.navbar .dropdown-item.active:hover {
+  background: transparent !important;
+  color: var(--link-accent) !important; /* match nav-link active color */
+  font-weight: 700;
+  box-shadow: none !important;
+}
+
+/* Make the messages dropdown active item more visible by adding a
+   thin left accent (mirrors the top-level nav active underline) and
+   ensuring any badge updates color to match. This helps the "Messages"
+   item stand out consistently across schemes. */
+.navbar .dropdown-item.active.messages-active,
+.navbar .dropdown-item.messages-active.active:focus,
+.navbar .dropdown-item.messages-active.active:hover {
+  padding-left: 1rem; /* align with normal dropdown padding; accent shown via pseudo-element */
+  background: transparent !important;
+  color: var(--link-accent) !important;
+}
+
+.navbar .dropdown-item.messages-active .badge {
+  background: var(--link-accent) !important;
+  color: var(--surface) !important;
+}
+
+/* ------------------------------------------------------------------
+   Make all nav items visually match the Messages left-accent treatment.
+   We use a pseudo-element so markup doesn't need changing and alignment
+   is preserved. This mirrors the existing .messages-active left border
+   but applies it for any active .nav-link or .dropdown-item while keeping
+   hover/active backgrounds consistent. No template edits required.
+*/
+.navbar .nav-link,
+.navbar .dropdown-item {
+  position: relative; /* establish containing block for pseudo */
+}
+
+/* left-accent bar shown when a dropdown item is active (Messages-style) */
+.navbar .dropdown-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  background: var(--link-accent);
+  border-radius: 2px;
+}
+
+/* inset the text slightly so accent doesn't overlap content */
+.navbar .nav-link.active {
+  /* Top-level nav links use an underline rather than a side accent.
+     Use the accent color and a slightly stronger thickness to match
+     the visual weight of dropdown left-accent. */
+  color: var(--link-accent) !important;
+  font-weight: 700;
+  border-bottom: none !important; /* replace with centered pseudo-underline */
+  padding-right: 0.4rem !important; 
+}
+
+/* Centered, shorter underline for top-level active nav links */
+.navbar .nav-link.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 1px; /* nudge slightly above the element bottom */
+  width: 75%; /* slightly less wide than the full link */
+  max-width: 84px; /* cap for very long links */
+  height: 4px; /* match previous thickness */
+  background: var(--link-accent);
+  border-radius: 2px;
+}
+
+.navbar .dropdown-item.active {
+  /* Dropdown items keep the left-accent pseudo-element; ensure text
+     color and weight match the accent. */
+  padding-left: calc(1rem + 4px);
+  color: var(--link-accent) !important;
+  font-weight: 700;
+}
+
+/* Ensure badges inside active items pick up the accent color */
+.navbar .nav-link.active .badge,
+.navbar .dropdown-item.active .badge {
+  background: var(--link-accent) !important;
+  color: var(--surface) !important;
+}
+
+/* Final override: prevent any other stylesheet from painting a left border
+   or underline on active nav items. This ensures a single visual accent
+   (the ::before pseudo-element) is used across the navbar. */
+/* Neutralizers should target dropdown items only so top-level links can retain
+   their underline. Keep high specificity to override compiled CSS for dropdowns. */
+html body .navbar .dropdown-item.active,
+html body .navbar .dropdown-item.messages-active,
+html body .navbar .dropdown-menu .dropdown-item.messages-active.active {
+  border-left: none !important;
+  border-bottom: none !important;
+}
+
+
+/* ------------------------------------------------------------------
+  Neutralize legacy .messages-active left border so it doesn't duplicate
+  the pseudo-element accent we add for all active items. This keeps a
+  single left-accent indicator for Messages and other nav links.
+  NOTE: redundant neutralizer removed below elsewhere to avoid duplicate
+  selector blocks. */
+
+
+
+/* Stronger override: ensure the Messages item text and any nested spans
+   use the exact same accent color as top-level nav links when active.
+   This uses a more specific selector to beat other compiled/Bootstrap rules. */
+.navbar .dropdown-menu .dropdown-item.messages-active.active,
+.navbar .dropdown-menu .dropdown-item.messages-active.active:focus,
+.navbar .dropdown-menu .dropdown-item.messages-active.active:hover {
+  color: var(--link-accent) !important;
+  background: transparent !important;
+  font-weight: 700 !important;
+}
+
+.navbar .dropdown-menu .dropdown-item.messages-active.active > span,
+.navbar .dropdown-menu .dropdown-item.messages-active.active > span * {
+  color: var(--link-accent) !important;
+}
+
+.navbar .dropdown-menu .dropdown-item.messages-active.active .badge {
+  background: var(--link-accent) !important;
+  color: var(--surface) !important;
+}
+
+.navbar .dropdown-menu {
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 6px;
+  min-width: 160px;
+  background: var(--surface); /* use themed surface instead of default white */
+}
+
+.navbar .dropdown-item {
+	color: var(--text-muted);
+	font-size: 0.9rem;
+	padding: 0.5rem 1rem;
+}
+
+.navbar .dropdown-item:hover {
+	background: var(--surface);
+	color: var(--text-primary);
+}
+
+.navbar .dropdown-divider {
+	border-color: var(--border);
+}
+
+/* Basket icon styling */
+.navbar .nav-link svg {
+	vertical-align: middle;
+}
+
+/* High-specificity neutralizers to avoid duplicate accents from compiled CSS
+   (e.g. static/css/main.css or staticfiles copies). These ensure only the
+   pseudo-element accent is visible for active items. */
+/* High-specificity neutralizers: ensure external/compiled styles can't add
+   their own left borders or underlines. We target the navbar via a deep
+   selector starting from html to increase specificity. */
+html body .navbar .dropdown-item.active,
+html body .navbar .dropdown-item.messages-active,
+html body .navbar .dropdown-menu .dropdown-item.messages-active.active {
+  border-left: none !important;
+  border-bottom: none !important;
+}
+
+/* Ensure active items have consistent left padding to account for the
+   pseudo-element accent (4px). Use explicit rules for top-level and
+   dropdown items to avoid layout shifts. */
+/* Ensure padding is correct for active items; top-level uses its normal padding
+  and dropdowns keep extra space to make room for the left accent pseudo. */
+html body .navbar .nav-link.active { padding-left: 0.4rem !important; }
+html body .navbar .dropdown-item.active { padding-left: calc(1rem + 4px) !important; }
+
+/* Emergency high-specificity cleanup: ensure no other stylesheet can leave
+   an underline or an extra left border on navbar active items. This targets
+   the active item and any nested elements (spans/badges) to neutralize
+   competing styles from compiled CSS. Only the ::before accent will remain. */
+html body .navbar .dropdown-item.active,
+html body .navbar .dropdown-item.active *,
+html body .navbar .dropdown-item.messages-active,
+html body .navbar .dropdown-item.messages-active * {
+  border-left: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+
+/* Toast Notifications Styling
+   A toast is a lightweight notification that appears temporarily
+   to provide feedback about an operation (like adding to basket) */
+
+/* Container for all toast messages
+   - Fixed position keeps it in view even when scrolling
+   - Bottom-right corner is a common, non-intrusive position
+   - High z-index ensures it appears above other content */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+/* Individual toast notification styling
+   - White background for readability
+   - Subtle border and shadow for depth
+   - Initially invisible (opacity: 0) and positioned below view
+   - Transform and transition for sliding animation */
+.toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    min-width: 280px;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+}
+
+/* When toast becomes visible
+   - Full opacity and normal position
+   - Applied via JavaScript when toast appears */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Header section of toast
+   - Contains title and close button
+   - Subtle border separator */
+.toast-header {
+    background: transparent;
+  border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+}
+
+/* Main content area of toast
+   - Contains the actual message */
+.toast-body {
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+}
+
+/* Success toast variant
+   - Blue left border matches the primary button color
+   - Uses Bootstrap's primary blue color (#0d6efd) */
+.toast-success {
+  border-left: 4px solid var(--link-accent);
+}
+
+/* Error toast variant
+   - Red left border indicates error or warning */
+.toast-error {
+  /* Use themed tertiary CTA as the error/danger accent; create a danger token later if needed */
+  border-left: 4px solid var(--cta-tertiary);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Adding Dylan's styles*/
+/* Keep body font using scheme variable so schemes can control fonts */
+body { font-family: var(--font-body, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial); }
+.navbar-brand { font-weight: 600; }
+
+.i {
+  font-size: 67.5px;  /* 10% smaller than 75px */
+  text-align: center;
+  margin: 0 20px;
+}
+.i:hover{
+    background-size: 400% 100%;
+    animation: gradientShift 2s ease infinite;
+    transform: translateY(-3px);
+}
+
+footer{
+  border-top: var(--text-primary) 2px solid;
+  color: white;
+  padding-top: 2rem; /* create breathing room above the footer */
+}
+
+/* Extra separation from page content — owner pages were visually too close */
+footer {
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  footer { margin-top: 3rem; }
+}
+
+
+#intro > p{
+    font-size: 24px;
+    font-family: var(--font-body, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
+  color: var(--text-primary);
+    font-weight: 500;
+}
+#intro > h2{
+    font-size: 32px;
+  color: var(--text-primary);
+    font-weight: 700;
+}
+.video {
+  width: 55%;
+  height: auto;
+  max-width: 100%;
+  box-shadow: 0 0 8px 8px rgba(0, 0, 0, 0.5);
+}
+#hero {
+    background: linear-gradient(90deg, #797979 0%, #3b8791 50% , #797979 100%);
+    width: 100%;
+    height: auto;
+}
+#multi-color {
+  background: linear-gradient(
+    90deg,
+    #5900be 0%,
+    #c48741 20%,
+    #41c497 50%,
+    #65f0ff 80%,
+    #ff66d9 100%
+  );
+  padding: 15px;
+}
+.card-color{
+  /* keep decorative gradient but ensure underlying surface uses theme */
+  background: linear-gradient(
+    90deg,
+    #65f0ff 0%,
+    rgb(59, 59, 59) 25%,
+    rgb(54, 54, 54) 75%,
+    #ff66d9 100%
+  );
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  .featured-works-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .featured-text {
+    max-width: 100%;
+  }
+  .featured-text p {
+    font-size: 20px;
+    line-height: 1.6;
+    text-align: justify;
+    margin: 0;
+    font-weight: 500;
+    padding: 15px;
+    border: 2px solid var(--border);
+  }
+  .featured-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .featured-image img {
+    width: auto;
+    height: 450px;
+    box-shadow: 0 0 8px 8px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+  }
+  #feature-card{
+    /* Feature card should respect theme surface and text */
+    background: var(--surface);
+    margin-bottom: 50px;
+    color: var(--text-primary);
+  }
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .featured-works-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .featured-image img {
+      height: 300px;
+    }
+    }
+
+  /* Smaller about/description text on small screens inside collection sections */
+  @media (max-width: 768px) {
+    .collection-section .card.card-body {
+      font-size: 0.9rem; /* smaller on mobile */
+      line-height: 1.3;
+      padding: 0.6rem 0.75rem;
+    }
+  }
+    .my-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+  }
+    .my-card > img{
+      width: 200px;
+      height: 400px;
+      display: block;
+    }
+
+    /* Featured thumbnails in artwork listing */
+
+    /* Make featured thumbnails match the store card image height */
+
+    .featured-thumb {
+      width: 260px; /* downscaled */
+      flex: 0 0 auto; /* keep size in horizontal scroller */
+      text-align: center;
+    }
+
+    .featured-thumb-img {
+      width: 260px;
+      height: 180px; /* downscaled */
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      display: block;
+    }
+
+    .featured-thumb-img:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .featured-thumb-placeholder {
+      width: 360px;
+      height: 250px;
+    }
+  .my-btn{
+  background-color: var(--text-muted);
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .my-btn:hover{
+    background: linear-gradient(
+      270deg,
+      #5900be 0%,
+      #65f0ff 50%,
+      #ff66d9 100%
+    );
+    background-size: 400% 100%;
+    animation: gradientShift 2s ease infinite;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+/* Gallery: full-width collection sections */
+.gallery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* Subtle horizontal divider between collection sections */
+.collection-divider {
+  border: none;
+  height: 1px;
+  /* use a hairline variable when available, otherwise fallback to a neutral dark line */
+  background: var(--hairline-color, rgba(0,0,0,0.12));
+  /* add a lightweight border-top fallback so the rule is visible even when
+     some themes/setups override background or the variable resolves to a
+     matching page color */
+  border-top: 1px solid var(--hairline-color, rgba(0,0,0,0.12));
+  display: block;
+  margin: 24px 0;
+  width: 100%;
+}
+
+/* Page title divider: shorter and centered under the main page heading */
+.page-title-divider {
+  width: 60%;
+  max-width: 720px;
+  height: 2px;
+  background: var(--hairline-color, rgba(0,0,0,0.12));
+  border-top: 2px solid var(--hairline-color, rgba(0,0,0,0.12));
+  display: block;
+  margin: 12px auto 20px;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .page-title-divider { width: 80%; margin-top: 10px; margin-bottom: 16px; }
+}
+
+/* If the page or theme exposes a --hairline-color variable, the dividers will
+   follow it. We avoid forcing colors via prefers-color-scheme so the site
+   (or a theme class) can control the exact appearance. */
+
+/* Small safe tweak: when the user's OS/browser is in dark mode we use a light
+   hairline so the divider remains visible against dark backgrounds. This only
+   applies if the browser reports prefers-color-scheme: dark. If you have a
+   site-level theme class (for example `.theme-dark`) we can prefer that
+   instead of this media query — tell me if you want that behavior. */
+
+
+.collection-section {
+  width: 100%;
+  height: 85vh; /* adjusted for sticky nav */
+  min-height: 85vh;
+  display: block;
+}
+
+.collection-cover {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.collection-cover-media {
+  width: 100%;
+  height: auto;
+  max-height: 300px; /* further downscaled */
+  object-fit: contain; /* show full image scaled to fit */
+  object-position: center center;
+  display: block;
+}
+
+.collection-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+/* Two-column layout: left info, right cover */
+.collection-section .row {
+  align-items: stretch;
+  height: 100%; /* make the inner row fill the section height */
+  margin: 0; /* remove row gutters affecting height */
+}
+
+/* Always keep two-column layout and let content scale inside it.
+   The row becomes a non-wrapping flex container so columns won't stack;
+   the cover column uses a fixed percentage while the left column grows. */
+.collection-section > .row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+/* Left column grows to fill remaining space; when no cover exists it will take full width. */
+.collection-section > .row > .collection-left {
+  flex: 1 1 58% !important;
+  max-width: 100% !important; /* allow full width when cover absent */
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+/* Cover column fixed proportion so left always scales to remaining width */
+.collection-section > .row > .collection-cover-col {
+  flex: 0 0 42% !important;
+  max-width: 42% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.collection-section .collection-body {
+  padding-right: 16px;
+  height: 100%;
+}
+
+.collection-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start; /* align media to the top so it lines up with row border */
+  justify-content: center;
+  padding-top: 0; /* ensure no extra gap */
+}
+
+.collection-cover-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* show full image/video scaled to fit the column */
+  object-position: top center; /* align the visible image to the top */
+  display: block;
+  margin: 0; /* remove any accidental offsets */
+}
+
+/* Make image elements scale to fill the column vertically while preserving aspect ratio */
+.collection-cover-media {
+  width: auto;      /* allow width to adjust when height is constrained */
+  max-width: 100%;  /* but never overflow the column */
+  height: 100%;     /* force image to match column height */
+}
+
+/* Make sure carousel area fills its container and images scale within it */
+.collection-left .left-bottom .collection-carousel,
+.collection-carousel .carousel,
+.collection-carousel .carousel-inner,
+.collection-carousel .carousel-item {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.collection-carousel .carousel-item img,
+.collection-carousel .carousel-item video {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Left column two-row layout */
+.collection-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.collection-left .left-top {
+  flex: 0 0 auto; /* small fixed area for title/buttons */
+}
+
+.collection-left .left-bottom {
+  flex: 1 1 auto; /* grow to fill remaining height */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+/* Make the right cover column match the left height */
+.collection-section > .row > .col-md-7 {
+  display: flex;
+  height: 100%;
+}
+
+/* Backwards-compatible selectors: ensure any right-column variant stretches to full height
+   (covers legacy `.col-md-7` and the new `.collection-cover-col`). */
+.collection-section > .row > .collection-cover-col,
+.collection-section > .row > .col-md-7 {
+  display: flex !important;
+  height: 100% !important;
+  align-items: stretch !important;
+}
+
+.collection-cover-col {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.collection-cover-col .collection-cover,
+.collection-section > .row > .col-md-7 .collection-cover {
+  width: 100% !important;
+  height: 100% !important;
+  align-self: stretch !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+}
+
+.collection-cover-col .collection-cover .collection-cover-media,
+.collection-section > .row > .col-md-7 .collection-cover .collection-cover-media,
+.collection-cover-col .collection-cover video.collection-cover-media,
+.collection-section > .row > .col-md-7 .collection-cover video.collection-cover-media {
+  height: 100% !important;
+  width: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: top center !important;
+}
+
+.collection-section > .row > .col-md-7 .collection-cover {
+  width: 100%;
+  align-self: stretch;
+  height: 100%;
+}
+
+/* Slightly wider left column and thinner right column on large screens */
+@media (min-width: 992px) {
+  .collection-left-col { flex: 0 0 58% !important; max-width: 58% !important; }
+  .collection-cover-col { flex: 0 0 42% !important; max-width: 42% !important; }
+  /* Ensure the cover column keeps flex layout for vertical stretching */
+  .collection-cover-col { display: flex !important; align-items: stretch !important; }
+  .collection-cover-col .collection-cover { width: 100%; height: 100%; }
+}
+
+/* Ensure video elements also scale to fit and are centered */
+.collection-cover video.collection-cover-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+  display: block;
+  margin: 0;
+}
+
+/* Ensure the carousel inside the left-bottom fills the remaining left column height */
+.collection-left .left-bottom .collection-carousel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Allow flex children to shrink correctly: set min-height:0 on flex parents so children
+   can use 100% height. This prevents unexpected overflow/collapsing in some browsers. */
+.collection-left .left-bottom,
+.collection-left .left-bottom .collection-carousel,
+.collection-carousel .carousel,
+.collection-carousel .carousel-inner,
+.collection-carousel .carousel-item {
+  min-height: 0 !important;
+}
+
+.collection-carousel .carousel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-carousel .carousel-inner {
+  height: 100%;
+  /* keep carousel viewport clipped so only active item is visible */
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-carousel .carousel-item {
+  height: 100%;
+  /* let Bootstrap control visibility (active/next/prev), avoid forcing display values */
+  position: relative;
+}
+
+/* Explicitly hide non-active carousel items to prevent stacking during our flex/height hacks */
+.collection-carousel .carousel-inner .carousel-item { display: block; }
+.collection-carousel .carousel-inner .carousel-item:not(.active) { display: none; }
+
+.collection-carousel .carousel-item img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain; /* keep full image visible */
+}
+
+/* Center the cover media vertically within the right column */
+.collection-section > .row > .col-md-7 {
+  align-items: center;
+}
+
+.collection-carousel .carousel {
+  height: 100%;
+}
+
+.collection-carousel .carousel-inner { height: 100%; }
+.collection-carousel .carousel-item { height: 100%; }
+
+.collection-carousel .carousel-item img {
+  height: 100% !important;            /* fill vertical space */
+  width: auto !important;             /* preserve aspect ratio */
+  max-width: 100% !important;         /* avoid overflowing horizontally */
+  object-fit: contain !important;     /* keep image visible, centered */
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Strong override to remove any earlier max-height caps and ensure carousel imgs fill height */
+.collection-section .carousel .carousel-item img,
+.collection-carousel .carousel-item img {
+  max-height: none !important;
+  height: 100% !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 768px) {
+  .collection-cover-media { max-height: 240px; }
+  .collection-carousel .carousel-item img { max-height: 180px; }
+}
+
+/* Manage Media thumbnail grid (owner pages) */
+.manage-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.manage-media-thumb {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.manage-media-thumb .card-img-top {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.manage-media-thumb .card-body {
+  padding: 0.75rem;
+}
+.manage-media-thumb .card-body .btn { padding: 0.25rem 0.6rem; }
+.manage-media-thumb .card-body .text-truncate { max-width: 100%; }
+
+/* Larger cards and extra spacing for collection detail page */
+.collection-detail-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: start;
+}
+.collection-detail-img {
+  width: 100%;
+  height: 100%; /* let the media area control height */
+  object-fit: contain; /* fill the card area */
+  display: block;
+}
+
+@media (min-width: 992px) {
+  .collection-detail-img { height: 260px; }
+}
+
+/* Make the card media fill the card and overlay the title */
+.collection-card-fill {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--surface);
+  min-height: 260px; /* ensure reasonable card height */
+  display: flex;
+  align-items: center;
+  padding: 0; /* remove default card padding so media can reach the edges */
+  box-sizing: border-box;
+  width: 100%;
+}
+.collection-card-fill .card-media {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.collection-card-fill .card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.collection-detail-grid > * { width: 100%; box-sizing: border-box; }
+.collection-detail-grid .card,
+.collection-card-fill { box-sizing: border-box; }
+
+/* -------------------------------------------------------------------------
+   Owner pages theme overrides (messages, manage collections, manage exhibitions)
+   - Conservative selectors so visitor-facing pages are unaffected
+   - Opt-in `.owner-listing` class is provided for templates that want explicit scoping
+*/
+
+.owner-listing .list-group-item,
+.owner-listing .list-group-item h5,
+.owner-listing .list-group-item p,
+.owner-listing table.table,
+.owner-listing table.table td,
+.owner-listing table.table th,
+.owner-listing .alert,
+.owner-listing .badge,
+.owner-listing .btn-outline-secondary,
+.owner-listing .btn-outline-primary,
+.owner-listing .btn-sm {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+/* Make owner list action buttons highlight with the primary background on hover
+   so Edit / Assign Art / Assign Media buttons have the same affordance */
+.list-group-item .btn-outline-primary:hover,
+.list-group-item .btn-outline-secondary:hover,
+.list-group-item a.btn-outline-primary:hover,
+.list-group-item a.btn-outline-secondary:hover,
+.collection-actions a.btn-outline-primary:hover,
+.collection-actions a.btn-outline-secondary:hover {
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+/* Also apply the same primary hover for buttons inside various card contexts
+   (art cards, media thumbs, collection cards) so their edit buttons match */
+.card .btn-outline-primary:hover,
+.card .btn-outline-secondary:hover,
+.card a.btn-outline-primary:hover,
+.card a.btn-outline-secondary:hover,
+.manage-media-thumb .btn:hover,
+.collection-card-fill .btn:hover,
+.store-card .btn:hover,
+.auth-card .btn:hover {
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+/* Table-based lists (Manage Collections) use smaller edit buttons; ensure hover
+   uses primary background as well */
+.table .btn-outline-primary:hover,
+.table .btn-outline-secondary:hover,
+.table a.btn-sm.btn-secondary:hover,
+.table a.btn-sm.btn-secondary:focus {
+  background: var(--text-primary) !important;
+  color: var(--surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+/* Links inside owner pages should be readable and follow accent tokens */
+.owner-listing a {
+  color: var(--link-accent) !important;
+}
+
+/* Fallback narrow selectors for the common owner page structures when templates are not updated.
+   These target list-group items and tables inside .container which is typical in owner templates. */
+/* Broaden fallback selectors to match nested structures used in owner templates */
+.container .list-group .list-group-item,
+.container table.table td,
+.container table.table th,
+.container .alert.alert-secondary,
+.container .badge.bg-secondary,
+.container .btn.btn-sm.btn-secondary {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+
+@media (max-width: 420px) {
+  .collection-detail-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+}
+.collection-card-fill .card-overlay-title {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);
+  color: var(--text-primary);
+}
+.collection-card-fill .card-title { margin: 0; font-size: 1rem; }
+
+@media (max-width: 768px) {
+  .collection-card-fill { min-height: 180px; }
+}
+
+/* Fix: ensure cover column stacks and media fits on small screens to avoid overflow */
+@media (max-width: 991px) {
+  /* Allow stacking and remove row negative margins which can cause overflow */
+  .collection-section > .row { flex-wrap: wrap !important; margin-left: 0 !important; margin-right: 0 !important; }
+
+  /* Make columns full width on small screens */
+  .collection-section > .row > .collection-left,
+  .collection-section > .row > .collection-cover-col,
+  .collection-section > .row > .col-md-7 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Ensure the cover box itself won't overflow and uses box-sizing */
+  .collection-cover {
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Force media to fit within the cover: width 100%, auto height */
+  .collection-cover .collection-cover-media,
+  .collection-cover img.collection-cover-media,
+  .collection-cover video.collection-cover-media,
+  .collection-section .collection-cover-media {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 420px !important;
+    object-fit: contain !important;
+    display: block !important;
+    position: relative !important;
+  }
+
+  /* Keep the 90vh section height on small screens but allow internal scrolling
+     so content won't overflow the viewport (covers are hidden on mobile). */
+  .collection-section {
+  height: 85vh !important;
+  min-height: 85vh !important;
+    overflow: hidden !important; /* prevent the section itself from extending */
+  }
+
+  .collection-left, .collection-cover-col, .collection-cover {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Make only the left-bottom area scrollable so the section stays fixed at 90vh */
+  .collection-left {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .collection-left .left-bottom {
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* smooth scrolling on iOS */
+  }
+  /* Hide the cover column entirely on small screens so it doesn't cause layout problems */
+  .collection-cover-col, .collection-cover {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  /* Left column should take full width when cover is hidden */
+  .collection-left, .collection-left-col {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+.collection-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  display: block;
+  padding: 6px 0; /* small vertical padding so title isn't flush against borders/buttons */
+}
+
+/* Place the subtle centered underline under the title+artist block (.left-top).
+   This ensures the rule appears after the "By ..." artist line rather than
+   immediately after the title text. */
+.left-top {
+  position: relative; /* anchor for the pseudo-element */
+  padding: 8px 0 10px 0; /* add top and bottom padding to give breathing room around title and artist */
+}
+
+.left-top::after {
+  content: "";
+  display: block;
+  width: 75%;
+  height: 2px;
+  background-color: rgba(0,0,0,0.12);
+  margin: 8px auto 0; /* space above and center horizontally */
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  /* Slightly narrower underline on small screens so it doesn't overwhelm the title */
+  .left-top::after { width: 60%; }
+}
+
+.collection-artist {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.collection-actions .btn {
+  min-width: 120px;
+}
+
+/* Make carousel sit full-width beneath the collection info */
+.collection-section .carousel {
+  margin-top: 16px;
+}
+
+/* Constrain the carousel images inside collection sections */
+.collection-section .carousel .carousel-item img {
+  max-height: 220px; /* keep carousel thumbnails small */
+  object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .collection-cover-media {
+    max-height: 360px;
+  }
+  .gallery-list { gap: 28px; }
+}
+  
+  /* Footer contact button - 20% smaller, same spacing as icons */
+  .footer-contact-btn {
+    font-size: 18px;  /* Increased for better readability */
+    font-weight: 600;  /* Bold for better visibility */
+    padding: 12px 18px;  /* Narrower horizontal padding */
+    margin: 0 20px;  /* Same margin as social icons */
+    height: 60px;  /* Match the height of social icons (75px * 0.8) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;  /* Rounded corners like Font Awesome square icons */
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Make featured thumbs smaller on narrow screens */
+  @media (max-width: 768px) {
+    .featured-thumb {
+      width: 220px;
+    }
+
+    .featured-thumb-img, .featured-thumb-placeholder {
+      width: 220px;
+      height: 160px;
+    }
+  }
+
+/* Featured carousel styles for store page */
+.featured-carousel {
+  width: 100%;
+  padding: 10px 40px; /* space for controls */
+}
+
+.featured-track {
+  scroll-behavior: smooth;
+  gap: 56px; /* increased spacing between cards */
+}
+
+.featured-card-wrapper {
+  padding: 16px;
+}
+
+  .featured-card {
+    width: 320px;
+    height: 360px; /* further downscaled */
+    background: var(--surface); /* letterboxing uses themed surface */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Reserve space for the caption under the media to keep it readable */
+.featured-card-caption {
+  height: 56px;
+  padding: 8px 10px;
+  background: var(--surface);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featured-media {
+  width: 100%;
+  height: calc(100% - 56px); /* media fills remaining height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface); /* letterboxing follows theme */
+}
+
+.featured-card-img {
+  /* default behaviour: contain */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: transparent;
+}
+
+.featured-card-img--fit-height {
+  height: 100%;
+  width: auto;
+  object-fit: cover; /* ensure image fills height, leaving bars on sides if needed */
+}
+
+/* Ensure images are centered inside the media area */
+.featured-card-img, .featured-card-img--fit-height {
+  display: block;
+  margin: 0 auto;
+  object-position: center center;
+}
+
+.featured-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--border);
+}
+
+/* Caption spacing */
+.featured-card-caption.small { font-size: 0.9rem; }
+
+/* Make sure featured artwork titles/names use the primary text color */
+.featured-card .featured-card-caption,
+.featured-card .featured-card-caption a,
+.featured-card .card-title,
+.featured-thumb .card-title,
+.featured-thumb a {
+  color: var(--text-primary) !important;
+}
+
+/* Layout: show 3 cards per view on large screens, 1 on small */
+@media (min-width: 992px) {
+  .featured-track {
+    display: flex;
+    gap: 56px;
+  }
+  .featured-card-wrapper {
+    flex: 0 0 auto;
+    width: calc((100% - 48px) / 3); /* three cards visible with gap */
+  }
+  .featured-card {
+    width: 100%;
+    height: 360px; /* fixed height so captions line up (downscaled) */
+    max-height: 360px;
+  }
+  .featured-card-img { max-height: 100%; }
+}
+
+@media (max-width: 991px) {
+  .featured-track {
+    display: flex;
+    gap: 32px;
+  }
+  .featured-card-wrapper { width: 100%; flex: 0 0 100%; }
+  .featured-card { width: 100%; height: 300px; }
+  .featured-card-img { max-height: 100%; }
+}
+
+/* Carousel controls styling (simple) */
+.carousel-control-prev, .carousel-control-next {
+  display: none !important; /* hide controls as requested */
+}
+  .my-space-inbetween{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+/* Debug layout outlines
+   - Toggle by adding `debug-layout` to the <body> tag in your templates or via JS:
+     document.body.classList.add('debug-layout')
+*/
+/* Debug layout rules removed — re-enable temporary debugging by adding a small
+   inline style block in the template or by reintroducing a `.debug-layout` block
+
+/* ---------------------------------------------------------------------------
+   Theme surface overrides for card/panel components
+   - This block intentionally applies after the rest of the stylesheet to
+     ensure any card-like backgrounds/borders coming from `main.css` are
+     overridden to use the active theme tokens. We keep this small and safe:
+     only background/background-color and border colors are affected.
+   - If you prefer not to use !important, we can remove them and instead
+     increase selector specificity where needed.
+*/
+.card,
+.card-body,
+.store-card,
+.basket-card,
+.manage-media-thumb,
+.collection-card-fill,
+.auth-card,
+.account .card,
+/* Card hover/transition rules scoped to store pages to avoid affecting forms */
+.store-page .store-card, .store-page .featured-card,
+.store-page .card.h-100, .store-page .card.h-100.shadow-sm, .store-page .card.shadow-sm, .store-page .collection-card, .store-page .collection-card-fill, .store-page .small-card {
+  /* Slower, smoother transition to reduce jitter */
+  transition: transform 360ms cubic-bezier(.22,.9,.32,1), box-shadow 360ms cubic-bezier(.22,.9,.32,1);
+  will-change: transform, box-shadow;
+  transform-origin: center bottom;
+}
+
+.store-page .store-card:hover, .store-page .featured-card:hover,
+.store-page .card.h-100:hover, .store-page .card.h-100.shadow-sm:hover, .store-page .card.shadow-sm:hover, .store-page .collection-card:hover, .store-page .collection-card-fill:hover, .store-page .small-card:hover {
+  /* Slightly less aggressive lift but smoother overall due to longer duration */
+  transform: translateY(-6px) scale(1.04);
+  /* Deeper, softer shadow for a higher perceived elevation */
+  box-shadow: 0 20px 48px rgba(18, 22, 26, 0.12), 0 6px 24px rgba(18, 22, 26, 0.06);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .store-card, .featured-card, .card.h-100, .card.h-100.shadow-sm, .card.shadow-sm, .collection-card, .collection-card-fill, .small-card {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+.store-card .btn:hover,
+.store-card .btn-outline-primary:hover,
+.store-card .btn,
+.auth-card .btn,
+.account .btn {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+/* Ensure listing/store cards render a visible base shadow and are not clipped
+   - Scope to .store-page so other pages (forms, auth, owner) are unaffected */
+.store-page .store-card, .store-page .featured-card, .store-page .card.h-100, .store-page .card.h-100.shadow-sm, .store-page .card.shadow-sm, .store-page .collection-card, .store-page .collection-card-fill, .store-page .small-card {
+  box-shadow: 0 6px 18px rgba(18, 22, 26, 0.06) !important;
+  overflow: visible !important;
+  position: relative; /* needed so z-index works on hover */
+}
+
+/* Raise hovered cards above neighbors so shadow isn't clipped by siblings */
+.store-page .store-card:hover, .store-page .featured-card:hover, .store-page .card.h-100:hover, .store-page .card.h-100.shadow-sm:hover, .store-page .card.shadow-sm:hover, .store-page .collection-card:hover, .store-page .collection-card-fill:hover, .store-page .small-card:hover {
+  z-index: 12;
+}
+
+/* Ensure small placeholders / overlays use border token for subtle contrast */
+.featured-card-placeholder,
+.card-placeholder {
+  background: var(--border) !important;
+}
+
+/* End theme surface overrides */
+
+/* Featured cards should be transparent so they can be placed on varied backings */
+.featured-card,
+.featured-card-caption,
+.featured-thumb {
+  background: transparent !important;
+}
+
+/* Forms: ensure form containers and controls use card surface and correct text color */
+.auth-card,
+.account .card,
+.form,
+.form-inline,
+.form-horizontal,
+.form-group,
+.card .form-control,
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Placeholder color and lighter helper text */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* High-specificity fallback: ensure theme card surface wins over compiled/third-party CSS.
+   This uses a long selector path starting from html body to increase specificity without
+   resorting to !important on every rule. Keep only background and border-color here.
+   If compiled CSS still wins (very unlikely now that schemes.css is loaded after main.css)
+   we can add `!important` as a last resort for specific selectors. */
+html body .card,
+html body .card .card-body,
+html body .store-card,
+html body .manage-media-thumb,
+html body .collection-card-fill,
+html body .auth-card,
+html body .account .card,
+html body .collection-section .card.card-body,
+html body .collection-card-fill,
+html body .artwork-sidebar,
+html body #add-to-basket-form,
+html body .col-md-5 .artwork-details {
+  background: var(--card-surface, var(--surface));
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+/* Ensure small helper text and form notes use muted token */
+.form-text, .help-block, .form-help {
+  color: var(--text-muted) !important;
+}

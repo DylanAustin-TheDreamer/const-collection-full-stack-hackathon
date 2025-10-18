@@ -25,8 +25,11 @@ def index(request):
         
         if hero_media and hero_media.file:
             context['hero_video'] = hero_media.file.url
+            # Use the media caption as the hero caption when available
+            context['hero_caption'] = hero_media.caption or ''
         else:
             context['hero_video'] = None  # Or a fallback static video
+            context['hero_caption'] = ''
             
         if secondary_media and secondary_media.file:
             context['secondary_video'] = secondary_media.file.url

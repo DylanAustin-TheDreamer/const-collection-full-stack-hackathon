@@ -1,0 +1,57 @@
+/* Scheme-2.css
+   Color and typography tokens for the "Scheme 2" design system
+   - Background: Museum White (#F5F5F0)
+   - Primary Text: Dark Gray (#333333)
+   - Links/Accents: Deep Teal or Navy (#004D40 or #1A237E)
+   - Tertiary/Buttons: Soft Sage Green (#8FBC8F)
+   - Headings Font: Playfair Display (serif)
+   - Body Font: Montserrat (sans-serif)
+
+   Note: Two options are provided for --link-accent. Pick one by uncommenting the preferred value.
+*/
+
+:root {
+  /* Colors */
+  --background: #F5F5F0; /* Museum White */
+  --text-primary: #333333; /* Dark Gray */
+
+  /* Links/accents: choose either deep teal or deep navy */
+  --link-accent-teal: #004D40; /* Deep Teal */
+  --link-accent-navy: #1A237E; /* Deep Navy */
+  --link-accent: var(--link-accent-teal); /* Default to teal; change to --link-accent-navy to use navy */
+
+  --cta-tertiary: #8FBC8F; /* Soft Sage Green */
+
+  /* Typography (font-family names only) */
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Montserrat", sans-serif;
+
+  /* Semantic aliases */
+  --surface: var(--background);
+  --text-muted: rgba(51,51,51,0.7);
+  --border: rgba(51,51,51,0.08);
+  /* Card/Box surface token (for art/card panels) - defaulting to white for this light scheme */
+  --card-surface: #FFFFFF; /* Assumption: cards are white on light scheme */
+}
+
+/* Example utilities */
+.body-scheme-2 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-2 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-2 {
+  color: var(--link-accent);
+}
+
+.button-cta-2 {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}

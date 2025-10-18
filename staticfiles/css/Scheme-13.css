@@ -1,0 +1,23 @@
+/* Scheme-13: Grunge Revival
+   - Background: #555D50 (Dark Olive Gray)
+   - Card Background: #8D6E63 (Muted Brown)
+   - Primary Text: #E5E5E5 (Off-White)
+   - Links/Accents: #4E8975 (Faded Teal)
+   - CTA / Tertiary: #A8E618 (Acid Yellow-Green)
+   - Heading font: Unica One (heavy display)
+   - Body font: Abel (sans-serif)
+*/
+:root {
+  --background: #555D50;
+  --surface: var(--background);
+  --card-surface: #8D6E63;
+  --text-primary: #E5E5E5;
+  --link-accent: #4E8975;
+  --cta-tertiary: #A8E618;
+
+  --font-heading: "Unica One", sans-serif;
+  --font-body: "Abel", sans-serif;
+
+  --text-muted: rgba(229,229,229,0.84);
+  --border: rgba(0,0,0,0.12);
+}

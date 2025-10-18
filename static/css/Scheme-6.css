@@ -1,0 +1,46 @@
+/* Scheme-6.css
+   Pastel Baby — Soft, sweet, delicate
+   - Main Background: #F0F0FF (Pale Lavender)
+   - Card Background: #FFF0F5 (Very Pale Pink)
+   - Primary Text: #A87C8F (Dusty Rose)
+   - Links/Accents: #B2DFDB (Soft Mint Green)
+   - Tertiary/Buttons: #81D4FA (Sky Blue)
+   - Headings Font: Bodoni
+   - Body Font: Lato Light
+*/
+
+:root {
+  --background: #F0F0FF;
+  --text-primary: #A87C8F;
+  --link-accent: #B2DFDB;
+  --cta-tertiary: #81D4FA;
+
+  --font-heading: "Bodoni MT", serif;
+  --font-body: "Lato", sans-serif;
+
+  --surface: var(--background);
+  --text-muted: rgba(168,124,143,0.9);
+  --border: rgba(0,0,0,0.06);
+  --card-surface: #FFF0F5;
+}
+
+.body-scheme-6 {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.heading-scheme-6 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+a.scheme-link-6 {
+  color: var(--link-accent);
+}
+
+.button-cta-6 {
+  background-color: var(--cta-tertiary);
+  color: var(--text-primary);
+  border: none;
+}

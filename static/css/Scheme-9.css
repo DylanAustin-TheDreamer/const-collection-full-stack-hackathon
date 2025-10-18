@@ -1,0 +1,23 @@
+/* Scheme-9: 8-Bit Retro Arcade
+   - Background: #1A1A1A (Retro Black)
+   - Card Background: #34495E (Slate Blue)
+   - Primary Text: #CCFF00 (Electric Lime)
+   - Links/Accents: #FF00FF (Neon Magenta)
+   - CTA / Tertiary: #FF9900 (Vivid Orange)
+   - Heading font: Press Start 2P (pixelated)
+   - Body font: Cousine (monospace)
+*/
+:root {
+  --background: #1A1A1A;
+  --surface: var(--background);
+  --card-surface: #34495E;
+  --text-primary: #CCFF00;
+  --link-accent: #FF00FF;
+  --cta-tertiary: #FF9900;
+
+  --font-heading: "Press Start 2P", monospace;
+  --font-body: "Cousine", monospace;
+
+  --text-muted: rgba(204,255,0,0.85);
+  --border: rgba(255,255,255,0.06);
+}
