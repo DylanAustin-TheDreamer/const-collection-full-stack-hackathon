@@ -125,18 +125,20 @@
 	outline: none;
 	box-shadow: 0 0 0 2px #D3D3D3; /* Cool Gray */
 }
-.auth-card .btn, .account .btn {
-	background: #333333; /* Graphite */
-	color: #FFFFFF; /* Pure White */
-	border: none;
-	border-radius: 6px;
-	padding: 0.75rem 1.5rem;
-	font-weight: 600;
-	transition: background 0.2s;
+.auth-card .btn:not(.btn-primary), .account .btn:not(.btn-primary) {
+  /* Keep the auth card's neutral button style but do not override
+     explicit .btn-primary buttons (they should show the site's primary) */
+  background: #333333; /* Graphite */
+  color: #FFFFFF; /* Pure White */
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: background 0.2s;
 }
-.auth-card .btn:hover, .account .btn:hover {
-	background: #000000; /* Absolute Black */
-	color: #FFFFFF;
+.auth-card .btn:not(.btn-primary):hover, .account .btn:not(.btn-primary):hover {
+  background: #000000; /* Absolute Black */
+  color: #FFFFFF;
 }
 .auth-card .form-text, .account .form-text {
   color: var(--text-muted); /* Medium Gray */

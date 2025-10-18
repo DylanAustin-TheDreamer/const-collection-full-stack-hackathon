@@ -39,3 +39,7 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0] if settings.STATICFILES_DIRS else None)
+    # Development-only debug routes
+    urlpatterns += [
+        path('debug/tint-demo/', collections_views.tint_demo, name='tint_demo'),
+    ]

@@ -271,6 +271,29 @@ li {
   filter: brightness(0.95);
 }
 
+/* Make auth-page primary buttons show a stronger hover/highlight to match
+   owner/submit buttons (visible lift + slight darken). This keeps the
+   stacked auth layout but provides a clear hover affordance. */
+.auth-card .btn.btn-primary,
+.account .btn.btn-primary {
+  background: var(--text-primary);
+  color: var(--surface);
+  border-color: var(--text-primary);
+}
+.auth-card .btn.btn-primary:hover,
+.account .btn.btn-primary:hover,
+.auth-card .btn.btn-primary:focus,
+.account .btn.btn-primary:focus {
+  /* Use the theme background as the hover highlight so auth submit
+     buttons match owner/submit buttons which use --background as the
+     highlighted surface. Force with !important to beat generic overrides. */
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+  box-shadow: 0 8px 20px rgba(18,22,26,0.08);
+  transform: translateY(-1px);
+}
+
 /* Prevent Bootstrap's default blue focus/active outline from flashing on click
    Keep the active/focus states using the theme tokens instead. Targets: submit
    buttons like Save/Create which often use .btn-primary */
@@ -385,6 +408,159 @@ li {
 .store-card a:hover .card-img-top {
     opacity: 0.9;
 }
+/* -------------------------------------------------------------------------
+   Image tint utilities
+   These utilities let you recolor raster images that include an alpha channel
+   (transparent PNGs) to match the active scheme color token `--link-accent`.
+   Use the .tint-mask approach when you have a monochrome/alpha PNG — it uses
+   the image as a mask and fills it with the accent color. The .tint-overlay
+   approach uses background-blend-mode and can work with more complex images.
+   A simple filter-based fallback (.tint-fallback) attempts to approximate
+   a tint via CSS filters when masking isn't suitable.
+
+   Notes:
+   - Replace the url() in the mask/overlay examples with the appropriate
+     image path or use them with inline styles for different images.
+   - Masking requires the image to have an alpha channel (transparent areas).
+   - For broadest support include both -webkit-mask and mask properties.
+-------------------------------------------------------------------------*/
+
+/* Mask tint (best for silhouette-like PNGs with transparent background).
+   Usage: <div class="tint-mask" style="--tint-size:200px; --tint-image:url('../images/transp-woman.png');"></div>
+*/
+.tint-mask {
+  display: inline-block;
+  width: var(--tint-size, 160px);
+  height: var(--tint-size, 160px);
+  /* Do not fill the full block; keep background transparent so the mask
+     paints only the silhouette. Per-instance color may still be provided
+     via --tint if desired (applied via mask/after element). */
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+
+  /* Use the provided image as a mask so the accent color shows only where the
+     image has opacity. We allow overriding the image via --tint-image. */
+  -webkit-mask-image: var(--tint-image, url('../images/transp-woman.png'));
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+
+  mask-image: var(--tint-image, url('../images/transp-woman.png'));
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+/* tint-mask-bg: places the masked logo on the site background and paints the
+   masked shape with --text-primary (useful for logos placed on the page
+   background where the logo should read like text). Usage: wrap the mask in
+   a container with the class .tint-mask-bg or set mode='bg' on the include. */
+.tint-mask-bg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tint-size, 160px);
+  height: var(--tint-size, 160px);
+  /* Force the wrapper to use the scheme background even when inside cards */
+  background: var(--background) !important;
+  border-radius: 6px; /* optional, keeps logo tidy on rounded cards */
+}
+
+.tint-mask-bg .tint-mask {
+  /* Keep the inner mask transparent; the ::after painter handles coloring
+     with --text-primary so we avoid a filled rectangle behind the mask. */
+  background-color: transparent !important;
+  width: calc(var(--tint-size, 160px) * 0.9);
+  height: calc(var(--tint-size, 160px) * 0.9);
+}
+
+/* If you want the wrapper to show the page background (transparent) instead
+   of painting a block, use this class on the include: .tint-mask-bg--transparent */
+.tint-mask-bg--transparent {
+  background: transparent !important;
+}
+
+/* Variant: place the element on the scheme background and paint the masked
+   logo with --text-primary. This is useful when the logo should read as a
+   foreground glyph on the normal page background (instead of being filled
+   by the accent color). */
+.tint-mask-bg {
+  display: inline-block;
+  width: var(--tint-size, 160px);
+  height: var(--tint-size, 160px);
+  position: relative;
+  background: var(--background, transparent);
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.tint-mask-bg::after {
+  /* Paint the logo using the mask; use --text-primary so it matches the
+     text color token for the active scheme. Allow overriding the image via
+     --tint-image. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--text-primary, currentColor);
+  -webkit-mask-image: var(--tint-image, url('../images/transp-woman.png'));
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: var(--tint-image, url('../images/transp-woman.png'));
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  pointer-events: none;
+}
+
+/* Overlay tint: place the PNG as a background and blend with the accent color.
+   Works well when the PNG has transparency and you want the color to multiply
+   with the underlying artwork. Usage: <div class="tint-overlay" style="--tint-size:200px; --tint-image:url('../images/transp-woman.png');"></div> */
+.tint-overlay {
+  display: inline-block;
+  width: var(--tint-size, 160px);
+  height: var(--tint-size, 160px);
+  background-color: var(--tint, var(--link-accent, #ff6b6b));
+  background-image: var(--tint-image, url('../images/transp-woman.png'));
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-blend-mode: multiply; /* try multiply, overlay, or screen depending on desired effect */
+}
+
+/* Filter fallback: for <img> elements where masking isn't possible. This
+   attempts a neutral-to-accent tint by converting the image to a single-tone
+   and reinjecting color via a semi-transparent overlay. It's best-effort. */
+.tint-fallback {
+  display: inline-block;
+  position: relative;
+}
+.tint-fallback img {
+  display: block;
+  width: var(--tint-size, 160px);
+  height: auto;
+  /* desaturate and darken so the overlay color reads consistently */
+  filter: grayscale(1) brightness(0.6) contrast(1);
+}
+.tint-fallback::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--tint, var(--link-accent, rgba(255,107,107,0.95)));
+  mix-blend-mode: screen; /* experiment with multiply / screen */
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* Helper: allow forcing image elements to follow currentColor (useful for
+   inline SVGs or icon fonts). For SVG images ensure the svg uses `fill="currentColor"`. */
+.img-currentcolor {
+  color: var(--link-accent);
+  fill: currentColor;
+}
+
 /* Minimalist Grayscale Palette for Auth Pages Only */
 .auth-card, .account .card {
 	background: var(--surface); /* Light Gray */
@@ -406,6 +582,133 @@ li {
   color: var(--text-primary) !important;
   border-color: var(--border) !important;
 }
+
+/* -------------------------------------------------------------------------
+   Image tinting utilities
+   Two non-destructive approaches to recolor raster images (PNG/JPG) so they
+   pick up the active scheme colour (--link-accent).
+
+   1) Mask / SVG mask technique (works best with single-color PNGs where the
+      artwork is opaque and the background is transparent). This uses the
+      image as an alpha mask and paints it with currentColor.
+
+   2) Overlay blend technique (works with photos but depends on the image
+      content; uses mix-blend-mode or a CSS overlay layer to tint visually).
+
+   Usage examples (Django template):
+     <div class="img-tint img-mask">
+       <img src="{% static 'images/transp-woman.png' %}" alt="person"/>
+     </div>
+
+     <div class="img-tint img-overlay">
+       <img src="{% static 'images/transp-woman.png' %}" alt="person"/>
+     </div>
+
+   Notes:
+   - Both patterns use --link-accent for the color so they follow the active
+     scheme. If you need a different token, override with inline style or a
+     helper class (e.g. .img-tint--secondary { --tint: var(--cta-tertiary); }).
+   - Alpha (transparent) areas remain transparent. The mask approach paints
+     opaque pixels; overlay tints the visual result and keeps semi-transparent
+     blending.
+*/
+
+/* Default tint token used by utilities */
+:root {
+  --tint: var(--link-accent, #0066cc);
+}
+
+/* Container that ensures the img fits and provides a stacking context */
+.img-tint {
+  display: inline-block;
+  position: relative;
+  line-height: 0;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.img-tint img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------------- Mask technique ----------------
+   Replace the visible pixels with the tint color. Best for icons/logos
+   and single-color PNGs where the transparent background is present. */
+.img-mask {
+  /* the color we paint the masked image with */
+  color: var(--tint);
+}
+
+.img-mask img {
+  /* Use the image as an alpha mask: make the image itself invisible and
+     allow the container's color to show through using mask/composite rules. */
+  -webkit-mask-image: url("/static/images/transp-woman.png");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url("/static/images/transp-woman.png");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+
+  /* Hide the original pixels; the container's color will be visible where
+     the mask is opaque. We use background + currentColor so the tint follows
+     the scheme token. */
+  background: currentColor;
+  opacity: 0; /* hide the img pixels themselves (keeps layout) */
+}
+
+.img-mask::after {
+  /* paint the mask using currentColor */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask-image: url("/static/images/transp-woman.png");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url("/static/images/transp-woman.png");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  pointer-events: none;
+}
+
+/* Use the tint token on the element (follows active scheme) */
+.img-mask { color: var(--tint); }
+
+
+/* ---------------- Overlay technique ----------------
+   Add a semi-opaque layer above the image using blend modes. This keeps the
+   photograph's texture while shifting hue/tone. Works for photos but the
+   result depends on image content and may require different opacity. */
+.img-overlay {
+  --overlay-opacity: 0.6; /* tweak for stronger/weaker tint */
+}
+
+.img-overlay img { display:block; }
+.img-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--tint);
+  opacity: var(--overlay-opacity);
+  mix-blend-mode: color; /* hue/saturation preserving blend; try 'overlay' or 'multiply' as alternatives */
+  pointer-events: none;
+}
+
+/* Convenience helper: let authors override the tint on a per-instance basis */
+.img-tint.img-tint--secondary { --tint: var(--cta-tertiary); }
+.img-tint.img-tint--muted { --tint: rgba(128,128,128,0.9); }
+
+/* Responsive sizing helpers: keep image no taller than X for common card uses */
+.img-tint--sm { max-width: 120px; }
+.img-tint--md { max-width: 220px; }
+.img-tint--lg { max-width: 420px; }
+
 
 /* Ensure add-to-basket buttons match themed hover affordance */
 .artwork-sidebar .btn-outline-primary:hover,
@@ -517,18 +820,20 @@ a.btn-back--owner {
 	outline: none;
 	box-shadow: 0 0 0 2px var(--border); /* Cool Gray */
 }
-.auth-card .btn, .account .btn {
-	background: var(--text-primary); /* Graphite */
-	color: var(--surface); /* Pure White */
-	border: none;
-	border-radius: 6px;
-	padding: 0.75rem 1.5rem;
-	font-weight: 600;
-	transition: background 0.2s;
+.auth-card .btn:not(.btn-primary), .account .btn:not(.btn-primary) {
+  /* Keep the auth card's neutral button style but do not override
+     explicit .btn-primary buttons (they should show the theme CTA) */
+  background: var(--text-primary); /* Graphite for neutral auth buttons */
+  color: var(--surface); /* Pure White */
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: background 0.2s;
 }
-.auth-card .btn:hover, .account .btn:hover {
-	background: var(--text-primary); /* Absolute Black */
-	color: var(--surface);
+.auth-card .btn:not(.btn-primary):hover, .account .btn:not(.btn-primary):hover {
+  background: var(--text-primary); /* Absolute Black */
+  color: var(--surface);
 }
 .auth-card .form-text, .account .form-text {
 	color: var(--border); /* Medium Gray */
@@ -584,7 +889,7 @@ small,
 }
 
 /* Ensure default paragraph and list text use primary text token unless overridden */
-p, li, span, a {
+p, li, span, {
   color: var(--text-primary);
 }
 
@@ -2038,9 +2343,7 @@ footer {
 }
 .store-card .btn:hover,
 .store-card .btn-outline-primary:hover,
-.store-card .btn,
-.auth-card .btn,
-.account .btn {
+.store-card .btn {
   background: var(--surface) !important;
   border-color: var(--border) !important;
 }

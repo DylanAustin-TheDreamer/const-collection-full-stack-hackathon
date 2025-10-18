@@ -12,9 +12,14 @@
         
         {% if messages %}
           {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" role="alert">
-              {{ message }}
-            </div>
+            {# Only show non-success messages on the signup page so unrelated
+               admin/owner success flashes (Media added, updates, sign out)
+               don't confuse new users. We still show errors and warnings. #}
+            {% if 'success' not in message.tags %}
+              <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+              </div>
+            {% endif %}
           {% endfor %}
         {% endif %}
 
