@@ -610,6 +610,10 @@ footer{
   border: none;
 }
 
+.hero-video {
+  padding: 20px;
+}
+
 @media (max-width: 768px) {
   .page-title-divider { width: 80%; margin-top: 10px; margin-bottom: 16px; }
 }
@@ -904,6 +908,34 @@ footer{
   height: 100% !important;
   width: auto !important;
   object-fit: contain !important;
+}
+
+/* Media Queries - Responsive design */
+@media (min-width: 300px) {
+    .video {
+    min-width: 100%;
+    height: auto;
+    margin-top: 0 !important;
+    }
+    .hero-video {
+    padding: 0;
+    }
+  #hero{
+    padding-top: 0;
+  }
+}
+@media (min-width: 768px) {
+  .video {
+    min-width: 55%;
+    height: auto;
+    box-shadow: 0 0 8px 8px rgba(0, 0, 0, 0.5);
+  }
+  .hero-video {
+  padding: 20px;
+  }
+  #hero{
+    padding-top: 28px;
+  }
 }
 
 @media (max-width: 768px) {

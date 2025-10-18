@@ -5,10 +5,10 @@
 {% block title %}Home | Const Collection{% endblock %}
 
 {% block content %}
-<div id="hero" style="padding-top: 28px;">
+<div id="hero">
   <div class="text-center" style="color: white; padding-top: 8px;">
     <h1 id="multi-color" style="padding: 15px;">{{ hero_caption|default:"Evening Garden Exhibition - 2025" }}</h1>
-    <div style="padding: 20px;">
+    <div class="hero-video" >
       {% if hero_video %}
       <video class="video mt-4" controls>
         <source src="{{ hero_video }}" type="video/mp4">
