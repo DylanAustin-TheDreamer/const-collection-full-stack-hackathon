@@ -8,15 +8,31 @@ class ExhibitionForm(forms.ModelForm):
         # When editing an existing instance, format time values to HH:MM
         # so the rendered input value doesn't include seconds.
         try:
-            if getattr(self, 'instance', None):
-                st = getattr(self.instance, 'start_time', None)
+            instance = getattr(self, 'instance', None)
+            # only set initial values when the form is NOT bound to POST data
+            if instance and not getattr(self, 'is_bound', False):
+                st = getattr(instance, 'start_time', None)
                 if st and 'start_time' in self.fields:
-                    # set the field initial explicitly so it is used when
-                    # rendering an unbound ModelForm with an instance
-                    self.fields['start_time'].initial = st.strftime('%H:%M')
-                et = getattr(self.instance, 'end_time', None)
+                    val = st.strftime('%H:%M')
+                    # set field and form initial so rendering works
+                    self.fields['start_time'].initial = val
+                    self.initial['start_time'] = val
+                et = getattr(instance, 'end_time', None)
                 if et and 'end_time' in self.fields:
-                    self.fields['end_time'].initial = et.strftime('%H:%M')
+                    val = et.strftime('%H:%M')
+                    self.fields['end_time'].initial = val
+                    self.initial['end_time'] = val
+                # set initial values for date inputs so edit form retains dates
+                sd = getattr(instance, 'start_date', None)
+                if sd and 'start_date' in self.fields:
+                    iso = sd.isoformat()
+                    self.fields['start_date'].initial = iso
+                    self.initial['start_date'] = iso
+                ed = getattr(instance, 'end_date', None)
+                if ed and 'end_date' in self.fields:
+                    iso = ed.isoformat()
+                    self.fields['end_date'].initial = iso
+                    self.initial['end_date'] = iso
         except Exception:
             # defensive: if formatting fails, leave values as-is
             pass
