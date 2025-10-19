@@ -196,6 +196,53 @@ def artwork_list(request):
         .order_by('-created_at')[:6]
     )
 
+    # Compute display price and selected format label for each artwork (used in templates)
+    def resolve_display_price(art_obj):
+        variants_qs = list(art_obj.variants.all())
+        variants_map = {v.medium: v for v in variants_qs}
+        # Try selected format first
+        price_display = None
+        format_label = None
+        if selected_format:
+            v = variants_map.get(selected_format)
+            if v and v.is_available and v.price is not None:
+                price_display = f"{v.currency} {v.price:,.2f}"
+                # look up human label
+                format_label = dict(ArtVariant.MEDIUM_CHOICES).get(v.medium)
+
+        # Fallback preferred order: ORIGINAL, POSTER, DIGITAL
+        if price_display is None:
+            preferred = [ArtVariant.ORIGINAL, ArtVariant.POSTER, ArtVariant.DIGITAL]
+            for m in preferred:
+                v = variants_map.get(m)
+                if v and v.is_available and v.price is not None:
+                    price_display = f"{v.currency} {v.price:,.2f}"
+                    format_label = dict(ArtVariant.MEDIUM_CHOICES).get(v.medium)
+                    break
+
+        # Final fallback: art-level price
+        if price_display is None:
+            price_display = art_obj.get_price_display()
+
+        # Attach to object for template access
+        try:
+            art_obj.display_price = price_display
+            art_obj.display_format_label = format_label
+            # Show flag only when user hasn't filtered by a specific format
+            orig = variants_map.get(ArtVariant.ORIGINAL)
+            if not selected_format:
+                art_obj.display_original_unavailable = (orig is None) or (not orig.is_available)
+            else:
+                art_obj.display_original_unavailable = False
+        except Exception:
+            pass
+
+    # Resolve for artworks in the main list and featured
+    for a in artworks:
+        resolve_display_price(a)
+    for fa in featured_artworks:
+        resolve_display_price(fa)
+
     context = {
         'artworks': artworks,
         'search_query': search_query,

@@ -9,8 +9,82 @@
     This template helps buyers make informed purchasing decisions
   -->
   
-  <div class="store-page">
-    <div class="container mt-4">
+  <div class="container mt-4">
+    <style>
+      /* Featured carousel: center items and show full cards per view (responsive) */
+  /* make featured carousel span full viewport width (full-bleed) so cards can use all vw */
+  .featured-carousel { position: relative; width: 110%; margin-left: -7.5vh; padding: 0; }
+    /* Remove outer horizontal padding so first/last cards sit flush with container edges
+      Keep the gap between cards via the gap property. */
+    .featured-track { display: flex; gap: .75rem; overflow: hidden; align-items: stretch; justify-content: flex-start; scroll-snap-type: x mandatory; padding-left: 0; padding-right: 0; }
+      .featured-card-wrapper { flex: 0 0 100%; max-width: 100%; scroll-snap-align: center; }
+      .featured-card-wrapper .card { height: 100%; display:flex; flex-direction:column; }
+  .featured-card-wrapper .card-img-top { height: 280px; object-fit: cover; }
+      .carousel-control-prev, .carousel-control-next { top: 50%; transform: translateY(-50%); }
+
+      @media (min-width: 768px) {
+        /* 2 cards per view */
+        .featured-card-wrapper { flex: 0 0 calc((100% - 0.05rem) / 1); max-width: calc((100% - 1rem) / 1); }
+        .featured-carousel { width: 110%; margin-left: -3.5vh; padding: 0; }
+      }
+      /* Improve featured card usage on small screens: show 1 card per view (full-width) with reduced image height */
+      @media (max-width: 767.98px) {
+        .featured-carousel { width: 108%; margin-left: -2vh; padding: 0; }
+          .featured-track { padding-left: 0; padding-right: 0; }
+        /* Force single column per view: each featured card takes full available width */
+        .featured-card-wrapper { flex: 0 0 100%; max-width: 100%; }
+        /* Reduce image height on narrow screens so the card doesn't take too much vertical space */
+        .featured-card-wrapper .card-img-top { height: 180px; object-fit: cover; }
+      }
+      @media (min-width: 992px) {
+        /* 3 cards per view */
+        .featured-card-wrapper { flex: 0 0 calc((100% - 0.1rem) / 3); max-width: calc((100% - 2rem) / 3); }
+        .featured-carousel { width: 110%; margin-left: -7.5vh; padding: 0; }
+      }
+      @media (min-width: 1200px) {
+        /* 4 cards per view */
+        .featured-card-wrapper { flex: 0 0 calc((100% - 0.1rem) / 3); max-width: calc((100% - 3rem) / 3); }
+      }
+        /* Ensure first and last featured cards have no extra margins so edges are flush */
+        .featured-track > .featured-card-wrapper:first-child { margin-left: 0; }
+        .featured-track > .featured-card-wrapper:last-child { margin-right: 0; }
+  /* Loader visibility class toggled by JS. Use !important to avoid being overridden. */
+  .cc-loading--visible { display: inline-flex !important; align-items: center; margin-left: .5rem; }
+  .cc-loading { display: none; }
+  /* Ensure filters text and spinner sit inline */
+  #artworks-filters-text { display: inline; }
+      /* Compact filter card styles: slightly larger than inputs, matching rounded corners */
+      .filter-card {
+        border-radius: .6rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.04);
+        overflow: hidden; /* clip child corners so the card appears rounded */
+        border: 1px solid rgba(0,0,0,0.04);
+        background-clip: padding-box;
+      }
+      .filter-card .card-body { padding: .2rem; }
+      .filter-card .card-title { font-size: .95rem; margin-bottom: .4rem; }
+      /* Ensure inputs/selects visually match the card rounding. Use !important to override Bootstrap defaults if necessary. */
+      .filter-card .form-control,
+      .filter-card .form-select {
+        border-radius: .45rem !important;
+        background-clip: padding-box;
+      }
+      /* Center the filter form's columns and tighten spacing (default) */
+      #artwork-filters-form.row { justify-content: center; gap: .125rem; row-gap: .25rem; }
+      /* On medium+ screens give each filter a controlled width so they appear centered with small gaps */
+      @media (min-width: 768px) {
+        #artwork-filters-form.row .col-md-4 { flex: 0 0 320px; max-width: 320px; }
+      }
+      /* Slightly reduce vertical spacing for the filter card area */
+      #artwork-filters-form .filter-card { margin-bottom: .25rem; }
+
+      /* Mobile tweaks: reduce padding and vertical gaps further */
+      @media (max-width: 767.98px) {
+        #artwork-filters-form.row { gap: .125rem; row-gap: .125rem; }
+        #artwork-filters-form .filter-card { margin-bottom: .125rem; }
+        .filter-card .card-body { padding: .35rem; }
+      }
+    </style>
     <!-- Page Header -->
     <div class="row mb-4">
       <div class="col-12">
@@ -30,18 +104,37 @@
               <div class="featured-track d-flex gap-3 overflow-hidden">
                 {% for fa in featured_artworks %}
                   <div class="featured-card-wrapper flex-shrink-0">
-                    <a href="{% url 'collections_app:artwork_detail' fa.pk %}" class="text-decoration-none">
-                      <div class="featured-card">
-                        <div class="featured-media d-flex align-items-center justify-content-center">
-                          {% if fa.image %}
-                            <img src="{{ fa.image.url }}" alt="{{ fa.title }}" class="featured-card-img featured-card-img--fit-height">
-                          {% else %}
-                            <div class="featured-card-placeholder"></div>
-                          {% endif %}
+                    <div class="card h-100 shadow-sm" style="width: 100%;">
+                        {% if fa.image %}
+                        <img src="{{ fa.image.url }}" class="card-img-top" alt="{{ fa.title }}" style="height:60vh; object-fit:cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:60vh;">
+                          <span class="text-muted">No Image</span>
                         </div>
-                        <div class="featured-card-caption text-dark text-truncate">{{ fa.title }}</div>
+                      {% endif %}
+
+                      <div class="card-body d-flex flex-column py-2">
+                        <h6 class="card-title mb-2 text-truncate">{{ fa.title }}</h6>
+                        <p class="card-text mb-3 mt-auto">
+                          <strong>Price:</strong>
+                          <span class="fw-bold">{{ fa.display_price|default:fa.get_price_display }}</span>
+                          {% if fa.display_format_label %}
+                            <span class="badge bg-secondary ms-2">{{ fa.display_format_label }}</span>
+                          {% endif %}
+                          {% if fa.display_original_unavailable %}
+                            <span class="badge bg-warning text-dark ms-2">Original unavailable</span>
+                          {% endif %}
+                        </p>
+
+                        <a href="{% url 'collections_app:artwork_detail' fa.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-primary w-100">View Details</a>
                       </div>
-                    </a>
+
+                      {% if not fa.is_available %}
+                        <div class="position-absolute" style="top:8px; right:8px; z-index:5;">
+                          <span class="badge bg-danger">Unavailable</span>
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
                 {% endfor %}
               </div>
@@ -56,47 +149,237 @@
 
     <div class="row mb-4">
       <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Search & Filter</h5>
-            <!-- Search form: keep search box, add collection and format filters -->
+                        <!-- Search form: keep search box, add collection and format filters -->
             <form id="artwork-filters-form" method="get" action="{% url 'collections_app:artwork_list' %}" class="row g-3">
-              <div class="col-md-4">
-                <label for="search" class="form-label">Search</label>
-                <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}" placeholder="Search by title or artist">
+              <div class="col-12 col-md-4">
+                <div class="card filter-card">
+                  <div class="card-body">                    
+                    <input aria-label="Search artworks" type="text" class="form-control" id="search" name="search" value="{{ search_query }}" placeholder="Search by title or artist">
+                  </div>
+                </div>
               </div>
 
-              <div class="col-md-4">
-                <label for="collection" class="form-label">Collection</label>
-                <select id="collection" name="collection" class="form-select">
-                  <option value="">All Collections</option>
-                  {% for c in collections %}
-                    <option value="{{ c.pk }}" {% if selected_collection|default:'' == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }} — {{ c.artist.name }}</option>
-                  {% endfor %}
-                </select>
+              <div class="col-12 col-md-4">
+                <div class="card filter-card">
+                  <div class="card-body">                    
+                    <select id="collection" name="collection" class="form-select" aria-label="Filter by collection">
+                      <option value="">All Collections</option>
+                      {% for c in collections %}
+                        <option value="{{ c.pk }}" {% if selected_collection|default:'' == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }} — {{ c.artist.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              <div class="col-md-3">
-                <label for="format" class="form-label">Available Format</label>
-                <select id="format" name="format" class="form-select">
-                  <option value="">Any Format</option>
-                  {% for key,label in format_choices %}
-                    <option value="{{ key }}" {% if selected_format == key %}selected{% endif %}>{{ label }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div class="col-md-1 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Filter</button>
+              <div class="col-12 col-md-4">
+                <div class="card filter-card">
+                  <div class="card-body">                    
+                    <select id="format" name="format" class="form-select" aria-label="Filter by format">
+                      <option value="">Any Format</option>
+                      {% for key,label in format_choices %}
+                        <option value="{{ key }}" {% if selected_format == key %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
               </div>
             </form>
-          </div>
-        </div>
+            <script>
+              (function(){
+                function initFilters(){
+                  try{
+                    // Ensure loader is hidden on init
+                    try{ hideLoader(); }catch(e){}
+                    var form = document.getElementById('artwork-filters-form');
+                    if(!form) return;
+                    var grid = document.getElementById('artworks-grid');
+                    if(!grid) return;
+
+                  function buildQuery(){
+                    var params = new URLSearchParams();
+                    var s = document.getElementById('search');
+                    if(s && s.value) params.set('search', s.value);
+                    var c = document.getElementById('collection');
+                    if(c && c.value) params.set('collection', c.value);
+                    var f = document.getElementById('format');
+                    if(f && f.value) params.set('format', f.value);
+                    return params.toString();
+                  }
+
+                  function getLoading(){ return document.getElementById('artworks-loading'); }
+                  function showLoader(){
+                    var el = getLoading();
+                    if(!el) return;
+                    el.classList.add('cc-loading--visible');
+                    el.setAttribute('aria-hidden', 'false');
+                  }
+                  function hideLoader(){
+                    var el = getLoading();
+                    if(!el) return;
+                    el.classList.remove('cc-loading--visible');
+                    el.setAttribute('aria-hidden', 'true');
+                  }
+                  var loading = getLoading();
+                  var filtersHeader = document.getElementById('artworks-filters-header');
+
+                  function updateFiltersHeader(){
+                    var parts = [];
+                    var s = document.getElementById('search'); if(s && s.value) parts.push('Search: "' + s.value + '"');
+                    var c = document.getElementById('collection'); if(c && c.value){ var sel = c.querySelector('option[value="'+c.value+'"]'); parts.push('Collection: ' + (sel?sel.textContent: c.value)); }
+                    var f = document.getElementById('format'); if(f && f.value){ var sel2 = f.querySelector('option[value="'+f.value+'"]'); parts.push('Format: ' + (sel2?sel2.textContent: f.value)); }
+                    var textEl = document.getElementById('artworks-filters-text');
+                    if(textEl) textEl.innerHTML = parts.length ? '<strong>Active filters:</strong> ' + parts.join(' • ') : '';
+                  }
+
+                  function replaceGridFromHtml(html){
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(html, 'text/html');
+                    var newGrid = doc.getElementById('artworks-grid');
+                    if(newGrid){
+                      grid.innerHTML = newGrid.innerHTML;
+                      updateFiltersHeader();
+                      return true;
+                    }
+
+                    var cardNodes = doc.querySelectorAll('.col-md-4.col-lg-3.mb-4');
+                    if(cardNodes && cardNodes.length){
+                      var htmlParts = [];
+                      cardNodes.forEach(function(n){ htmlParts.push(n.outerHTML); });
+                      grid.innerHTML = htmlParts.join('\n');
+                      return true;
+                    }
+
+                    return false;
+                  }
+
+                  var __cc_latest_request_id = 0;
+                  var __cc_show_timer = null;
+                  var __cc_active_requests = 0;
+                  var __cc_watchdog = null;
+
+                  function fetchAndReplace(){
+                    var qs = buildQuery();
+                    var url = window.location.pathname + (qs ? '?' + qs : '');
+
+                    var reqId = ++__cc_latest_request_id;
+                    __cc_active_requests++;
+
+                    if(loading){
+                      if(__cc_show_timer) clearTimeout(__cc_show_timer);
+                      __cc_show_timer = setTimeout(function(){
+                        if(__cc_active_requests > 0){
+                          showLoader();
+                        }
+                      }, 80);
+                    }
+
+                    fetch(url, { credentials: 'same-origin', headers: {'X-Requested-With':'XMLHttpRequest'} })
+                      .then(function(resp){ return resp.text(); })
+                      .then(function(html){
+                        if(reqId === __cc_latest_request_id){
+                          var ok = replaceGridFromHtml(html);
+                          if(ok){
+                            history.replaceState({}, '', url);
+                          }
+                        }
+                      }).catch(function(){} )
+                      .finally(function(){
+                        __cc_active_requests = Math.max(0, __cc_active_requests - 1);
+                        if(__cc_show_timer) { clearTimeout(__cc_show_timer); __cc_show_timer = null; }
+                        if(__cc_active_requests === 0) {
+                          hideLoader();
+                          if(__cc_watchdog){ clearTimeout(__cc_watchdog); __cc_watchdog = null; }
+                        }
+                        var _el = getLoading();
+                        if(_el && __cc_active_requests === 0 && _el.classList.contains('cc-loading--visible')){
+                          hideLoader();
+                        }
+                      });
+
+                    if(getLoading()){
+                      if(__cc_watchdog) clearTimeout(__cc_watchdog);
+                      __cc_watchdog = setTimeout(function(){
+                        __cc_active_requests = 0;
+                        hideLoader();
+                        __cc_watchdog = null;
+                      }, 15000);
+                    }
+                  }
+
+                  var __cc_fetch_timer = null;
+                  function scheduleFetch(immediate){
+                    updateFiltersHeader();
+                    try{ showLoader(); }catch(e){}
+
+                    if(immediate){
+                      if(__cc_fetch_timer) { clearTimeout(__cc_fetch_timer); __cc_fetch_timer = null; }
+                      fetchAndReplace();
+                      return;
+                    }
+                    if(__cc_fetch_timer) clearTimeout(__cc_fetch_timer);
+                    __cc_fetch_timer = setTimeout(function(){ fetchAndReplace(); __cc_fetch_timer = null; }, 60);
+                  }
+
+                  function attachSelectHandlers(){
+                    var selects = form.querySelectorAll('select');
+                    if(selects && selects.length){
+                      selects.forEach(function(el){
+                        if(el.dataset && el.dataset.ccAttached) return;
+                        el.addEventListener('change', function(){ scheduleFetch(); });
+                        el.addEventListener('input', function(){ scheduleFetch(); });
+                        try{ el.dataset.ccAttached = '1'; }catch(e){}
+                      });
+                      return true;
+                    }
+                    return false;
+                  }
+
+                  var search = document.getElementById('search');
+                  if(search){
+                    var t;
+                    search.removeEventListener('input', function(){});
+                    search.addEventListener('input', function(){
+                      clearTimeout(t);
+                      t = setTimeout(fetchAndReplace, 250);
+                    });
+                    search.addEventListener('keydown', function(e){
+                      if(e.key === 'Enter'){
+                        e.preventDefault();
+                        clearTimeout(t);
+                        fetchAndReplace();
+                      }
+                    });
+                  }
+
+                  var mo = new MutationObserver(function(mutations){
+                    var reattached = attachSelectHandlers();
+                  });
+                  mo.observe(form, { childList: true, subtree: true });
+
+                  attachSelectHandlers();
+                  }catch(e){ }
+                }
+
+                if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initFilters);
+                else initFilters();
+              })();
+            </script>
+          
+        
       </div>
     </div>
 
     <!-- Artworks Grid Display -->
-    <div class="row">
+    <div id="artworks-wrap" style="position:relative;">
+      <div id="artworks-filters-header" class="mb-3" aria-live="polite">
+        <span id="artworks-filters-text"></span>
+        <span id="artworks-loading" class="cc-loading" aria-live="polite" aria-hidden="true">
+          <div class="spinner-border spinner-border-sm text-secondary" role="status" aria-hidden="true"></div>
+          <div class="visually-hidden">Loading artworks...</div>
+        </span>
+      </div>
+      <div id="artworks-grid" class="row">
       {% for artwork in artworks %}
         <!-- Individual Artwork Card -->
         <div class="col-md-4 col-lg-3 mb-4">
@@ -120,57 +403,21 @@
             {% endif %}
             
             <div class="card-body d-flex flex-column">
-              <!-- Artwork Title -->
               <h5 class="card-title">{{ artwork.title }}</h5>
-              
-              <!-- Artist Name -->
-              <p class="card-text text-muted mb-2">
-                <small>by {{ artwork.artist.name }}</small>
-              </p>
-              
-              <!-- Medium - Important for buyer decisions -->
-              <p class="card-text mb-1">
-                <strong>Medium:</strong> 
-                <span class="badge bg-secondary">{{ artwork.medium|default:"Not specified" }}</span>
-              </p>
-              
-              <!-- Size/Dimensions - Important for buyer decisions -->
-              <p class="card-text mb-1">
-                <strong>Size:</strong> {{ artwork.get_size_display }}
-              </p>
-              
-              <!-- Price - show cheapest available variant price as 'From $X' -->
-              <p class="card-text mb-3">
+
+              <p class="card-text mb-3 mt-auto">
                 <strong>Price:</strong>
-                {% with variants=artwork.variants.all %}
-                  {% with prices=variants|dictsortreversed:'price' %}
-                    {% comment %}Compute cheapest available variant in template{% endcomment %}
-                    {% with cheapest=None %}
-                      {% for v in variants %}
-                        {% if v.is_available and v.price %}
-                          {% if forloop.first %}
-                            {% with cheapest=v.price %}{% endwith %}
-                          {% endif %}
-                        {% endif %}
-                      {% endfor %}
-                      {% if cheapest %}
-                        <span class="text-success fw-bold fs-5">{{ artwork.currency }} {{ cheapest|floatformat:2 }}</span>
-                      {% else %}
-                        <span class="text-muted">Price not available</span>
-                      {% endif %}
-                    {% endwith %}
-                  {% endwith %}
-                {% endwith %}
+                <span class="fw-bold">{{ artwork.display_price|default:artwork.get_price_display }}</span>
+                {% if artwork.display_format_label %}
+                  <span class="badge bg-secondary ms-2">{{ artwork.display_format_label }}</span>
+                {% endif %}
+                {% if artwork.display_original_unavailable %}
+                  <span class="badge bg-warning text-dark ms-2">Original unavailable</span>
+                {% endif %}
               </p>
-              
-              <!-- View Details Button -->
+
               <div class="mt-auto">
-                <a 
-                  href="{% url 'collections_app:artwork_detail' artwork.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" 
-                  class="btn btn-primary w-100"
-                >
-                  View Details
-                </a>
+                <a href="{% url 'collections_app:artwork_detail' artwork.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-primary w-100">View Details</a>
               </div>
             </div>
             
@@ -191,6 +438,7 @@
           </div>
         </div>
       {% endfor %}
+      </div>
     </div>
 
     <!-- Results Summary -->
@@ -203,6 +451,5 @@
         </div>
       </div>
     {% endif %}
-    </div>
   </div>
 {% endblock %}
