@@ -104,14 +104,14 @@
                   <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
                 </svg>
               </div>
-              <div class="flex-grow-1 ms-3">
+              <div class="container-fluid">
                 <h5 class="mb-1">Cecilia's Email</h5>
-                <p class="text-muted mb-0">{{ email }}</p>
+                <p class="text-muted mb-0" style="word-wrap: break-word;">{{ email }}</p>
               </div>
             </div>
           </div>
           <!-- Curator information -->
-           <h3 class="card-title mb-4">Curator {{ curator_name }}</h3>
+           <h3 class="card-title mb-4" style="word-wrap: break-word;">Curator {{ curator_name }}</h3>
           <!-- Phone -->
           <div class="mb-4">
             <div class="d-flex align-items-start">
@@ -122,7 +122,7 @@
               </div>
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Curator Phone Number</h5>
-                <p class="text-muted mb-0">{{ phone }}</p>
+                <p class="text-muted mb-0" style="word-wrap: break-word;">{{ phone }}</p>
               </div>
             </div>
           </div>
@@ -137,13 +137,13 @@
               </div>
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Curator Email</h5>
-                <p class="text-muted mb-0">{{ curator_email }}</p>
+                <p class="text-muted mb-0" style="word-wrap: break-word;">{{ curator_email }}</p>
               </div>
             </div>
           </div>
 
           <!-- Opening Hours -->
-           <h3 class="card-title mb-4">Our Availability</h3>
+           <h3 class="card-title mb-4" >Our Availability</h3>
           <div class="mb-4">
             <div class="d-flex align-items-start">
               <div class="flex-shrink-0">
@@ -154,11 +154,11 @@
               <div class="flex-grow-1 ms-3">
                 <h5 class="mb-1">Opening Hours</h5>
                 {% if opening_hours %}
-                <p class="text-muted mb-1">{{ opening_hours }}</p>
+                <p class="text-muted mb-1" style="word-wrap: break-word;">{{ opening_hours }}</p>
                 {% else %}
-                <p class="text-muted mb-1">Tuesday - Friday: 10:00 AM - 6:00 PM</p>
-                <p class="text-muted mb-1">Saturday - Sunday: 11:00 AM - 5:00 PM</p>
-                <p class="text-muted mb-0">Monday: Closed</p>
+                <p class="text-muted mb-1" style="word-wrap: break-word;">Tuesday - Friday: 10:00 AM - 6:00 PM</p>
+                <p class="text-muted mb-1" style="word-wrap: break-word;">Saturday - Sunday: 11:00 AM - 5:00 PM</p>
+                <p class="text-muted mb-0" style="word-wrap: break-word;">Monday: Closed</p>
                 {% endif %}
               </div>
             </div>
