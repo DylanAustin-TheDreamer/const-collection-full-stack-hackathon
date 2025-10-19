@@ -3,9 +3,10 @@
 {% block title %}Manage Exhibitions | Owner | Const Collection{% endblock %}
 
 {% block content %}
-  <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center">
+  <div class="container mt-4" style="overflow-x: hidden;">
+    <div class="d-flex flex-column align-items-center">
       <h2>Manage Exhibitions</h2>
+      <br>
       <a href="{% url 'owner_app:create_exhibition' %}" class="btn btn-primary">Add New Exhibition</a>
     </div>
 

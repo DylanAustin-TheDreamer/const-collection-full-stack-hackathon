@@ -3,9 +3,9 @@
 {% block title %}Edit About | Owner | Const Collection{% endblock %}
 
 {% block content %}
-  <div class="container mt-4">
+  <div class="container mt-4" style="overflow-x: hidden;">
     <h1>Edit About</h1>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="container-fluid">
       {% csrf_token %}
       {{ artist_form.as_p }}
       <button class="btn btn-primary" type="submit" name="artist_submit">Save Artist Info</button>
@@ -13,8 +13,8 @@
     
     <br><hr><br>
     
-    <h1>Edit Contact Information</h1>
-    <form method="post">
+    <h1 style="word-wrap: break-word;">Edit Contact Information</h1>
+    <form method="post" class="container-fluid">
       {% csrf_token %}
       {{ contact_form.as_p }}
       <button class="btn btn-primary" type="submit" name="contact_submit">Save Contact Info</button>
