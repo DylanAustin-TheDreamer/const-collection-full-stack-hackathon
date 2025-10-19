@@ -214,6 +214,25 @@
                             </div>
 
                             <div class="cc-media-grid collection-detail-grid">
+                              {# show cover image first inside the grid so it appears before assigned media #}
+                              {% if exhibition.cover_image %}
+                                <div class="cc-media-item">
+                                  <div class="card collection-card-fill">
+                                    <div class="card-media">
+                                      {% with url=exhibition.cover_image.url %}
+                                        {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+                                          <video class="collection-detail-img" autoplay muted playsinline loop preload="metadata" poster="{{ url }}">
+                                            <source src="{{ url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                          </video>
+                                        {% else %}
+                                          <img src="{{ url }}" class="collection-detail-img" alt="{{ exhibition.title }} cover" loading="lazy" onerror="this.style.display='none'">
+                                        {% endif %}
+                                      {% endwith %}
+                                    </div>
+                                  </div>
+                                </div>
+                              {% endif %}
                               {% for em in exhibition.exhibition_media.all %}
                                 {% if em.media and em.media.file %}
                                   <div class="cc-media-item">
@@ -327,6 +346,25 @@
                             </div>
 
                             <div class="cc-media-grid collection-detail-grid">
+                              {# show cover image first inside the grid so it appears before assigned media #}
+                              {% if exhibition.cover_image %}
+                                <div class="cc-media-item">
+                                  <div class="card collection-card-fill">
+                                    <div class="card-media">
+                                      {% with url=exhibition.cover_image.url %}
+                                        {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
+                                          <video class="collection-detail-img" autoplay muted playsinline loop preload="metadata" poster="{{ url }}">
+                                            <source src="{{ url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                          </video>
+                                        {% else %}
+                                          <img src="{{ url }}" class="collection-detail-img" alt="{{ exhibition.title }} cover" loading="lazy" onerror="this.style.display='none'">
+                                        {% endif %}
+                                      {% endwith %}
+                                    </div>
+                                  </div>
+                                </div>
+                              {% endif %}
                               {% for em in exhibition.exhibition_media.all %}
                                 {% if em.media and em.media.file %}
                                   <div class="cc-media-item">
