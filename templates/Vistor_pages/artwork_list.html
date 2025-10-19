@@ -61,6 +61,26 @@
         border: 1px solid rgba(0,0,0,0.04);
         background-clip: padding-box;
       }
+      /* Featured heading styling */
+      /* Ensure the featured heading wins over global/utility rules by
+         targeting the h5 element specifically and increasing specificity. */
+      .featured-heading, h5.featured-heading {
+        text-align: center;
+        font-size: 2rem !important;
+        font-weight: 600;
+        margin-bottom: .75rem;
+        display: block;
+        position: relative;
+      }
+      .featured-heading::after {
+        content: '';
+        display: block;
+        width: 3.5rem;
+        height: 2px;
+        background: rgba(0,0,0,0.12);
+        margin: .45rem auto 0 auto;
+        border-radius: 2px;
+      }
       .filter-card .card-body { padding: .2rem; }
       .filter-card .card-title { font-size: .95rem; margin-bottom: .4rem; }
       /* Ensure inputs/selects visually match the card rounding. Use !important to override Bootstrap defaults if necessary. */
@@ -97,7 +117,7 @@
     <div class="row mb-4">
       <div class="col-12">
         <div class="mb-3">
-          <h5 class="mb-2">Featured</h5>
+          <h5 class="mb-2 featured-heading">Featured</h5>
           <div id="featured-carousel" class="featured-carousel position-relative">
             {% if featured_artworks %}
               <button type="button" class="carousel-control-prev btn btn-outline-secondary position-absolute" data-action="prev" aria-label="Previous">‹</button>
@@ -238,6 +258,12 @@
                     var newGrid = doc.getElementById('artworks-grid');
                     if(newGrid){
                       grid.innerHTML = newGrid.innerHTML;
+                      // Update results summary if present in returned fragment
+                      var newSummary = doc.getElementById('artworks-summary');
+                      if(newSummary){
+                        var oldSummary = document.getElementById('artworks-summary');
+                        if(oldSummary) oldSummary.innerHTML = newSummary.innerHTML;
+                      }
                       updateFiltersHeader();
                       return true;
                     }
@@ -247,6 +273,14 @@
                       var htmlParts = [];
                       cardNodes.forEach(function(n){ htmlParts.push(n.outerHTML); });
                       grid.innerHTML = htmlParts.join('\n');
+                      // If we couldn't find a full summary fragment, try to parse a textual count from the returned HTML
+                      try{
+                        var docSummary = doc.getElementById('artworks-summary');
+                        if(docSummary){
+                          var oldSummary2 = document.getElementById('artworks-summary');
+                          if(oldSummary2) oldSummary2.innerHTML = docSummary.innerHTML;
+                        }
+                      }catch(e){}
                       return true;
                     }
 
@@ -379,7 +413,7 @@
           <div class="visually-hidden">Loading artworks...</div>
         </span>
       </div>
-      <div id="artworks-grid" class="row">
+  <div id="artworks-grid" class="row justify-content-center">
       {% for artwork in artworks %}
         <!-- Individual Artwork Card -->
         <div class="col-md-4 col-lg-3 mb-4">
@@ -445,7 +479,7 @@
     {% if artworks %}
       <div class="row mt-4">
         <div class="col-12">
-          <p class="text-muted text-center">
+          <p id="artworks-summary" class="text-muted text-center">
             Showing {{ artworks|length }} artwork{{ artworks|length|pluralize }}
           </p>
         </div>
