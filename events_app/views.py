@@ -1,7 +1,4 @@
 from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
-from django.db.models import Q
-
 from .models import Exhibition
 
 
@@ -11,16 +8,16 @@ def index(request):
     Upcoming: no end_date (ongoing) or end_date >= today.
     Previous: end_date < today.
     """
-    today = timezone.localdate()
-
+    # Only exhibitions with status 'finished' should be considered previous.
+    # All other statuses go into upcoming.
     upcoming_exhibitions = (
         Exhibition.objects
-        .filter(Q(end_date__isnull=True) | Q(end_date__gte=today))
+        .exclude(status='finished')
         .order_by('start_date')
     )
 
     previous_exhibitions = (
-        Exhibition.objects.filter(end_date__lt=today)
+        Exhibition.objects.filter(status='finished')
         .order_by('-end_date')
     )
 

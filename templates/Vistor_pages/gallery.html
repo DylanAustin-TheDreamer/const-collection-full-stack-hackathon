@@ -12,6 +12,8 @@
   <hr class="collection-divider page-title-divider" />
     <div class="gallery-list">
       {% for collection in collections %}
+      <div class="card">
+          <div class="card-body">
         <section class="collection-section mb-5">
           <div class="row align-items-center">
             {% if collection.cover_image %}
@@ -90,9 +92,11 @@
               </div>
             {% endif %}
           </div>
-
+          
           
         </section>
+    </div>
+    </div>
         {% if not forloop.last %}
           <hr class="collection-divider" />
         {% endif %}
