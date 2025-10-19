@@ -3,7 +3,7 @@
 {% block title %}My Dashboard | Const Collection{% endblock %}
 {% block content %}
 <div class="container mt-5 dashboard-page">
-  <h1 class="mb-4">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+  <h1 class="mb-4" style="word-wrap: break-word;">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
   <!-- Theme selector (uses existing static/js/theme-toggle.js API)
        Moved under Profile Info card and presented as a radial selector list. -->
 

@@ -435,6 +435,7 @@ li {
   /* Do not fill the full block; keep background transparent so the mask
      paints only the silhouette. Per-instance color may still be provided
      via --tint if desired (applied via mask/after element). */
+  background-image: var(--tint-image);
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
@@ -889,7 +890,7 @@ small,
 }
 
 /* Ensure default paragraph and list text use primary text token unless overridden */
-p, li, span, {
+p, li, span {
   color: var(--text-primary);
 }
 

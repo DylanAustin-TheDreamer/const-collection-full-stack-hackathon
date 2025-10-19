@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /admin/
+Allow: /
+Sitemap: https://const-collection-0f06bd9d4705.herokuapp.com/sitemap.xml

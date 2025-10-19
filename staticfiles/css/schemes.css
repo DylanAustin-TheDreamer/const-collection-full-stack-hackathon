@@ -435,6 +435,7 @@ li {
   /* Do not fill the full block; keep background transparent so the mask
      paints only the silhouette. Per-instance color may still be provided
      via --tint if desired (applied via mask/after element). */
+  background-image: var(--tint-image);
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
@@ -889,7 +890,7 @@ small,
 }
 
 /* Ensure default paragraph and list text use primary text token unless overridden */
-p, li, span, {
+p, li, span {
   color: var(--text-primary);
 }
 
@@ -2426,4 +2427,42 @@ html body .col-md-5 .artwork-details {
 /* Ensure small helper text and form notes use muted token */
 .form-text, .help-block, .form-help {
   color: var(--text-muted) !important;
+}
+
+/* Focused modal styling for the owner confirm-email modal. This is scoped to
+   the explicit modal class so it won't affect other modals on the site. */
+.cc-confirm-email-modal .modal-content {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+.cc-confirm-email-modal .cc-modal-btn-primary {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+}
+.cc-confirm-email-modal .cc-modal-btn-secondary {
+  background: var(--surface) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
+}
+
+/* Focused alert styling for owner message confirm/retry alerts */
+.cc-confirm-alert,
+.cc-retry-alert {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+.cc-confirm-alert .cc-alert-btn-primary,
+.cc-retry-alert .cc-alert-btn-primary {
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+}
+.cc-confirm-alert .cc-alert-btn-secondary,
+.cc-retry-alert .cc-alert-btn-secondary {
+  background: var(--surface) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
 }

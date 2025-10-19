@@ -3,9 +3,10 @@
 {% block title %}Manage Collections{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center">
+<div class="container mt-4 d-flex flex-wrap text-center" style="overflow-x: hidden;">
+  <div>
     <h2>Collections</h2>
+    <br>
     <a class="btn btn-primary" href="{% url 'owner_app:create_collection' %}">Create Collection</a>
   </div>
 

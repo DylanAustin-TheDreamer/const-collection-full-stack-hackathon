@@ -28,7 +28,7 @@
           <div class="col-md-8"  id="pad">
           <h2>{{ artist.name }}</h2>
           <div class="about-bio">{{ artist.bio|linebreaks }}</div>
-          <p><strong>Email:</strong> <a href="mailto:{{ artist.email }}">{{ artist.email }}</a></p>
+          <p style="word-wrap: break-word;"><strong>Email:</strong> <a href="mailto:{{ artist.email }}">{{ artist.email }}</a></p>
           {% if artist.phone_number %}
             <p><strong>Phone:</strong> {{ artist.phone_number }}</p>
           {% endif %}
