@@ -1102,13 +1102,28 @@ def delete_media(request, pk):
 
     from .models import Media
     media = get_object_or_404(Media, pk=pk)
+    # Count exhibitions that reference this media
+    exhibition_count = media.exhibitions.count()
+    exhibition_titles = list(media.exhibitions.select_related('exhibition').values_list('exhibition__title', flat=True)[:20])
+
     if request.method == 'POST':
+        # Remove exhibition links first (cascade would remove them on media.delete()
+        # but do explicit cleanup to be explicit)
+        media.exhibitions.all().delete()
         media.delete()
         return redirect('collections_app:manage_media')
+
     return render(
         request,
         'owner_pages/confirm_delete.html',
-        {'object': media, 'type': 'Media'},
+        {
+            'object': media,
+            'type': 'Media',
+            'dependent': {
+                'media_in_exhibitions': exhibition_count,
+                'exhibition_titles': exhibition_titles,
+            },
+        },
     )
 
 

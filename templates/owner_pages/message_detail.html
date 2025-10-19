@@ -20,7 +20,7 @@
               This message sender has not registered an account, your reply will be sent via Email to
               <em>{{ message.email }}</em>?
               <div class="mt-2">
-                <form method="post" style="display:inline-block;">
+                <form method="post" class="d-inline-block">
                   {% csrf_token %}
                   <input type="hidden" name="action" value="reply">
                   <input type="hidden" name="confirm_send_to_email" value="1">
@@ -38,7 +38,7 @@
               <strong>Email send failed.</strong>
               The reply was saved but sending the email failed. You can retry sending it now.
               <div class="mt-2">
-                <form method="post" style="display:inline-block;">
+                <form method="post" class="d-inline-block">
                   {% csrf_token %}
                   <input type="hidden" name="action" value="retry_reply">
                   <input type="hidden" name="reply_id" value="{{ request.GET.reply_failed_id }}">

@@ -27,10 +27,10 @@
                     <div class="mt-2 d-flex flex-column gap-2 align-items-end">
                       <a href="{% url 'owner_app:assign_art' ex.pk %}" class="btn btn-sm btn-outline-primary">Assign Art</a>
                       <a href="{% url 'owner_app:assign_media' ex.pk %}" class="btn btn-sm btn-outline-secondary">Assign Media</a>
-                      <form method="post" action="{% url 'owner_app:delete_exhibition' ex.pk %}" style="display:inline-block; margin:0;">
-                        {% csrf_token %}
-                        <button class="btn btn-sm btn-danger" type="submit">Delete</button>
-                      </form>
+                      <a href="{% url 'owner_app:delete_exhibition' ex.pk %}" data-cc-confirm="true" class="btn btn-sm btn-danger btn-compact cc-delete d-flex align-items-center px-2">
+                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                        <span class="d-none d-sm-inline ms-1">Delete</span>
+                      </a>
                     </div>
                   </div>
                 </div>

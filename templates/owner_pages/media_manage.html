@@ -44,11 +44,11 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" data-cc-confirm="true" class="btn btn-outline-danger btn-sm btn-compact cc-delete d-flex align-items-center px-2">
+                      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                      <span class="d-none d-sm-inline ms-1">Delete</span>
+                    </a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}
@@ -82,11 +82,11 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" data-cc-confirm="true" class="btn btn-outline-danger btn-sm btn-compact cc-delete d-flex align-items-center px-2">
+                      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                      <span class="d-none d-sm-inline ms-1">Delete</span>
+                    </a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}
@@ -120,11 +120,11 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" class="btn btn-outline-danger btn-sm btn-compact cc-delete d-flex align-items-center px-2">
+                      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                      <span class="d-none d-sm-inline ms-1">Delete</span>
+                    </a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}
@@ -158,11 +158,11 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" class="btn btn-outline-danger btn-sm btn-compact cc-delete d-flex align-items-center px-2">
+                      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                      <span class="d-none d-sm-inline ms-1">Delete</span>
+                    </a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}
@@ -197,9 +197,12 @@
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
                     <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
+                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" class="m-0">
                       {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                      <button class="btn btn-outline-danger btn-sm cc-delete d-flex align-items-center px-2" type="submit" title="Delete">
+                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                        <span class="d-none d-sm-inline ms-1">Delete</span>
+                      </button>
                     </form>
                   </div>
                   <div class="small text-muted mt-2">
@@ -234,11 +237,8 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" data-cc-confirm="true" class="btn btn-outline-danger btn-sm btn-compact cc-delete">Delete</a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}
@@ -272,11 +272,8 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" data-cc-confirm="true" class="btn btn-outline-danger btn-sm btn-compact cc-delete">Delete</a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}
@@ -310,11 +307,8 @@
                 <div class="card-body small">
                   <div class="text-truncate mb-2">{{ m.caption }}</div>
                   <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
-                    <form method="post" action="{% url 'collections_app:delete_media' m.id %}" style="display:inline-block;">
-                      {% csrf_token %}
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <a class="btn btn-outline-secondary btn-sm btn-compact" href="{% url 'collections_app:edit_media' m.id %}">Edit</a>
+                    <a href="{% url 'collections_app:delete_media' m.id %}" data-cc-confirm="true" class="btn btn-outline-danger btn-sm btn-compact cc-delete">Delete</a>
                   </div>
                   <div class="small text-muted mt-2">
                     {% if m.hero %}<span class="badge bg-primary me-1">Hero</span>{% endif %}

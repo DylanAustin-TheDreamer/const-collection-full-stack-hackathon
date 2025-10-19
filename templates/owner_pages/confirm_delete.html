@@ -6,9 +6,67 @@
 <div class="container mt-4">
   <h2>Delete {{ type }}</h2>
   <p>Are you sure you want to delete <strong>{{ object }}</strong>? This action cannot be undone.</p>
+  {% if dependent %}
+    <div class="confirm-dep-alert">
+      <strong>Note:</strong>
+      {% if type == 'Exhibition' %}
+        Deleting this Exhibition will NOT delete the artworks or media linked to it. Only the exhibition record and its cover image (if present) will be removed.
+      {% else %}
+        Deleting this {{ type }} will also affect the following related records:
+      {% endif %}
+      <ul>
+        {% if dependent.art_count is not none %}
+          <li>{{ dependent.art_count }} artwork(s)</li>
+        {% endif %}
+        {% if dependent.variant_count is not none %}
+          <li>{{ dependent.variant_count }} variant(s)</li>
+        {% endif %}
+        {% if dependent.basket_count is not none %}
+          <li>{{ dependent.basket_count }} basket item(s) (these will be removed)</li>
+        {% endif %}
+        {% if dependent.art_count is not none and dependent.media_count is not none %}
+          {# both counts present - no-op #}
+        {% endif %}
+        {% if dependent.media_count is not none %}
+          <li>{{ dependent.media_count }} media link(s)</li>
+        {% endif %}
+        {% if dependent.media_in_exhibitions is not none %}
+          <li>{{ dependent.media_in_exhibitions }} exhibition reference(s)</li>
+        {% endif %}
+      </ul>
+    </div>
+
+    {# Generic lists: art_titles, exhibition_titles, variant_names, etc. #}
+    {% if dependent.art_titles %}
+      <p>Examples of artworks that will be deleted:</p>
+      <ul>
+        {% for t in dependent.art_titles %}
+          <li>{{ t }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if dependent.exhibition_titles %}
+      <p>Examples of exhibitions referencing this media:</p>
+      <ul>
+        {% for t in dependent.exhibition_titles %}
+          <li>{{ t }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if dependent.variant_names %}
+      <p>Variants on this artwork:</p>
+      <ul>
+        {% for v in dependent.variant_names %}
+          <li>{{ v }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
   <form method="post">
     {% csrf_token %}
-    <button class="btn btn-danger" type="submit">Yes, delete</button>
+  <button class="btn btn-danger cc-delete" type="submit">Yes, delete</button>
   <a class="btn-back btn-back--owner" href="javascript:history.back()">Cancel</a>
   </form>
 </div>

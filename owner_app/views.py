@@ -3,7 +3,7 @@ from .models import ArtistProfile, Contact
 from .forms import ArtistProfileForm, ContactForm
 from collections_app.forms import ArtForm
 from collections_app.forms_collection import CollectionForm
-from collections_app.models import Art, Media
+from collections_app.models import Art, Media, ArtVariant, BasketItem
 from collections_app.models import Collection
 from events_app.forms import ExhibitionForm
 from events_app.models import Exhibition
@@ -157,13 +157,33 @@ def edit_art(request, pk):
 @user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def delete_art(request, pk):
     art = Art.objects.get(pk=pk)
+    # Dependent counts: variants and any basket items referencing those variants
+    variant_qs = art.variants.all()
+    variant_count = variant_qs.count()
+    basket_qs = BasketItem.objects.filter(variant__art=art)
+    basket_count = basket_qs.count()
+
+    variant_names = list(variant_qs.values_list('medium', flat=True)[:10])
+
     if request.method == 'POST':
+        # Remove basket items that would PROTECT deletion of variants
+        if basket_count:
+            basket_qs.delete()
         art.delete()
         return redirect('owner_app:art_list')
+
     return render(
         request,
         'owner_pages/confirm_delete.html',
-        {'object': art, 'type': 'Art'},
+        {
+            'object': art,
+            'type': 'Art',
+            'dependent': {
+                'variant_count': variant_count,
+                'basket_count': basket_count,
+                'variant_names': variant_names,
+            },
+        },
     )
 
 
@@ -226,13 +246,43 @@ def edit_collection(request, pk):
 @user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def delete_collection(request, pk):
     collection = Collection.objects.get(pk=pk)
+    # Gather dependent objects so we can show a clear confirmation page
+    arts_qs = Art.objects.filter(collection=collection)
+    art_count = arts_qs.count()
+    variant_qs = ArtVariant.objects.filter(art__collection=collection)
+    variant_count = variant_qs.count()
+    # Basket items reference ArtVariant via required FK with PROTECT; these
+    # must be removed before we can delete the variants/art/collection.
+    basket_qs = BasketItem.objects.filter(variant__art__collection=collection)
+    basket_count = basket_qs.count()
+
+    # Provide a short preview list of art titles for the confirmation page
+    art_titles = list(arts_qs.values_list('title', flat=True)[:20])
+
     if request.method == 'POST':
+        # First remove dependent BasketItems which would otherwise PROTECT
+        # deletion of ArtVariant (and therefore prevent collection deletion).
+        if basket_count:
+            basket_qs.delete()
+
+        # Deleting the collection will cascade-delete its Art and ArtVariant
+        # rows (Art.collection and ArtVariant.art are CASCADE).
         collection.delete()
         return redirect('owner_app:collections_list')
+
     return render(
         request,
         'owner_pages/confirm_delete.html',
-        {'object': collection, 'type': 'Collection'},
+        {
+            'object': collection,
+            'type': 'Collection',
+            'dependent': {
+                'art_count': art_count,
+                'variant_count': variant_count,
+                'basket_count': basket_count,
+                'art_titles': art_titles,
+            },
+        },
     )
 
 
@@ -270,13 +320,33 @@ def edit_exhibition(request, pk):
 @user_passes_test(lambda u: u.is_superuser, login_url='/accounts/login/')
 def delete_exhibition(request, pk):
     exhibition = Exhibition.objects.get(pk=pk)
+    # Count linked items (ExhibitionArt, ExhibitionMedia)
+    art_links = exhibition.exhibition_arts.count()
+    media_links = exhibition.exhibition_media.count()
+    art_titles = list(exhibition.exhibition_arts.select_related('art').values_list('art__title', flat=True)[:20])
+
     if request.method == 'POST':
+        # Do NOT delete linked ExhibitionArt / ExhibitionMedia rows.
+        # Those links do not require the Exhibition to be removed and should
+        # remain intact for archival or reporting purposes. Only delete the
+        # Exhibition DB row here; avoid attempting to remove remote assets
+        # (cover image) from storage — leaving orphaned media is preferable
+        # to failing the whole delete request.
         exhibition.delete()
         return redirect('owner_app:exhibitions_list')
+
     return render(
         request,
         'owner_pages/confirm_delete.html',
-        {'object': exhibition, 'type': 'Exhibition'},
+        {
+            'object': exhibition,
+            'type': 'Exhibition',
+            'dependent': {
+                'art_count': art_links,
+                'media_count': media_links,
+                'art_titles': art_titles,
+            },
+        },
     )
 
 
