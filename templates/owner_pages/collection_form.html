@@ -30,10 +30,7 @@
    </form>
 
   {% if collection.pk %}
-    <form method="post" action="{% url 'owner_app:delete_collection' collection.pk %}" class="mt-2">
-      {% csrf_token %}
-      <button class="btn btn-danger" type="submit">Delete Collection</button>
-    </form>
+  <a href="{% url 'owner_app:delete_collection' collection.pk %}" data-cc-confirm="true" class="btn btn-danger cc-delete mt-2">Delete Collection</a>
   {% endif %}
 </div>
 {% endblock %}

@@ -280,6 +280,38 @@ document.addEventListener('DOMContentLoaded', function() {
     hydrateArtworkListIfNeeded();
 });
 
+// Owner confirm-delete navigation guard
+// Some third-party scripts attach delegated click handlers that may
+// call preventDefault/stopImmediatePropagation and interfere with
+// simple anchor navigation. Anchors that should open the owner
+// confirmation pages are marked with `data-cc-confirm="true"`.
+// We capture clicks on them early and force navigation.
+document.addEventListener('click', function (ev) {
+    try {
+        // Only act on left-clicks without modifier keys
+        if (ev.defaultPrevented) return;
+        if (ev.button !== 0) return; // not a left click
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+
+        // Look for an anchor with the marker attribute
+        var el = ev.target;
+        while (el && el !== document) {
+            if (el.matches && el.matches('a[data-cc-confirm="true"]')) break;
+            el = el.parentNode;
+        }
+        if (!el || el === document) return;
+
+        // Prevent other handlers from blocking the navigation and force it
+        try { ev.stopImmediatePropagation(); } catch (e) { ev.stopPropagation && ev.stopPropagation(); }
+        ev.preventDefault && ev.preventDefault();
+        // Use location.assign to allow back-button behavior
+        window.location.assign(el.href);
+    } catch (err) {
+        // swallow - non-critical
+        console.debug('cc-confirm handler error', err);
+    }
+}, true); // use capture to run before delegated bubble handlers
+
 /**
  * Basket quantity helpers
  */

@@ -329,47 +329,81 @@ li {
   background: transparent;
 }
 
-/* Danger / delete buttons: keep a consistent red/warn color across schemes */
-:root {
-  /* Provide a danger token; schemes can override if they want a different hue */
-  --danger: #dc3545; /* Bootstrap danger fallback */
+/* Danger / delete button theme removed here so admin delete buttons can
+   be styled centrally via the `.cc-delete` utility class. If you need to
+   restore scheme-wide danger styling, add it back in a scoped/override-safe
+   way. */
+
+/* Centralised delete button class for owner/manage pages. This enforces
+   the requested delete visual (red border, red icon, label color) and
+   ensures parity with the edit button sizing. Using !important here to
+   ensure scheme-level styles don't override the admin control visuals. */
+.cc-delete {
+  border-color: #dc3545 !important; /* keep red border */
+  /* label text should match the site's primary text color so it reads like other buttons */
+  color: var(--text-primary, var(--primary-text, #222)) !important;
+}
+/* icons should match the label text color (inherit) so they don't look like part of the border */
+.cc-delete > .fa,
+.cc-delete > i {
+  color: inherit !important;
+  margin-left: 3px; /* nudge icon slightly right so it doesn't visually touch the table border */
 }
 
-.btn-danger,
-.btn-danger:focus,
-.btn-danger:active,
-.btn-outline-danger,
-.btn-outline-danger:hover,
-.btn-minimal-danger,
-.button--danger {
-  color: var(--danger) !important;
-  border-color: var(--danger) !important;
-  background: transparent !important;
+/* Utility: compact button sizing used across owner/manage pages to keep
+   Edit/Delete buttons visually aligned without inline styles.
+   Defined here so each scheme can override token values if necessary. */
+.btn-compact {
+  min-width: 56px; /* smaller min width for small screens */
+  /* allow natural width otherwise */
+  vertical-align: middle;
 }
 
-.btn-danger:hover,
-.btn-outline-danger:active,
-.btn-minimal-danger:hover {
-  background: rgba(220,53,69,0.12) !important; /* stronger red wash on hover for visibility */
-  color: var(--danger) !important;
+/* cc-edit: align Edit button icon/text with site text color in owner table views
+   Used sparingly on specific templates (e.g., collections_list) so the icon doesn't
+   pick up outline/hover tokens that make it appear different from Delete. */
+.cc-edit {
+  color: var(--text-primary, var(--primary-text, #222)) !important;
+}
+.cc-edit > .fa,
+.cc-edit > i {
+  color: inherit !important;
 }
 
-/* More specific hover targets to ensure manage-card/basket delete buttons show highlight */
-.collection-actions .btn-outline-danger:hover,
-.manage-media-thumb .btn-outline-danger:hover,
-.collection-card-fill .btn-outline-danger:hover,
-.collection-section .btn-outline-danger:hover,
-.btn.btn-outline-danger.btn-sm:hover,
-.btn.btn-outline-danger:hover {
-  background: rgba(220,53,69,0.12) !important;
-  color: var(--danger) !important;
-  border-color: var(--danger) !important;
+/* Small visual nudge to ensure delete icon doesn't touch the table cell border
+   only for the owner collections table which uses tight cell padding. */
+.owner-collections-table .cc-delete > .fa,
+.owner-collections-table .cc-delete > i {
+  margin-left: 6px; /* slightly larger nudge for tight table cells */
 }
 
 /* Small buttons used in owner pages */
 .btn-sm {
   padding: 0.25rem 0.6rem;
   font-size: 0.85rem;
+}
+
+/* Nav toggler visual cleanup: remove the white rounded background and focus outline
+   so the toggler icon sits directly on the navbar background. Scoped to the
+   navbar-sticky variant used in base.html. */
+.navbar-sticky .navbar-toggler .navbar-toggler-icon {
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.navbar-sticky .navbar-toggler:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure no faint outline / decorative background remains on toggler icon */
+.navbar-sticky .navbar-toggler,
+.navbar-sticky .navbar-toggler:focus,
+.navbar-sticky .navbar-toggler .navbar-toggler-icon {  
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* Decorative / site-specific button variants */
@@ -1082,6 +1116,73 @@ html body .navbar .nav-link {
   height: 4px; /* match previous thickness */
   background: var(--link-accent);
   border-radius: 2px;
+}
+
+/* On small screens (mobile / collapsed navbar), switch the underline active
+   indicator to a left-side accent (matches dropdown active styling). This
+   makes the active item stand out in the vertical list layout. */
+@media (max-width: 991.98px) {
+  .navbar .nav-link.active::after { display: none !important; }
+
+  /* When the navbar collapses the nav links become a vertical list; add a
+     slim left accent bar to the active link and increase left padding so the
+     content doesn't overlap the accent. */
+  .navbar-collapse .nav-link.active,
+  .navbar .navbar-collapse .nav-link.active {
+    position: relative !important;
+    padding-left: calc(1rem + 8px) !important; /* leave room for the accent */
+  }
+
+  .navbar-collapse .nav-link.active::before,
+  .navbar .navbar-collapse .nav-link.active::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0.4rem !important;
+    bottom: 0.4rem !important;
+    width: 4px !important;
+    border-radius: 2px !important;
+    background: var(--link-accent) !important;
+  }
+}
+
+  /* Themed confirmation dependency alert used in owner confirm-delete page.
+     Uses card surface so it reads like a component and uses primary text color
+     for better contrast in schemes. Keep modest padding and border-radius. */
+  .confirm-dep-alert {
+    background: var(--card-surface, var(--surface)) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border) !important;
+    padding: .85rem 1rem 1.25rem 1rem !important; /* extra bottom padding so buttons don't sit tight */
+    border-radius: 8px !important;
+    margin-bottom: 0.75rem !important; /* space between alert and following content */
+  }
+
+/* Toggler uses Font Awesome bar icon now. Make its color follow nav link tokens
+   so it matches the nav items (default muted, hover/focus text-primary, active link-accent). */
+.navbar-sticky .navbar-toggler .fa-bars,
+.navbar-sticky .navbar-toggler i.fa-bars,
+.navbar-sticky .navbar-toggler svg.svg-inline--fa {
+  /* target both the <i> icon and any inline SVG Font Awesome may inject */
+  color: var(--text-muted) !important;
+  font-size: 2rem !important; /* increased size per request */
+  width: 2rem; /* explicit size for SVG fallback */
+  height: 2rem; /* explicit size for SVG fallback */
+  fill: currentColor !important; /* ensure SVG follows currentColor */
+}
+.navbar-sticky .navbar-toggler:hover .fa-bars,
+.navbar-sticky .navbar-toggler:focus .fa-bars,
+.navbar-sticky .navbar-toggler:hover svg.svg-inline--fa,
+.navbar-sticky .navbar-toggler:focus svg.svg-inline--fa {
+  color: var(--text-primary) !important;
+  fill: currentColor !important;
+}
+.navbar-sticky .navbar-toggler.collapsed[aria-expanded="true"] .fa-bars,
+.navbar-sticky .navbar-toggler.collapsed[aria-expanded="true"] svg.svg-inline--fa,
+.navbar-sticky .navbar-nav .nav-link.active ~ .navbar-toggler .fa-bars,
+.navbar-sticky .navbar-nav .nav-link.active ~ .navbar-toggler svg.svg-inline--fa {
+  color: var(--link-accent) !important;
+  fill: currentColor !important;
 }
 
 .navbar .dropdown-item.active {

@@ -329,6 +329,19 @@ li {
   background: transparent;
 }
 
+/* Centralised delete button class for owner/manage pages. Mirrors source rules.
+   Keep red border while letting icon/text use primary text color so the button
+   reads like other UI elements. */
+.cc-delete {
+  border-color: #dc3545 !important; /* keep red border */
+  color: var(--text-primary, var(--primary-text, #222)) !important;
+}
+.cc-delete > .fa,
+.cc-delete > i {
+  color: inherit !important;
+  margin-left: 3px; /* nudge icon slightly right */
+}
+
 /* Danger / delete buttons: keep a consistent red/warn color across schemes */
 :root {
   /* Provide a danger token; schemes can override if they want a different hue */
@@ -741,6 +754,29 @@ li {
   border-color: var(--text-primary) !important;
 }
 
+/* Nav toggler visual cleanup: remove the white rounded background and focus outline
+   so the toggler icon sits directly on the navbar background. Scoped to the
+   navbar-sticky variant used in base.html. */
+.navbar-sticky .navbar-toggler .navbar-toggler-icon {
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.navbar-sticky .navbar-toggler:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure no faint outline / decorative background remains on toggler icon */
+.navbar-sticky .navbar-toggler,
+.navbar-sticky .navbar-toggler:focus,
+.navbar-sticky .navbar-toggler .navbar-toggler-icon {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 /* Standardize Back / Cancel buttons: make them the "inverted" (outline) variant
    of the primary action so Cancel visually pairs with Save but as an outline.
    - Outline uses primary text and border
@@ -1082,6 +1118,70 @@ html body .navbar .nav-link {
   height: 4px; /* match previous thickness */
   background: var(--link-accent);
   border-radius: 2px;
+}
+
+/* On small screens (mobile / collapsed navbar), switch the underline active
+   indicator to a left-side accent (matches dropdown active styling). This
+   makes the active item stand out in the vertical list layout. */
+@media (max-width: 991.98px) {
+  .navbar .nav-link.active::after { display: none !important; }
+
+  /* When the navbar collapses the nav links become a vertical list; add a
+     slim left accent bar to the active link and increase left padding so the
+     content doesn't overlap the accent. */
+  .navbar-collapse .nav-link.active,
+  .navbar .navbar-collapse .nav-link.active {
+    position: relative !important;
+    padding-left: calc(1rem + 8px) !important; /* leave room for the accent */
+  }
+
+  .navbar-collapse .nav-link.active::before,
+  .navbar .navbar-collapse .nav-link.active::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0.4rem !important;
+    bottom: 0.4rem !important;
+    width: 4px !important;
+    border-radius: 2px !important;
+    background: var(--link-accent) !important;
+  }
+}
+
+/* Themed confirmation dependency alert used in owner confirm-delete page.
+   Uses card surface so it reads like a component and uses primary text color
+   for better contrast in schemes. Keep modest padding and border-radius. */
+.confirm-dep-alert {
+  background: var(--card-surface, var(--surface)) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  padding: .85rem 1rem 1.25rem 1rem !important; /* extra bottom padding so buttons don't sit tight */
+  border-radius: 8px !important;
+  margin-bottom: 0.75rem !important; /* space between alert and following content */
+}
+.navbar-sticky .navbar-toggler .fa-bars,
+.navbar-sticky .navbar-toggler i.fa-bars,
+.navbar-sticky .navbar-toggler svg.svg-inline--fa {
+  /* target both the <i> icon and any inline SVG Font Awesome may inject */
+  color: var(--text-muted) !important;
+  font-size: 1.4rem !important; /* increased size per request */
+  width: 1.4rem; /* explicit size for SVG fallback */
+  height: 1.4rem; /* explicit size for SVG fallback */
+  fill: currentColor !important; /* ensure SVG follows currentColor */
+}
+.navbar-sticky .navbar-toggler:hover .fa-bars,
+.navbar-sticky .navbar-toggler:focus .fa-bars,
+.navbar-sticky .navbar-toggler:hover svg.svg-inline--fa,
+.navbar-sticky .navbar-toggler:focus svg.svg-inline--fa {
+  color: var(--text-primary) !important;
+  fill: currentColor !important;
+}
+.navbar-sticky .navbar-toggler.collapsed[aria-expanded="true"] .fa-bars,
+.navbar-sticky .navbar-toggler.collapsed[aria-expanded="true"] svg.svg-inline--fa,
+.navbar-sticky .navbar-nav .nav-link.active ~ .navbar-toggler .fa-bars,
+.navbar-sticky .navbar-nav .nav-link.active ~ .navbar-toggler svg.svg-inline--fa {
+  color: var(--link-accent) !important;
+  fill: currentColor !important;
 }
 
 .navbar .dropdown-item.active {
