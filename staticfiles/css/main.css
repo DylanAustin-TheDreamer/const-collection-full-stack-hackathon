@@ -398,7 +398,22 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 footer{
   border-top: 2px solid var(--border);
   color: var(--text-primary);
+
+/* Utility: compact button sizing used across owner/manage pages to keep
+   Edit/Delete buttons visually aligned without inline styles. */
+.btn-compact { /* defined in schemes.css for theming */
+  /* intentionally empty - see static/css/schemes.css for authoritative definition */
 }
+
+/* Force icons inside buttons to inherit text color. Use when you want the
+   button border/hover to be themed (e.g. danger) but the icon to remain
+   neutral or inherit a specific color. */
+/* (removed .btn-icon-reset — icon behavior now controlled by .cc-delete in schemes.css) */
+
+/* Central class for all admin delete buttons so we can target them together
+   without repeating per-template styles. Defaults to outline-secondary look
+   but keeps compatibility with danger variants. */
+
 
 
 #intro > p{
@@ -1326,3 +1341,4 @@ footer{
 /* Debug layout rules removed — re-enable temporary debugging by adding a small
    inline style block in the template or by reintroducing a `.debug-layout` block
    here if you need to visually inspect layout again. */
+}
