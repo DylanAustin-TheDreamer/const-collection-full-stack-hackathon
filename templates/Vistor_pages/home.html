@@ -153,6 +153,9 @@
   }
   @media (max-width: 576px) {
     .slow-looking-media { max-height: 40vh; }
+    #homeBtns {
+      flex-direction: column;
+    }
   }
 
   /* on small screens make the clips full-viewport width (edge-to-edge) */
@@ -173,7 +176,7 @@
   }
 </style>
 
-<div class="my-space-inbetween container" style="padding: 35px;">
+<div class="my-space-inbetween container" style="padding: 35px;" id="homeBtns">
 <a href="{% url 'store_app:index' %}" class="my-btn">Shop</a>
 <a href="{% url 'collections_app:gallery' %}" class="my-btn">Gallery</a>
 <a href="{% url 'contact' %}" class="my-btn">Contact</a>
