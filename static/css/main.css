@@ -401,9 +401,9 @@ footer{
 
 /* Utility: compact button sizing used across owner/manage pages to keep
    Edit/Delete buttons visually aligned without inline styles. */
-.btn-compact { /* defined in schemes.css for theming */
+/* .btn-compact { /* defined in schemes.css for theming */
   /* intentionally empty - see static/css/schemes.css for authoritative definition */
-}
+/* } */
 
 /* Force icons inside buttons to inherit text color. Use when you want the
    button border/hover to be themed (e.g. danger) but the icon to remain
