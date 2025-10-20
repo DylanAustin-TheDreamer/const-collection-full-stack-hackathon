@@ -1,4 +1,46 @@
-﻿# Art by Cecilia
+<p align="center"> #Art by Cecilia </p>
+
+---
+
+<div align="center">
+
+##  **Project Overview**
+
+</div>
+
+> **Our team of four navigated the challenge of integrating multiple Django apps**—collections, events, owner management, and store functionality—while maintaining a cohesive user experience across visitor-facing galleries and administrative dashboards. 
+> 
+> ### **The Biggest Win**
+> 
+> Successfully implementing a **full-stack e-commerce platform** featuring:
+> -  **Cloudinary image optimization**
+> -  **Dynamic theming** with 20+ Google Font combinations
+> -  **Sophisticated messaging system** connecting visitors directly with the artist
+> 
+> ###  **Delivered Through Collaborative Agile Sprints**
+> 
+> Tracked on our Kanban board, we delivered:
+> - ✅ CRUD operations for artworks and exhibitions
+> - ✅ Integrated Stripe payments for testing
+> - ✅ Production-ready Heroku deployment with PostgreSQL
+> - ✅ Responsive design and accessibility standards across all devices
+>
+> <br>
+>
+> **Prepared by:** [Dylan](https://github.com/DylanAustin-TheDreamer) • [Ryan](https://github.com/zZWinterZz) • [Valentyna](https://github.com/Val916) • [Rebekah](https://github.com/Rebekah-codes)
+
+---
+
+Art that remembers. Const Collection by Cecilia K. is a quiet revolution—paintings that reclaim the feminine, resist distortion, and invite you to collect what feels true.
+
+This platform is designed to honor the artist's voice, showcase their evolving body of work, and invite visitors into a space of emotional resonance and thoughtful exploration. It blends storytelling, visual clarity, and intuitive navigation to serve artists, visitors, and buyers alike.
+
+<br>
+
+<p align="center">
+    <a href=
+
+
 
 Art that remembers. Const Collection by Cecilia K. is a quiet revolution—paintings that reclaim the feminine, resist distortion, and invite you to collect what feels true.
 
@@ -33,26 +75,27 @@ This platform is designed to honor the artist's voice, showcase their evolving b
     - [Frontend](#frontend)
     - [Cloud Services & Deployment](#cloud-services--deployment)
     - [Development Tools](#development-tools)
-3. [User Stories & Planning](#user-stories--planning)
-4. [Database Design](#database-design)
+3. [E-Commerce & Payment System](#e-commerce--payment-system)
+4. [User Stories & Planning](#user-stories--planning)
+5. [Database Design](#database-design)
     - [ERD Diagram](#erd-diagram)
     - [Core Models](#core-models)
-5. [Testing](#testing)
+6. [Testing](#testing)
     - [Manual Testing Results](#manual-testing-results)
     - [Code Validation](#code-validation)
       - [HTML Validation](#html-validation)
       - [CSS Validation](#css-validation)
       - [Python Validation](#python-validation)
     - [Lighthouse Performance Testing](#lighthouse-performance-testing)
-6. [Deployment](#deployment)
+7. [Deployment](#deployment)
     - [Heroku Deployment Process](#heroku-deployment-process)
     - [Deployment Steps](#deployment-steps)
-7. [AI Integration](#ai-integration)
-8. [Credits and Acknowledgements](#credits-and-acknowledgements)
+8. [AI Integration](#ai-integration)
+9. [Credits and Acknowledgements](#credits-and-acknowledgements)
     - [Project Foundation](#project-foundation)
     - [Development Resources and Tools](#development-resources-and-tools)
     - [Content Sources and Media Attribution](#content-sources-and-media-attribution)
-9. [Features Left to Implement](#features-left-to-implement)
+10. [Features Left to Implement](#features-left-to-implement)
 
 ---
 
@@ -66,7 +109,7 @@ This platform is designed to honor the artist's voice, showcase their evolving b
 - **Picture Management** - Create, read, update, and delete media, Art, Collections, About page or Exibitions for the Owner (CRUD) [Here](https://github.com/DylanAustin-TheDreamer/const-collection-full-stack-hackathon/blob/main/staticfiles/collections_app/images/readme-images/CRUDfortheOwner.png)
 - **The About Page** is ![Here](https://github.com/DylanAustin-TheDreamer/const-collection-full-stack-hackathon/blob/main/staticfiles/collections_app/images/readme-images/About.png)
 - **Payment** enable for testing for Admin [Here](https://github.com/DylanAustin-TheDreamer/const-collection-full-stack-hackathon/blob/main/staticfiles/collections_app/images/readme-images/Payment%20test%20for%20Admin.png)
-
+-  **Sophisticated messaging system** — A three-tier communication platform enabling direct visitor-to-artist contact through public contact forms, real-time unread message tracking with badge notifications, and threaded conversation history where owners can reply directly through the platform with automatic email delivery to anonymous visitors
 
 #### User Experience
 
@@ -141,7 +184,47 @@ Rainbowcolored hover Effects: Subtle hover effects on some buttons enhance user 
 
 ### Typography
 
-The site uses **Google Fonts**
+The site uses **Google Fonts**.
+The project has a sophisticated **multi-theme system** where each theme (Scheme 1-20+) can use different font combinations. Here's how it works:
+
+ All Available Google Fonts (loaded in base.html line 32):
+
+2. Font Variables in Each Scheme (from CSS files):
+Scheme 1 (Dark theme):
+
+Headings: Playfair Display (serif)
+Body: Montserrat (sans-serif)
+Scheme 2 (Light museum theme):
+
+Headings: Playfair Display (serif)
+Body: Montserrat (sans-serif)
+Scheme 3 (Taupe theme):
+
+Headings: Playfair Display (serif)
+Body: Montserrat (sans-serif)
+3. How the Switch Happens (from schemes.css):
+
+```css
+/* CSS Variables control fonts */
+:root {
+    --font-heading: "Playfair Display", serif;
+    --font-body: "Montserrat", sans-serif;
+}
+
+/* Applied globally */
+body {
+    font-family: var(--font-body, system-ui, ...);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading, inherit);
+}
+```
+
+When a user selects a different theme (Scheme 1, 2, 3, etc.), the corresponding Scheme-X.css file is loaded, which redefines --font-heading and --font-body, instantly changing all fonts across the site!
+
+4. Where Users Change Themes:
+The theme selector appears in the user dashboard with a radial selector showing theme dots that users can click to switch between schemes.
 
 ### Imagery
 
@@ -155,31 +238,47 @@ The site uses **Google Fonts**
 
 ### Backend
 
-- **[Python 3.12](https://www.python.org/)** - Core programming language
+### Backend
+
+- **[Python 3.12](https://www.python.org/)** - Core language
 - **[Django 4.2](https://www.djangoproject.com/)** - Web framework
-- **[PostgreSQL](https://www.postgresql.org/)** - Database system
-- **[Django Allauth](https://django-allauth.readthedocs.io/)** - Authentication system
+- **[PostgreSQL](https://www.postgresql.org/)** - Database
+- **[Django Allauth](https://django-allauth.readthedocs.io/)** - Authentication
 
 ### Frontend
 
-- **[HTML5](https://developer.mozilla.org/en-US/docs/Web/HTML)** - Markup language
-- **[CSS3](https://developer.mozilla.org/en-US/docs/Web/CSS)** - Styling
-- **[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)** - Interactive functionality
-- **[Bootstrap 5](https://getbootstrap.com/)** - CSS framework
+- **[HTML5](https://developer.mozilla.org/en-US/docs/Web/HTML)** & **[CSS3](https://developer.mozilla.org/en-US/docs/Web/CSS)** - Markup & styling
+- **[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)** - Interactivity
+- **[Bootstrap 5](https://getbootstrap.com/)** - UI framework
 - **[Font Awesome](https://fontawesome.com/)** - Icons
 
 ### Cloud Services & Deployment
 
-- **[Heroku](https://www.heroku.com/)** - Application hosting
-- **[Cloudinary](https://cloudinary.com/)** - Image hosting and optimization
-- **[WhiteNoise](https://whitenoise.evans.io/)** - Static file serving
+- **[Heroku](https://www.heroku.com/)** - Hosting
+- **[Cloudinary](https://cloudinary.com/)** - Image optimization
+- **[WhiteNoise](https://whitenoise.evans.io/)** - Static files
 
 ### Development Tools
 
-- **[GitHub](https://github.com/)** - Version control
-- **[GitHub Copilot](https://github.com/features/copilot)** - AI-assisted development
+- **[GitHub](https://github.com/)** & **[GitHub Copilot](https://github.com/features/copilot)** - Version control & AI assistance
 - **[VS Code](https://code.visualstudio.com/)** - Code editor
-- **[Chrome DevTools](https://developer.chrome.com/docs/devtools/)** - Testing and debugging
+- **[Chrome DevTools](https://developer.chrome.com/docs/devtools/)** - Debugging
+
+---
+
+## E-Commerce & Payment System
+
+**Integrated Payment System**
+
+A complete e-commerce checkout flow featuring:
+- **Shopping basket functionality** with real-time item management, quantity updates, and persistent storage across sessions
+- **Admin test checkout** enabling order creation with billing information capture (email, address, contact details)
+- **Stripe integration prepared** with API configuration and payment processing architecture ready for production deployment
+- **Order management system** that creates permanent order records with snapshot pricing, variant tracking, and automatic basket clearing upon successful checkout
+
+Currently operational for admin testing with full Stripe payment processing infrastructure in place for future activation.
+
+---
 
 ## User Stories & Planning
 
@@ -519,6 +618,5 @@ GitHub Copilot helped shape user stories, generate Django scaffolding, and strea
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Badges by Shields.io](https://img.shields.io/badge/Badges-by%20Shields.io-brightgreen?logo=shieldsdotio)](https://shields.io/)
 [![Using MermaidChart](https://img.shields.io/badge/Using-MermaidChart-00BFA5?logo=mermaid&logoColor=white)](https://www.mermaidchart.com/)
-
 
 </div>
