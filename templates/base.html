@@ -2,9 +2,7 @@
 {% load static %}
 {% load nav_tags %}
 <html lang="en">
-  <head>
-
-<head>
+    <head>
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
@@ -19,7 +17,6 @@
     <title>{% block title %}Const Collection{% endblock %}</title>
     <meta name="description" content="Illuminated acrylic art by Cecilia Kristoffersson and curated collections by Magnus Florin. Explore vibrant, contemporary artworks and exhibitions at Const Collection. Make orders through our online store.">
     <meta name="keywords" content="art, gallery, artist, exhibitions, shop, Cecilia Kristoffersson, Marcus Bussey, Const Collection, acrylic, paintings, illuminated acrylic, illuminated acrylics, illuminated art, colorful art, pychedelic art, pychedelic, pychedelia, vibrant art, vibrant, modern art, contemporary art">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- End of Meta Tags -->
 
     <!-- Bootstrap 5 CSS -->
@@ -262,8 +259,8 @@
     <script src="{% static 'js/featured-carousel.js' %}"></script>
         <script src="{% static 'js/theme-toggle.js' %}"></script>
 
-        {# Child templates can inject page-specific scripts here. Placed after vendor/site scripts so
-           page scripts can safely reference Bootstrap and site globals. #}
+          <!-- Child templates can inject page-specific scripts here. Placed after vendor/site scripts so
+              page scripts can safely reference Bootstrap and site globals. -->
         {% block scripts %}{% endblock %}
 
     </body>
