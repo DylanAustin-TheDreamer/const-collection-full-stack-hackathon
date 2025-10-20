@@ -2363,7 +2363,7 @@ footer {
 
 .featured-card-wrapper .card-specific:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow 220ms cubic-bezier(.2,.8,.2,1); /* slightly softened deep elevation */
+  box-shadow: 220ms cubic-bezier(.2,.8,.2,1); /* slightly softened deep elevation */
   z-index: 60;
 }
 
@@ -2646,4 +2646,35 @@ html body .col-md-5 .artwork-details {
   background: var(--surface) !important;
   color: var(--text-muted) !important;
   border-color: var(--border) !important;
+}
+
+
+
+
+/* Dylan's Section, where he shall attempt to sort out responsive design through the scheme script.
+Seems to be the only one that wants to comply. Hope no one minds 
+Has to be min-width to get it right ya see */
+
+@media (min-width: 300px) {
+  .title{
+    font-size: 1.5rem !important;
+  }
+
+  .intro-text, p{
+    font-size: 1rem !important;
+  }
+}
+
+@media (min-width: 575px) {
+  .title{
+    font-size: 2rem !important;
+  }
+
+  .intro-text, p{
+    font-size: 1rem !important;
+  }
+
+  .intro-text{
+    font-size: 1.5rem !important;
+  }
 }
