@@ -113,20 +113,25 @@
     color: var(--surface);
 }
 
-/* Summary card */
+/* Summary card: increase contrast between card surface and page surface
+   by using the card-surface token and a clearer border/shadow. Also
+   make the header use the primary text color (not a bright filled
+   background) so the heading reads clearly on the card. */
 .summary-card {
-    background-color: var(--surface);
-    border: 2px solid var(--border);
+    background-color: var(--card-surface, var(--surface));
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .summary-header {
-    background-color: var(--text-primary);
-    color: var(--surface);
-    padding: 1.5rem;
+    background-color: transparent;
+    color: var(--text-primary);
+    padding: 1rem 1.5rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
 }
 
 .summary-body {
@@ -201,13 +206,23 @@
 /* Summary security */
 .summary-security {
     text-align: center;
-    padding-top: 1rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid var(--border);
-    color: var(--text-muted);
+    background-color: var(--card-surface, var(--surface));
+    color: var(--text-strong, var(--text-primary));
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    margin-top: 1rem;
 }
 
 .summary-security i {
-    margin-right: 0.25rem;
+    margin-right: 0.5rem;
+    color: var(--link-accent);
+}
+
+.summary-security small {
+    display: block;
+    color: var(--text-strong, var(--text-primary));
 }
 
 /* Shipping info */

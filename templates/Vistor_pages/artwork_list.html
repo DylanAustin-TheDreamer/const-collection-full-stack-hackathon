@@ -47,7 +47,7 @@
       }
       /* Hover emphasis for featured and regular cards */
       /* Apply transitions to wrappers so hover shadows are not clipped by the inner card's overflow:hidden */
-      .featured-card-wrapper,
+      .featured-card-wrapper .card-specific,
       #artworks-grid > .col-md-4 {
         transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s cubic-bezier(.2,.8,.2,1);
         will-change: transform, box-shadow;
@@ -55,10 +55,12 @@
       }
 
       /* Featured wrapper hover: stronger lift and deeper shadow (shadow applied to wrapper) */
-      .featured-card-wrapper:hover {
+      .featured-card-wrapper .card-specific:hover {
         transform: translateY(-8px) scale(1.025);
-        box-shadow: 0 28px 60px rgba(0,0,0,0.24);
+        box-shadow .22s cubic-bezier(.2,.8,.2,1);
         z-index: 60;
+        overflow: visible;
+        
       }
 
       /* Regular grid column wrapper hover: subtle lift and emphasized shadow */
@@ -152,7 +154,7 @@
               <div class="featured-track d-flex gap-3 overflow-hidden">
                 {% for fa in featured_artworks %}
                   <div class="featured-card-wrapper flex-shrink-0">
-                    <div class="card h-100 deep-card-shadow" style="width: 100%;">
+                    <div class="card card-specific h-100 deep-card-shadow" style="width: 100%;">
                         {% if fa.image %}
                         <img src="{{ fa.image.url }}" class="card-img-top" alt="{{ fa.title }}" style="height:60vh; object-fit:cover;">
                         {% else %}
