@@ -8,8 +8,12 @@
          inline <style> block here or reintroduce `.debug-layout` rules in
          `static/css/main.css` while debugging. -->
     {# Debug inline styles removed. Add ?debug_layout=1 handling back here if needed. #}
-  <h2>Gallery</h2>
-  <hr class="collection-divider page-title-divider" />
+    <div class="row mb-4">
+      <div class="col-12">
+  <h1 class="display-4 page-heading-underline">Gallery</h1>        
+      </div>
+    </div>
+    <hr class="collection-divider page-title-divider" />
     <div class="gallery-list">
       {% for collection in collections %}
   <div class="card deep-card-shadow">

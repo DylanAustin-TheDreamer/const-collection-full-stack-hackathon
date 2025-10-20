@@ -74,17 +74,42 @@
                         /* small extra gap on the leftmost icons to avoid visual overhang next to Contact */
 
                     }
+                /* Slightly reduce navbar vertical padding to make header shorter */
+                .navbar.navbar-sticky {
+                    padding-top: 0.35rem;
+                    padding-bottom: 0.35rem;
+                }
+                /* Subtle page header underline that uses the site's accent and is non-intrusive */
+                .page-heading-underline {
+                    position: relative;
+                    display: inline-block;
+                    padding-bottom: 0.6rem; /* make room for the underline */
+                }
+                .page-heading-underline::after {
+                    content: "";
+                    position: absolute;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    bottom: 0.08rem;
+                    height: 3px;
+                    width: 60%;
+                    max-width: 14rem; /* increased so long headings get a noticeably longer underline */
+                    min-width: 3rem; /* keep a visible line on very short headings */
+                    background: var(--text-primary, rgba(17,17,17,0.92));
+                    opacity: 0.28;
+                    border-radius: 2px;
+                }
     </style>
 </head>
 
 <body{% if request.GET.debug_layout == '1' %} class="debug-layout"{% endif %}>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light navbar-sticky">
+    <nav class="navbar navbar-expand-lg navbar-light navbar-sticky deep-card-shadow" style="background: var(--surface); border-radius: 0 0 14px 14px;">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="{% url 'collections_app:index' %}">
                                         Const Collection
-                                        <div class="tint-mask-bg" style="--tint-size:56px; margin-left:14px; display:inline-flex; align-items:center;">
-                                            <div class="tint-mask" style="--tint-image:url('{% static 'images/transp-woman.png' %}'); width:56px; height:56px;" role="img" aria-label="Const Collection logo"></div>
+                                        <div class="tint-mask-bg" style="--tint-size:48px; margin-left:10px; display:inline-flex; align-items:center;">
+                                            <div class="tint-mask" style="--tint-image:url('{% static 'images/transp-woman.png' %}'); width:48px; height:48px;" role="img" aria-label="Const Collection logo"></div>
                                         </div>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
