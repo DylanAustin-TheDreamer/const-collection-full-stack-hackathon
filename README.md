@@ -38,9 +38,6 @@ This platform is designed to honor the artist's voice, showcase their evolving b
 <br>
 
 <p align="center">
-    <a href=
-
-
 
 Art that remembers. Const Collection by Cecilia K. is a quiet revolution—paintings that reclaim the feminine, resist distortion, and invite you to collect what feels true.
 
@@ -620,3 +617,4 @@ GitHub Copilot helped shape user stories, generate Django scaffolding, and strea
 [![Using MermaidChart](https://img.shields.io/badge/Using-MermaidChart-00BFA5?logo=mermaid&logoColor=white)](https://www.mermaidchart.com/)
 
 </div>
+
