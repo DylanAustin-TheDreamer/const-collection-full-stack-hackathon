@@ -15,8 +15,15 @@
   }
   </style>
 
-  <div class="container mt-4" id="about">
-    {% if artist %}
+  {% if artist %}
+    <div class="container-fluid" style="margin-top:3rem; margin-bottom:1rem;">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1 class="display-4 page-heading-underline">{{ artist.name }}</h1>
+        </div>
+      </div>
+    </div>
+  <div class="container mt-2" id="about">
       <div class="row align-items-center">
         <div class="col-md-4 text-center" id="pad">
           {% if artist.image %}
@@ -26,7 +33,6 @@
         </div>
         
           <div class="col-md-8"  id="pad">
-          <h2>{{ artist.name }}</h2>
           <div class="about-bio">{{ artist.bio|linebreaks }}</div>
           <p style="word-wrap: break-word;"><strong>Email:</strong> <a href="mailto:{{ artist.email }}">{{ artist.email }}</a></p>
           {% if artist.phone_number %}
@@ -35,8 +41,10 @@
         </div>
       </div>
     {% else %}
-      <div class="text-center">
-        <p>No artist profile available.</p>
+      <div class="container mt-4">
+        <div class="text-center">
+          <p>No artist profile available.</p>
+        </div>
       </div>
     {% endif %}
   </div>

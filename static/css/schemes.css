@@ -1001,7 +1001,7 @@ main {
 /* On small screens the navbar toggler increases navbar height when expanded.
    Provide a slightly larger fallback to accommodate the taller mobile navbar. */
 @media (max-width: 767px) {
-  :root { --navbar-height: 112px; }
+  :root { --navbar-height: 64px; }
 }
 
 @media (min-width: 768px) {
@@ -1443,6 +1443,7 @@ footer {
     background: linear-gradient(90deg, #797979 0%, #3b8791 50% , #797979 100%);
     width: 100%;
     height: auto;
+    padding-top: 5px;
 }
 #multi-color {
   background: linear-gradient(
