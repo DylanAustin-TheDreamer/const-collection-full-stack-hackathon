@@ -1,13 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseForbidden, HttpResponse, Http404
+from django.http import JsonResponse, HttpResponseForbidden
 from django.db.models import Q
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 from django.urls import reverse
-from django.core.mail import send_mail
 from .models import Order, OrderItem
 
 
@@ -35,7 +32,26 @@ def index(request):
             context['secondary_video'] = secondary_media.file.url
         else:
             context['secondary_video'] = None  # Or a fallback static video
-            
+        # Get tertiary/third section media for the Slow Looking preview
+        tertiary_media = Media.objects.filter(third_section=True).first()
+        if tertiary_media and tertiary_media.file:
+            # Provide both URL and media_type so templates can render
+            # image or video
+            context['tertiary_media_url'] = tertiary_media.file.url
+            context['tertiary_media_type'] = tertiary_media.media_type
+        else:
+            context['tertiary_media_url'] = None
+            context['tertiary_media_type'] = None
+        # Provide featured artworks for the homepage carousel
+        from .models import Art
+        featured_qs = (
+            Art.objects
+            .filter(is_featured=True)
+            .filter(Q(is_available=True) | Q(variants__is_available=True))
+            .distinct()
+            .order_by('-created_at')[:6]
+        )
+        context['featured_artworks'] = featured_qs
     except Exception as e:
         # Handle any database errors gracefully
         context['hero_video'] = None
@@ -55,7 +71,8 @@ def tint_demo(request):
 
 def gallery(request):
     from .models import Collection
-    # Ensure any collection literally named "More art" appears at the end of the list
+    # Ensure any collection literally named "More art" appears at the
+    # end of the list
     from django.db.models import Case, When, IntegerField, Value
     collections = (
         Collection.objects
@@ -118,8 +135,6 @@ def collection_detail(request, pk):
 def art_detail(request, pk):
     from .models import Art
 
-
-
     art = Art.objects.select_related('collection__artist').get(pk=pk)
 
     # For compatibility keep 'artwork' context key pointing to the Art instance
@@ -146,7 +161,8 @@ def artwork_list(request):
     """
     from .models import Art, Collection, ArtVariant
 
-    # Fetch all art rows (Art is canonical) and expose them as 'artworks' for templates
+    # Fetch all art rows (Art is canonical) and expose them as
+    # 'artworks' for templates
     # Prefetch variants so templates can show per-medium pricing without N+1
     artworks = (
         Art.objects
@@ -176,13 +192,17 @@ def artwork_list(request):
     # Filter by available format (ArtVariant.medium)
     selected_format = request.GET.get('format', '')
     if selected_format:
-        artworks = artworks.filter(variants__medium=selected_format, variants__is_available=True)
+        artworks = artworks.filter(
+            variants__medium=selected_format,
+            variants__is_available=True,
+        )
     
     # Order artworks by creation date (newest first)
     artworks = artworks.order_by('-created_at')
     
     # Prepare context data to pass to the template
-    # Provide collections and format choices for the filter UI and featured artworks
+    # Provide collections and format choices for the filter UI
+    # and featured artworks
     collections = Collection.objects.select_related('artist').all()
     format_choices = ArtVariant.MEDIUM_CHOICES
     # Include featured artworks even when `Art.is_available` is False but the
@@ -196,7 +216,8 @@ def artwork_list(request):
         .order_by('-created_at')[:6]
     )
 
-    # Compute display price and selected format label for each artwork (used in templates)
+    # Compute display price and selected format label for each
+    # artwork (used in templates)
     def resolve_display_price(art_obj):
         variants_qs = list(art_obj.variants.all())
         variants_map = {v.medium: v for v in variants_qs}
@@ -212,12 +233,18 @@ def artwork_list(request):
 
         # Fallback preferred order: ORIGINAL, POSTER, DIGITAL
         if price_display is None:
-            preferred = [ArtVariant.ORIGINAL, ArtVariant.POSTER, ArtVariant.DIGITAL]
+            preferred = [
+                ArtVariant.ORIGINAL,
+                ArtVariant.POSTER,
+                ArtVariant.DIGITAL,
+            ]
             for m in preferred:
                 v = variants_map.get(m)
                 if v and v.is_available and v.price is not None:
                     price_display = f"{v.currency} {v.price:,.2f}"
-                    format_label = dict(ArtVariant.MEDIUM_CHOICES).get(v.medium)
+                    format_label = (
+                        dict(ArtVariant.MEDIUM_CHOICES).get(v.medium)
+                    )
                     break
 
         # Final fallback: art-level price
@@ -231,7 +258,9 @@ def artwork_list(request):
             # Show flag only when user hasn't filtered by a specific format
             orig = variants_map.get(ArtVariant.ORIGINAL)
             if not selected_format:
-                art_obj.display_original_unavailable = (orig is None) or (not orig.is_available)
+                art_obj.display_original_unavailable = (
+                    (orig is None) or (not orig.is_available)
+                )
             else:
                 art_obj.display_original_unavailable = False
         except Exception:
@@ -277,7 +306,10 @@ def artwork_detail(request, pk):
 
     # Fetch the Art row and present it under 'artwork' for templates
     art = get_object_or_404(
-        Art.objects.select_related('collection__artist').prefetch_related('variants'),
+        (
+            Art.objects.select_related('collection__artist')
+            .prefetch_related('variants')
+        ),
         pk=pk
     )
 
@@ -293,7 +325,8 @@ def artwork_detail(request, pk):
     ]
     variants = [variants_map[k] for k in preferred_order if k in variants_map]
 
-    # Determine main price display: prefer ORIGINAL then POSTER then DIGITAL when available
+    # Determine main price display: prefer ORIGINAL then POSTER
+    # then DIGITAL when available
     price_display = None
     default_variant_pk = None
     for medium_key in preferred_order:
@@ -318,6 +351,7 @@ def artwork_detail(request, pk):
         'size_display': art.get_size_display(),
         'price_display': price_display,
         'variants': variants,
+        'default_variant_pk': default_variant_pk,
     }
     
     # Render the artwork detail template with the context data
@@ -1213,13 +1247,61 @@ def messages_view(request):
     from owner_app.models import Messages as MsgModel
 
     # Handle marking a message as read via POST or GET for convenience.
-    if request.method == 'POST' and 'mark_read' in request.POST:
-        try:
-            mid = int(request.POST.get('mark_read'))
-            MsgModel.objects.filter(pk=mid).update(unread=False)
+    if request.method == 'POST':
+        # Delete selected messages
+        action = request.POST.get('action')
+        if action == 'delete_selected':
+            ids = request.POST.getlist('selected_ids')
+            try:
+                ids_int = [int(i) for i in ids]
+                MsgModel.objects.filter(
+                    pk__in=ids_int,
+                    owner=request.user,
+                ).delete()
+                from django.contrib import messages as dj_messages
+                dj_messages.success(request, 'Selected messages deleted.')
+            except Exception:
+                pass
             return redirect('collections_app:messages')
-        except Exception:
-            pass
+
+        if action == 'delete_all_system':
+            # Conservative definition of system messages: sender is None and
+            # either name contains 'system' or email starts with 'system' or
+            # email is blank.
+            try:
+                MsgModel.objects.filter(
+                    owner=request.user,
+                    sender__isnull=True,
+                ).filter(
+                    Q(name__icontains='system')
+                    | Q(email__startswith='system')
+                    | Q(email='')
+                ).delete()
+                from django.contrib import messages as dj_messages
+                dj_messages.success(request, 'System messages deleted.')
+            except Exception:
+                pass
+            return redirect('collections_app:messages')
+
+        if action == 'delete_all':
+            try:
+                MsgModel.objects.filter(owner=request.user).delete()
+                from django.contrib import messages as dj_messages
+                dj_messages.success(request, 'All messages deleted.')
+            except Exception:
+                pass
+            return redirect('collections_app:messages')
+
+        # Mark read handling (single button per message)
+        if 'mark_read' in request.POST:
+            try:
+                mid = int(request.POST.get('mark_read'))
+                MsgModel.objects.filter(
+                    pk=mid, owner=request.user
+                ).update(unread=False)
+                return redirect('collections_app:messages')
+            except Exception:
+                pass
 
     # Optional GET param to mark a specific message as read and view it.
     read_id = request.GET.get('read')
@@ -1282,16 +1364,17 @@ def message_detail(request, pk):
                 # If the original sender is a registered user, store the
                 # reply internally and associate the replying user.
                 if getattr(msg, 'sender', None):
-                    # Save an internal reply and attempt to email the registered
-                    # sender's account email so they receive the reply in their
-                    # inbox as well as in the site's message thread.
+                    # Registered sender: create an internal site reply only.
+                    # Do not attempt to send an email — owners should reply
+                    # using the site's messaging thread so replies remain
+                    # internal.
                     replying_user = (
                         request.user
                         if getattr(request, 'user', None) and request.user.is_authenticated
                         else None
                     )
 
-                    # Create the internal reply first
+                    # Create the internal reply (via_email stays False)
                     reply = MessageReply.objects.create(
                         message=msg,
                         sender=replying_user,
@@ -1299,46 +1382,39 @@ def message_detail(request, pk):
                         via_email=False,
                     )
 
-                    # If the original sender has a valid email, try to send the
-                    # reply by email. If sending succeeds, mark the stored
-                    # reply's via_email=True so the record reflects that an
-                    # email was dispatched.
+                    # Inform the owner the reply was saved internally.
+                    dj_messages.success(request, 'Reply saved to the site message thread.')
+                    # Also create a Messages record so the original registered
+                    # sender receives the reply in their messages inbox.
                     try:
-                        recipient_email = None
-                        # msg.sender may be a User instance or None; prefer msg.sender.email
-                        if getattr(msg, 'sender', None) and getattr(msg.sender, 'email', None):
-                            recipient_email = msg.sender.email
-                        # Fallback to the stored message.email field if available
-                        if not recipient_email and getattr(msg, 'email', None):
-                            recipient_email = msg.email
-
-                        if recipient_email:
-                            subject = (
-                                "Reply from "
-                                + (request.user.get_full_name() or request.user.username)
-                            )
-                            full_body = body + "\n\nReply sent via site owner"
-                            send_mail(
-                                subject,
-                                full_body,
-                                settings.DEFAULT_FROM_EMAIL,
-                                [recipient_email],
-                                fail_silently=False,
-                            )
-                            # mark reply as emailed
-                            reply.via_email = True
-                            reply.save(update_fields=['via_email'])
-                            dj_messages.success(request, 'Reply saved and emailed to the user.')
-                        else:
-                            dj_messages.warning(request, 'Reply saved but no recipient email was found.')
+                        MsgModel.objects.create(
+                            name=(
+                                request.user.get_full_name() or
+                                request.user.username
+                            ),
+                            email=(request.user.email or ''),
+                            phone='',
+                            message=body,
+                            subject=(
+                                getattr(msg, 'subject', 'general') or 'general'
+                            ),
+                            sender=(
+                                request.user
+                                if getattr(request, 'user', None)
+                                and request.user.is_authenticated
+                                else None
+                            ),
+                            owner=msg.sender,
+                        )
                     except Exception:
-                        # Email sending failed; notify owner and provide retry link
-                        dj_messages.error(request, 'Reply saved but sending email failed. You can retry.')
-                        return redirect(f"{reverse('collections_app:message_detail', kwargs={'pk': pk})}?reply_failed_id={reply.pk}")
+                        # Don't block the owner if creating the outbound
+                        # message fails.
+                        pass
                 else:
-                    # Anonymous visitor — require explicit confirmation before creating
-                    # and emailing a reply. The client-side modal will submit
-                    # confirm_send_to_email=1 when the owner confirms.
+                    # Anonymous visitor — require explicit confirmation before
+                    # creating and emailing a reply. The client-side modal
+                    # will submit confirm_send_to_email=1 when the owner
+                    # confirms.
                     confirm = request.POST.get('confirm_send_to_email')
                     subject = (
                         "Reply from "
@@ -1349,7 +1425,8 @@ def message_detail(request, pk):
                     )
                     full_body = body + "\n\nReply sent via site owner"
                     try:
-                        # Only create/send the reply if the owner explicitly confirmed.
+                        # Only create/send the reply if the owner explicitly
+                        # confirmed.
                         if confirm == '1':
                             send_mail(
                                 subject,
@@ -1373,11 +1450,13 @@ def message_detail(request, pk):
                                 request, 'Reply saved and emailed to visitor.'
                             )
                         else:
-                            # No confirmation provided: do not persist the reply.
+                            # No confirmation provided: do not persist
+                            # the reply.
                             dj_messages.warning(
                                 request,
-                                'Visitor is not a registered user. Confirm sending '
-                                'email to that address to deliver this reply.',
+                                'Visitor is not a registered user. Confirm '
+                                'sending email to that address to deliver '
+                                'this reply.',
                             )
                             confirm_url = (
                                 reverse(
@@ -1388,7 +1467,8 @@ def message_detail(request, pk):
                             )
                             return redirect(confirm_url)
                     except Exception:
-                        # Sending email failed; record the reply (via_email False)
+                        # Sending email failed; record the reply
+                        # (via_email False)
                         reply = MessageReply.objects.create(
                             message=msg,
                             sender=(

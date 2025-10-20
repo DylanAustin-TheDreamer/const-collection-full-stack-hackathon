@@ -45,6 +45,35 @@
         main {
             flex: 1;
         }
+        /* Footer icons: keep the social icons vertically centered and evenly spaced on small screens */
+    .footer-icons a.nav-link { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.5rem; }
+    .footer-icons .i { line-height: 1; font-size: 1.8rem; display: inline-block; vertical-align: middle; }
+        @media (max-width: 576px) {
+          .footer-icons { gap: 0.25rem; }
+          .footer-icons a.nav-link { padding: 0.15rem 0.35rem; }
+        }
+                /* Deep card shadow used on homepage; apply via .deep-card-shadow on card containers */
+                .deep-card-shadow {
+                        box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.64);
+                        border-radius: 8px;
+                        overflow: hidden; /* keep inner corners clipped when media fills the card */
+                        background-clip: padding-box;
+                }
+                /* Ensure filter-card + deep-card-shadow wins over page-scoped .filter-card rules */
+                .filter-card.deep-card-shadow {
+                    box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.64);
+                }
+                    /* Footer icons: social anchors match the Contact button height and use auto width */
+                    .footer-icons { display:flex; gap: 0.75rem; align-items:center; justify-content:center; }
+                    .footer-icons .footer-contact-btn { height:56px; display:flex; align-items:center; justify-content:center; padding: 0 1rem; }
+                    .footer-icons a.nav-link { display:inline-flex; align-items:center; justify-content:center; height:56px; padding: 0 0.9rem; width: auto; border-radius: 8px; background: rgba(0,0,0,0.04); }
+                    .footer-icons a.nav-link .i { font-size: 3.5rem; line-height: 1; }
+                    @media (max-width: 576px) {
+                        .footer-icons { gap: 0.5rem; }
+                        .footer-icons .footer-contact-btn, .footer-icons a.nav-link { height:48px; padding: 0 0.6rem; }
+                        /* small extra gap on the leftmost icons to avoid visual overhang next to Contact */
+
+                    }
     </style>
 </head>
 
@@ -157,18 +186,43 @@
             </div>
         </nav>
     </header>
-        <main>
+                <!-- Flash messages (Django messages) rendered with scheme tokens -->
+                        {% if messages %}
+                        <div class="container mt-3">
+                            {% for m in messages %}
+                                {% if m.level_tag == 'error' %}
+                                    <div role="alert" class="alert" style="background: var(--danger, #b00020); color: var(--surface); border-radius:6px; padding:12px;">
+                                        {{ m|safe }}
+                                    </div>
+                                {% elif m.level_tag == 'warning' %}
+                                    <div role="alert" class="alert" style="background: var(--warning, #f59e0b); color: var(--surface); border-radius:6px; padding:12px;">
+                                        {{ m|safe }}
+                                    </div>
+                                {% elif m.level_tag == 'success' %}
+                                    <div role="alert" class="alert" style="background: var(--success, #10b981); color: var(--surface); border-radius:6px; padding:12px;">
+                                        {{ m|safe }}
+                                    </div>
+                                {% else %}
+                                    <div role="alert" class="alert" style="background: var(--surface, #fff); color: var(--text-primary); border-radius:6px; padding:12px;">
+                                        {{ m|safe }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                <main>
                 {% block content %}
                 {% endblock %}
         </main>
         <footer>
           <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid d-flex justify-content-center align-items-center" style="padding: 25px;">
-              <a class="nav-link" href="https://www.facebook.com/profile.php?id=61559467855096#" target="_blank"><i class="fab fa-facebook-square i"></i></a>
-              <a class="nav-link" href="https://www.instagram.com/constcollectionartbyceciliak?igsh=MTRqZXVoOXVlZms5Yw%3D%3D" target="_blank"><i class="fab fa-instagram-square i"></i></a>
-              <a class="nav-link" href="https://www.youtube.com/@constcollectionartbycecilia.k" target="_blank"><i class="fab fa-youtube-square i"></i></a>
-              <a class="my-btn footer-contact-btn" href="{% url 'contact' %}">Contact</a>
-            </div>
+                        <div class="container-fluid d-flex justify-content-center align-items-center footer-icons" style="padding: 25px;">
+                            <a class="nav-link" href="https://www.facebook.com/profile.php?id=61559467855096#" target="_blank"><i class="fab fa-facebook-square i"></i></a>
+                            <a class="nav-link" href="https://www.instagram.com/constcollectionartbyceciliak?igsh=MTRqZXVoOXVlZms5Yw%3D%3D" target="_blank"><i class="fab fa-instagram-square i"></i></a>
+                            <a class="nav-link" href="https://www.youtube.com/@constcollectionartbycecilia.k" target="_blank"><i class="fab fa-youtube-square i"></i></a>
+                            <a class="my-btn footer-contact-btn" href="{% url 'contact' %}">Contact</a>
+                        </div>
           </nav>
       </footer>
         {# Load Bootstrap JS (includes Popper) and site scripts so interactive components work #}
@@ -182,6 +236,10 @@
         <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/featured-carousel.js' %}"></script>
         <script src="{% static 'js/theme-toggle.js' %}"></script>
+
+        {# Child templates can inject page-specific scripts here. Placed after vendor/site scripts so
+           page scripts can safely reference Bootstrap and site globals. #}
+        {% block scripts %}{% endblock %}
 
     </body>
 </html>

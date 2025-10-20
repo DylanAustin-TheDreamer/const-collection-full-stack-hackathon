@@ -10,17 +10,77 @@
     <h1 id="multi-color" style="padding: 15px;">{{ hero_caption|default:"Evening Garden Exhibition - 2025" }}</h1>
     <div class="hero-video" >
       {% if hero_video %}
-      <video class="video mt-4" controls>
+      <div class="hero-media-wrap position-relative">
+      <video id="heroVideo" class="hero-clip" autoplay muted playsinline loop preload="metadata" poster="{{ hero_video }}">
         <source src="{{ hero_video }}" type="video/mp4">
         Your browser does not support the video tag.
       </video>
+      <button id="heroVolumeBtn" class="btn btn-sm btn-light position-absolute" aria-pressed="true" aria-label="Unmute video" title="Unmute" style="right:12px; bottom:12px; opacity:0.95; padding:6px 7px; border-radius:28px;">
+        <!-- Inline SVGs to avoid relying on FontAwesome JS replacing <i> tags -->
+        <svg id="heroIconMuted" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M16.5 12a4.5 4.5 0 0 0-4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19.07 4.93L4.93 19.07" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+        </svg>
+        <svg id="heroIconOn" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none;">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19.07 4.93a9 9 0 0 1 0 14.14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      </div>
       {% else %}
       <div class="alert alert-info">Hero video not available</div>
       {% endif %}
     </div>
-  </div>
-</div>
 
+<script>
+  (function(){
+    var btn = document.getElementById('heroVolumeBtn');
+    var vid = document.getElementById('heroVideo');
+    var icon = document.getElementById('heroVolumeIcon');
+    var iconMuted = document.getElementById('heroIconMuted');
+    var iconOn = document.getElementById('heroIconOn');
+    if(!btn || !vid || !iconMuted || !iconOn) return;
+
+    function refresh(){
+      var isMuted = !!vid.muted || (typeof vid.volume === 'number' && vid.volume === 0);
+      if(isMuted){
+        iconMuted.style.display = '';
+        iconOn.style.display = 'none';
+        btn.setAttribute('aria-pressed','true');
+        btn.setAttribute('aria-label','Unmute video');
+        btn.title = 'Unmute';
+      } else {
+        iconMuted.style.display = 'none';
+        iconOn.style.display = '';
+        btn.setAttribute('aria-pressed','false');
+        btn.setAttribute('aria-label','Mute video');
+        btn.title = 'Mute';
+      }
+    }
+
+    vid.addEventListener('volumechange', refresh);
+    vid.addEventListener('loadedmetadata', refresh);
+    vid.addEventListener('play', refresh);
+    refresh();
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      if(vid.muted){
+        vid.muted = false;
+        try{ vid.volume = 0.6; }catch(e){}
+        var p = vid.play();
+        if(p && typeof p.catch === 'function') p.catch(function(){});
+      } else {
+        vid.muted = true;
+      }
+      setTimeout(refresh, 50);
+    }, false);
+  })();
+</script>
+ 
+    </div>
 <div class="container-fluid text-center" style="background:linear-gradient(90deg, #797979 65%, #d1d1d1 100%); padding: 25px;">
   <div class="container" id="intro" >
   <h2 style="word-wrap: break-word;">Illuminated acrylic artist - Cecilia Kristoffersson</h2>
@@ -33,18 +93,85 @@
   </div>
 </div>
 
-<div class="container-fluid card-color" style="background-color: rgb(78, 78, 78); padding: 25px;">
+<div class="container-fluid card-color" style="background-color: rgb(78, 78, 78); padding: 10px 25px 15px;">
 <div class="container d-flex flex-column align-items-center justify-content-center">
   {% if secondary_video %}
-  <video class="video" autoplay loop muted>
-    <source src="{{ secondary_video }}" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+  <div class="secondary-video-wrap w-100 d-flex justify-content-center">
+    <video class="secondary-clip" autoplay muted playsinline loop preload="metadata" poster="{{ secondary_video }}">
+      <source src="{{ secondary_video }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
   {% else %}
   <div class="alert alert-info">Secondary video not available</div>
   {% endif %}
 </div>
 </div>
+
+<style>
+  /* Make hero/secondary clips span full viewport width while remaining centered and responsive */
+  /* default: videos constrained and centered on larger screens */
+  .hero-clip,
+  .secondary-clip {
+    width: 100%;
+    max-width: 1296px; /* keeps hero video readable on large viewports */
+    height: auto;
+    display: block;
+    /* small top gap so the hero is closer to the title but not touching; bottom spacing moved into the container */
+    margin: 8px auto 0;
+    object-fit: cover;
+    /* deeper elevation to match featured card */
+    border-radius: 6px;
+    box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);
+  }
+  /* ensure the wrapper sizes to the media so absolute controls are positioned relative to the video */
+  .hero-media-wrap {
+    position: relative;
+    display: block;
+    max-width: 1296px;
+    margin: 8px auto 0;
+    width: 100%;
+  }
+  /* Slow Looking card uses theme token --card-background with a sensible fallback */
+  .slow-looking-card { background-color: var(--surface, rgb(78,78,78)); }
+  /* make the hero container a bit taller so the hero has internal bottom spacing */
+  .hero-video { padding-bottom: 12px; }
+  /* tiny padding to ensure the hero section doesn't visually overlap following content in some layouts */
+  #hero { padding-bottom: 1px; }
+  /* featured carousel image sizing */
+  .featured-carousel-img { height: 320px; object-fit: cover; }
+  /* secondary clip: remove max-size caps so it can expand naturally */
+  .secondary-clip { max-width: none; max-height: none; }
+
+  /* Slow Looking preview media: responsive sizing so it appears on small screens */
+  .slow-looking-media {
+    width: 100%;
+    height: auto;
+    max-height: 480px;
+    object-fit: cover;
+    display: block;
+  }
+  @media (max-width: 576px) {
+    .slow-looking-media { max-height: 40vh; }
+  }
+
+  /* on small screens make the clips full-viewport width (edge-to-edge) */
+  @media (max-width: 767.98px) {
+    .hero-clip,
+    .secondary-clip {
+      width: 100%;
+      max-width: 100%;
+      margin: 0; /* no centering transform on small */
+    }
+    /* hide horizontal overflow so 100vw doesn't cause scroll */
+    .container-fluid.card-color { overflow-x: hidden; }
+  }
+  /* limit hero height so it doesn't exceed viewport too much */
+  .hero-clip { max-height: 70vh; }
+  @media (max-width: 576px) {
+    .hero-clip { max-height: 50vh; }
+  }
+</style>
 
 <div class="my-space-inbetween container" style="padding: 35px;">
 <a href="{% url 'store_app:index' %}" class="my-btn">Shop</a>
@@ -56,9 +183,9 @@
 </div>
 
 <div class="container" style="padding: 25px; box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);" id="feature-card">
-  <h2>Featured Works</h2>
   <div class="featured-works-grid">
     <div class="featured-text">
+      <h2>Featured Works</h2>
       <p>My work is a call for change, a gentle yet unyielding
       demand for a new way of being. We are living through a
       time of profound disconnection, where digital illusions
@@ -80,15 +207,112 @@
       external, that have kept us silent all this time.</p>
     </div>
     <div class="featured-image">
-      <img src="{% static 'images/let-sleeping-girls.jpg' %}" alt="Featured Artwork 1">
-      <h3 style="color: whitesmoke; background-color: rgb(77, 77, 77); padding: 15px;">Let sleeping girls lie? (2024)</h3>
+      <div class="text-center mb-3">
+        <div id="featured-caption" class="text-muted"></div>
+      </div>
+      {% if featured_artworks %}
+        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+          {# carousel indicators removed intentionally - keep UI cleaner #}
+          <div class="carousel-inner">
+            {% for art in featured_artworks %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}" data-title="{{ art.title|escape }}" data-year="{{ art.year_created }}">
+                {% if art.image %}
+                  <img src="{{ art.image.url }}" class="d-block w-100 featured-carousel-img" alt="{{ art.title }}">
+                {% else %}
+                  <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <span class="text-muted">No Image</span>
+                  </div>
+                {% endif %}
+                {# caption moved above carousel; keep slide markup minimal #}
+              </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      {% else %}
+        <img src="{% static 'images/let-sleeping-girls.jpg' %}" alt="Featured Artwork 1">
+        <h3 style="color: whitesmoke; background-color: rgb(77, 77, 77); padding: 15px;">Let sleeping girls lie? (2024)</h3>
+      {% endif %}
     </div>
   </div>
 </div>
 
-<div style="text-align: center;">
-  <a href="https://dylanaustin-thedreamer.github.io/Unity-webGL/" class="my-btn" style="margin-top: 20px; margin-bottom: 20px; opacity: 0.6;">Virtual Gallery</a>
-</div>
+{% if featured_artworks %}
+<script>
+  // Update the featured caption to match the active carousel item
+  (function(){
+    function updateFeaturedCaption(){
+      var active = document.querySelector('#featuredCarousel .carousel-item.active');
+      var el = document.getElementById('featured-caption');
+      if(!active || !el) return;
+      var title = active.dataset.title || '';
+      var year = active.dataset.year || '';
+      el.textContent = title + (year ? ' ('+year+')' : '');
+    }
+    // initial
+    updateFeaturedCaption();
+    var carousel = document.getElementById('featuredCarousel');
+    if(carousel){
+      carousel.addEventListener('slid.bs.carousel', updateFeaturedCaption);
+    }
+  })();
+</script>
+{% endif %}
+  <div class="container slow-looking-card" style="padding: 25px; box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644); margin-top: 20px;" id="secondary-card">
+    <div class="row g-0 align-items-center">
+      <div class="col-12 col-md-7">
+        {% if tertiary_media_url %}
+          {% if tertiary_media_type == 'video' %}
+            <video class="slow-looking-media img-fluid rounded-start" autoplay muted playsinline loop preload="metadata" poster="{{ tertiary_media_url }}">
+              <source src="{{ tertiary_media_url }}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          {% else %}
+            <img src="{{ tertiary_media_url }}" class="slow-looking-media img-fluid rounded-start" alt="Slow Looking preview">
+          {% endif %}
+        {% else %}
+          <img src="{% static 'images/placeholder-art.jpg' %}" class="slow-looking-media img-fluid rounded-start" alt="Slow Looking preview">
+        {% endif %}
+      </div>
+      <div class="col-12 col-md-5 d-flex flex-column">
+  <div class="card-body ps-4 ps-md-5" style="max-width: 520px;">
+          <h3 class="card-title">Slow Looking</h3>
+          <p class="card-text">My art invites “slow looking”. According a study done
+by the Tate Gallery in the UK, visitors only spend
+around 8 seconds looking at each painting in a gallery,
+which is why the initiative of “slow looking” is a focus
+point in my art exhibition. Within my frames I have
+included a source of light, revealing what I call, the
+spirit of the painting. This ethereal realm of light asks
+you, the audience to sit for a while, to gaze, to stare,
+to pause, to de-stress and embrace the present
+moment as you watch how light interacts with the
+painted colours on the canvas changing the original
+image, from one to many.</p>
+
+          <p class="card-text">My paintings are to be viewed as the sun starts to set,
+outdoors in a park or a garden, as the peaceful
+evening curtains the sky. Using the outdoors, a garden
+or park as my gallery space seems a fitting place to
+exhibit my Edenfield collection. As you sit, sipping your
+wine, in my outdoor gallery at night, allow the interplay
+of colour and light to illuminate your perceptions,
+connecting art to the natural world around you.</p>
+          <!-- Intentionally no link: this card is a contemplative space, not a gateway to the gallery -->
+          <div class="w-100 mt-3 d-flex justify-content-center">
+            <a href="https://dylanaustin-thedreamer.github.io/Unity-webGL/" class="my-btn" style="opacity:0.9;">Virtual Gallery</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 <div class="mt-4"style="box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);">

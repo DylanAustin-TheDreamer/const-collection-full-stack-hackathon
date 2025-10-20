@@ -124,7 +124,7 @@
               <div class="featured-track d-flex gap-3 overflow-hidden">
                 {% for fa in featured_artworks %}
                   <div class="featured-card-wrapper flex-shrink-0">
-                    <div class="card h-100 shadow-sm" style="width: 100%;">
+                    <div class="card h-100 deep-card-shadow" style="width: 100%;">
                         {% if fa.image %}
                         <img src="{{ fa.image.url }}" class="card-img-top" alt="{{ fa.title }}" style="height:60vh; object-fit:cover;">
                         {% else %}
@@ -172,7 +172,7 @@
                         <!-- Search form: keep search box, add collection and format filters -->
             <form id="artwork-filters-form" method="get" action="{% url 'collections_app:artwork_list' %}" class="row g-3">
               <div class="col-12 col-md-4">
-                <div class="card filter-card">
+                <div class="card filter-card deep-card-shadow">
                   <div class="card-body">                    
                     <input aria-label="Search artworks" type="text" class="form-control" id="search" name="search" value="{{ search_query }}" placeholder="Search by title or artist">
                   </div>
@@ -180,7 +180,7 @@
               </div>
 
               <div class="col-12 col-md-4">
-                <div class="card filter-card">
+                <div class="card filter-card deep-card-shadow">
                   <div class="card-body">                    
                     <select id="collection" name="collection" class="form-select" aria-label="Filter by collection">
                       <option value="">All Collections</option>
@@ -193,7 +193,7 @@
               </div>
 
               <div class="col-12 col-md-4">
-                <div class="card filter-card">
+                <div class="card filter-card deep-card-shadow">
                   <div class="card-body">                    
                     <select id="format" name="format" class="form-select" aria-label="Filter by format">
                       <option value="">Any Format</option>
@@ -413,18 +413,18 @@
           <div class="visually-hidden">Loading artworks...</div>
         </span>
       </div>
-  <div id="artworks-grid" class="row justify-content-center">
+  <div id="artworks-grid" class="row gx-6 gy-4 justify-content-center">
       {% for artwork in artworks %}
         <!-- Individual Artwork Card -->
-        <div class="col-md-4 col-lg-3 mb-4">
-          <div class="card h-100 shadow-sm">
+        <div class="col-md-4 col-lg-3">
+          <div class="card h-100 deep-card-shadow">
             <!-- Artwork Image -->
             {% if artwork.image %}
               <img 
                 src="{{ artwork.image.url }}" 
                 class="card-img-top" 
                 alt="{{ artwork.title }}"
-                style="height: 250px; object-fit: cover;"
+                style="height: 280px; object-fit: cover;"
               >
             {% else %}
               <!-- Placeholder if no image available -->
