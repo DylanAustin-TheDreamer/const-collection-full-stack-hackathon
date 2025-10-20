@@ -9,34 +9,120 @@
       <h2>Messages</h2>
       <p class="text-muted">Site messages and visitor inquiries. This is a lightweight inbox view.</p>
 
-      <div class="list-group">
-        {% for msg in inbox %}
-          <div class="list-group-item">
-            <div class="d-flex w-100 justify-content-between align-items-start">
-              <div>
-                <h5 class="mb-1"><a href="{% url 'collections_app:message_detail' msg.id %}">{{ msg.subject }}</a></h5>
-                <p class="mb-1 small">From: {{ msg.name }} &lt;{{ msg.email }}&gt;</p>
-                <p class="mb-1">{{ msg.message|linebreaksbr }}</p>
-              </div>
-              <div class="text-end ms-3">
-                <div class="small text-muted">{{ msg.sent_at }}</div>
-                {% if msg.unread %}
-                  <div class="badge bg-primary mt-2">Unread</div>
-                {% endif %}
-                <form method="post" class="mt-2">
-                  {% csrf_token %}
-                  <input type="hidden" name="mark_read" value="{{ msg.id }}">
-                  <button type="submit" class="btn btn-sm btn-outline-secondary">Mark read</button>
-                </form>
+      <form method="post" id="inbox-actions-form">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between mb-3">
+          <div></div>
+          <div class="d-flex align-items-center">
+            <div class="form-check me-2">
+              <input class="form-check-input" type="checkbox" id="select-all">
+              <label class="form-check-label small" for="select-all">Select all</label>
+            </div>
+            <button type="submit" name="action" value="delete_selected" class="btn btn-sm btn-danger">Delete selected</button>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteAllModal">Delete all</button>
+          </div>
+        </div>
+
+        <div class="list-group">
+          {% for msg in inbox %}
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between align-items-start">
+                {# left column intentionally left for message content; checkbox moved to actions on right #}
+                <div>
+                  <h5 class="mb-1"><a href="{% url 'collections_app:message_detail' msg.id %}">{{ msg.subject }}</a></h5>
+                  {% if msg.sender %}
+                    <p class="mb-1 small">
+                      From: {{ msg.sender.username }}
+                      {% if msg.name and msg.name != msg.sender.username %}
+                        : {{ msg.name }}
+                      {% endif %}
+                      &nbsp;&lt;{{ msg.email }}&gt;
+                    </p>
+                  {% else %}
+                    <p class="mb-1 small">From: {{ msg.name }} &lt;{{ msg.email }}&gt;</p>
+                  {% endif %}
+                  <p class="mb-1">{{ msg.message|linebreaksbr }}</p>
+                </div>
+                <div class="text-end ms-3">
+                  <div class="small text-muted">{{ msg.sent_at }}</div>
+                  <div class="d-flex flex-column align-items-end">
+                    <div class="d-flex align-items-center">
+                      {% if msg.unread %}
+                        <div class="badge bg-primary me-2">Unread</div>
+                      {% endif %}
+                      <div class="form-check">
+                        <input class="form-check-input message-checkbox" type="checkbox" name="selected_ids" value="{{ msg.id }}" id="msg-{{ msg.id }}">
+                      </div>
+                    </div>
+                    <div class="mt-2">
+                      {% if msg.unread %}
+                        <button type="submit" name="mark_read" value="{{ msg.id }}" class="btn btn-sm btn-outline-secondary">Mark read</button>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          {% empty %}
+            <div class="alert alert-secondary">No messages</div>
+          {% endfor %}
+        </div>
+      </form>
+
+      <!-- Delete All confirmation modal (Bootstrap) -->
+      <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header" style="background: var(--card-surface); color: var(--text-primary);">
+                <h5 class="modal-title" id="deleteAllModalLabel" style="color: var(--link-accent);">constcollection says</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" style="background: var(--card-surface); color: var(--text-primary);">
+                Delete ALL messages in your inbox? This cannot be undone.
+              </div>
+              <div class="modal-footer" style="background: var(--card-surface);">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="background: var(--surface); border-color: rgba(0,0,0,0.08);">Cancel</button>
+                <button type="button" id="delete-all-confirm" class="btn" style="background: var(--danger); color: var(--surface);">Yes, delete all</button>
+              </div>
           </div>
-        {% empty %}
-          <div class="alert alert-secondary">No messages</div>
-        {% endfor %}
+        </div>
       </div>
 
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function(){
+    var selectAll = document.getElementById('select-all');
+    if (!selectAll) return;
+    selectAll.addEventListener('change', function(e) {
+      var checked = e.target.checked;
+      var boxes = document.querySelectorAll('.message-checkbox');
+      boxes.forEach(function(b){ b.checked = checked; });
+    });
+    // Modal confirm: submit delete_all when modal confirm clicked
+    var deleteAllConfirm = document.getElementById('delete-all-confirm');
+    if (deleteAllConfirm) {
+      deleteAllConfirm.addEventListener('click', function(){
+        var form = document.getElementById('inbox-actions-form');
+        // ensure an input named 'action' with value 'delete_all' is present
+        var existing = form.querySelector('input[name="action"][value="delete_all"]');
+        if (!existing) {
+          // remove other action inputs (like from Delete selected) to avoid duplicates
+          var other = form.querySelectorAll('input[name="action"]');
+          other.forEach(function(o){ o.parentNode.removeChild(o); });
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'action';
+          input.value = 'delete_all';
+          form.appendChild(input);
+        }
+        form.submit();
+      });
+    }
+  })();
+</script>
 {% endblock %}

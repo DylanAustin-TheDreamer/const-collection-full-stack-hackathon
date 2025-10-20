@@ -81,6 +81,12 @@
         display: block;
       }
 
+      /* helper: cover shown inside the media grid only on small screens */
+      .cover-in-grid { display: block; }
+      @media (min-width: 768px) {
+        .cover-in-grid { display: none !important; }
+      }
+
       @media (max-width: 767.98px) {
         /* on small screens collapse to a single column grid */
         .cc-media-grid { grid-template-columns: 1fr; grid-auto-rows: auto; height: auto; }
@@ -159,7 +165,7 @@
         <div class="row">
           {% for exhibition in upcoming_exhibitions %}
             <div class="col-12 mb-4">
-              <div class="card">
+              <div class="card deep-card-shadow">
                 <div class="card-body">
                   <div class="collection-section">
                     <div class="row">
@@ -216,7 +222,7 @@
                             <div class="cc-media-grid collection-detail-grid">
                               {# show cover image first inside the grid so it appears before assigned media #}
                               {% if exhibition.cover_image %}
-                                <div class="cc-media-item">
+                                <div class="cc-media-item d-block d-md-none">
                                   <div class="card collection-card-fill">
                                     <div class="card-media">
                                       {% with url=exhibition.cover_image.url %}
@@ -258,7 +264,7 @@
                         </div>
 
                       {% if exhibition.cover_image %}
-                        <div class="col-12 col-md-5 collection-cover-col">
+                        <div class="col-12 col-md-5 collection-cover-col d-none d-md-block">
                           {% with url=exhibition.cover_image.url %}
                             <div class="collection-cover">
                               {% if '.mp4' in url or '.webm' in url or '.ogg' in url %}
@@ -291,7 +297,7 @@
         <div class="row">
           {% for exhibition in previous_exhibitions %}
             <div class="col-12 mb-4">
-              <div class="card">
+              <div class="card deep-card-shadow">
                 <div class="card-body">
                   <div class="collection-section">
                     <div class="row">
@@ -348,7 +354,7 @@
                             <div class="cc-media-grid collection-detail-grid">
                               {# show cover image first inside the grid so it appears before assigned media #}
                               {% if exhibition.cover_image %}
-                                <div class="cc-media-item">
+                                <div class="cc-media-item cover-in-grid d-block d-md-none">
                                   <div class="card collection-card-fill">
                                     <div class="card-media">
                                       {% with url=exhibition.cover_image.url %}
