@@ -164,20 +164,21 @@
                             {% url 'owner_app:exhibitions_list' as manage_exhibitions_url %}
                             {% url 'owner_app:edit_artist' as edit_artist_url %}
                             {% url 'account_logout' as logout_url %}
+                        
 
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item {% nav_active dashboard_url %}"
                     href="{{ dashboard_url }}">Dashboard</a></li>
-                                                                                                {% load messages_tags %}
-                                                                                                <li>
-                                                                                                    {% message_count as count %}
-                                                                                                    <a class="dropdown-item d-flex align-items-center {% nav_active messages_url %}" href="{{ messages_url }}">
-                                                                                                        <span>Messages</span>
-                                                                                                        {% if count|add:0 %}
-                                                                                                            <span class="badge bg-secondary ms-2">{{ count }}</span>
-                                                                                                        {% endif %}
-                                                                                                    </a>
-                                                                                                </li>
+                    {% load messages_tags %}
+                    <li>
+                        {% message_count as count %}
+                        <a class="dropdown-item d-flex align-items-center {% nav_active messages_url %}" href="{{ messages_url }}">
+                        <span>Messages</span>
+                        {% if count|add:0 %}
+                        <span class="badge bg-secondary ms-2">{{ count }}</span>
+                        {% endif %}
+                        </a>
+                    </li>
                 {% if request.user.is_superuser %}
                 <li>
                     <hr class="dropdown-divider">
@@ -197,7 +198,6 @@
                     <hr class="dropdown-divider">
                 </li>
                 <li><a class="dropdown-item {% nav_active logout_url %}" href="{{ logout_url }}">Logout</a></li>
-                            </ul>
                         </li>
                         {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
@@ -255,9 +255,9 @@
             // expose STATIC_URL for theme-toggle.js so it can build proper hrefs
             window.STATIC_URL = "{% static '' %}";
         </script>
-        <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/featured-carousel.js' %}"></script>
+        <script src="{% static 'js/featured-carousel.js' %}"></script>
         <script src="{% static 'js/theme-toggle.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
 
           <!-- Child templates can inject page-specific scripts here. Placed after vendor/site scripts so
               page scripts can safely reference Bootstrap and site globals. -->

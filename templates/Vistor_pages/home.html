@@ -34,51 +34,6 @@
       {% endif %}
     </div>
 
-<script>
-  (function(){
-    var btn = document.getElementById('heroVolumeBtn');
-    var vid = document.getElementById('heroVideo');
-    var icon = document.getElementById('heroVolumeIcon');
-    var iconMuted = document.getElementById('heroIconMuted');
-    var iconOn = document.getElementById('heroIconOn');
-    if(!btn || !vid || !iconMuted || !iconOn) return;
-
-    function refresh(){
-      var isMuted = !!vid.muted || (typeof vid.volume === 'number' && vid.volume === 0);
-      if(isMuted){
-        iconMuted.style.display = '';
-        iconOn.style.display = 'none';
-        btn.setAttribute('aria-pressed','true');
-        btn.setAttribute('aria-label','Unmute video');
-        btn.title = 'Unmute';
-      } else {
-        iconMuted.style.display = 'none';
-        iconOn.style.display = '';
-        btn.setAttribute('aria-pressed','false');
-        btn.setAttribute('aria-label','Mute video');
-        btn.title = 'Mute';
-      }
-    }
-
-    vid.addEventListener('volumechange', refresh);
-    vid.addEventListener('loadedmetadata', refresh);
-    vid.addEventListener('play', refresh);
-    refresh();
-
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      if(vid.muted){
-        vid.muted = false;
-        try{ vid.volume = 0.6; }catch(e){}
-        var p = vid.play();
-        if(p && typeof p.catch === 'function') p.catch(function(){});
-      } else {
-        vid.muted = true;
-      }
-      setTimeout(refresh, 50);
-    }, false);
-  })();
-</script>
  
     </div>
 <div class="container-fluid text-center" style="background:linear-gradient(90deg, #797979 65%, #d1d1d1 100%); padding: 25px;">
@@ -320,5 +275,53 @@ connecting art to the natural world around you.</p>
 
 <div class="mt-4"style="box-shadow: 0 2px 8px 8px rgba(0, 0, 0, 0.644);">
 </div>
+
+
+<!-- Script for handling hero video, moved to bottom of page for better practice -->
+<script>
+  (function(){
+    var btn = document.getElementById('heroVolumeBtn');
+    var vid = document.getElementById('heroVideo');
+    var icon = document.getElementById('heroVolumeIcon');
+    var iconMuted = document.getElementById('heroIconMuted');
+    var iconOn = document.getElementById('heroIconOn');
+    if(!btn || !vid || !iconMuted || !iconOn) return;
+
+    function refresh(){
+      var isMuted = !!vid.muted || (typeof vid.volume === 'number' && vid.volume === 0);
+      if(isMuted){
+        iconMuted.style.display = '';
+        iconOn.style.display = 'none';
+        btn.setAttribute('aria-pressed','true');
+        btn.setAttribute('aria-label','Unmute video');
+        btn.title = 'Unmute';
+      } else {
+        iconMuted.style.display = 'none';
+        iconOn.style.display = '';
+        btn.setAttribute('aria-pressed','false');
+        btn.setAttribute('aria-label','Mute video');
+        btn.title = 'Mute';
+      }
+    }
+
+    vid.addEventListener('volumechange', refresh);
+    vid.addEventListener('loadedmetadata', refresh);
+    vid.addEventListener('play', refresh);
+    refresh();
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      if(vid.muted){
+        vid.muted = false;
+        try{ vid.volume = 0.6; }catch(e){}
+        var p = vid.play();
+        if(p && typeof p.catch === 'function') p.catch(function(){});
+      } else {
+        vid.muted = true;
+      }
+      setTimeout(refresh, 50);
+    }, false);
+  })();
+</script>
 
 {% endblock %}
