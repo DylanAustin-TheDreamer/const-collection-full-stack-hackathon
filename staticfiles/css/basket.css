@@ -201,13 +201,23 @@
 /* Summary security */
 .summary-security {
     text-align: center;
-    padding-top: 1rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid var(--border);
-    color: var(--text-muted);
+    background-color: var(--card-surface, var(--surface));
+    color: var(--text-strong, var(--text-primary));
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    margin-top: 1rem;
 }
 
 .summary-security i {
-    margin-right: 0.25rem;
+    margin-right: 0.5rem;
+    color: var(--link-accent);
+}
+
+.summary-security small {
+    display: block;
+    color: var(--text-strong, var(--text-primary));
 }
 
 /* Shipping info */

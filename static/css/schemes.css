@@ -229,6 +229,19 @@ li {
   min-height: 36px !important; /* keeps a consistent touch target */
 }
 
+/* Navbar dropdown stacking fix: ensure dropdowns render above page content
+   Keep the visual rounded bottom corners and shadow, but allow overflow
+   and raise z-index so Bootstrap dropdowns are above cards and vendor popovers.
+*/
+.navbar.navbar-sticky.deep-card-shadow {
+  overflow: visible !important;
+  z-index: 1100; /* above typical content (1000-1050) but below modals/toasts */
+}
+
+.navbar .dropdown-menu {
+  z-index: 1200; /* ensure dropdown itself sits above the navbar container */
+}
+
 .btn:hover {
   background: var(--surface);
   color: var(--text-primary);
@@ -2278,7 +2291,8 @@ footer {
 
 .featured-track {
   scroll-behavior: smooth;
-  gap: 56px; /* increased spacing between cards */
+  gap: 56px;
+  padding-top: 20px; /* increased spacing between cards */
 }
 
 .featured-card-wrapper {
@@ -2335,6 +2349,71 @@ footer {
 .featured-card-img, .featured-card-img--fit-height {
   display: block;
   margin: 0 auto;
+  object-position: center center;
+
+
+/* Featured card visual improvements ------------------------------------------------- */
+/* Use the wrapper for hover elevation so inner card can keep overflow:hidden for rounded
+   corners. Make shadow use theme-aware color (via rgba on --text-primary fallback). */
+.featured-card-wrapper {
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms cubic-bezier(.2,.8,.2,1);
+  will-change: transform, box-shadow;
+  overflow: visible; /* allow hover shadow to be visible */
+}
+
+.featured-card-wrapper .card-specific:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow 220ms cubic-bezier(.2,.8,.2,1); /* slightly softened deep elevation */
+  z-index: 60;
+}
+
+/* Keyboard focus: visible outline for accessibility */
+.featured-card-wrapper:focus-within,
+.featured-card-wrapper .card:focus {
+  outline: 3px solid rgba(0, 120, 215, 0.14); /* accessible focus ring */
+  outline-offset: 4px;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .featured-card-wrapper,
+  .featured-card-wrapper:hover,
+  .featured-card-wrapper:focus-within {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Ensure featured images fill the visual area consistently and keep object-fit */
+.featured-card .card-img-top,
+.featured-card-img,
+.featured-card-img--fit-height,
+.featured-card-wrapper .card-img-top {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* prefer cover for consistent visual crop */
+}
+
+/* Targeted fixes: allow deep-card-shadow to render outside bounding boxes when the
+   card is positioned (sticky) or used on the navbar. We keep the default
+   overflow:hidden for deep-card-shadow (used to clip inner media) but when the
+   card is positioned and needs to visually escape its container (sticky sidebar
+   or navbar), allow shadows to be visible so they aren't clipped by ancestor
+   overflow rules. These rules are intentionally narrow and use !important so
+   they win over aggressive layout helpers that set overflow:hidden.
+*/
+.navbar.navbar-sticky.deep-card-shadow,
+.sticky-top.deep-card-shadow,
+.card.sticky-top.deep-card-shadow {
+  overflow: visible !important;
+  position: relative !important; /* ensure z-index applies predictably */
+  z-index: 1100 !important;
+}
+
+/* Ensure dropdowns inside the navbar appear above page content */
+.navbar .dropdown-menu {
+  z-index: 1200 !important;
+}
   object-position: center center;
 }
 
