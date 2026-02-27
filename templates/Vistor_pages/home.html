@@ -11,9 +11,17 @@
     <div class="hero-video" >
       {% if hero_video %}
       <div class="hero-media-wrap position-relative">
-      <video id="heroVideo" class="hero-clip" autoplay muted playsinline loop preload="metadata" poster="{{ hero_video }}">
+      <video id="heroVideo" class="hero-clip" autoplay muted playsinline loop preload="metadata" poster="{{ hero_video }}" controls>
         <source src="{{ hero_video }}" type="video/mp4">
         Your browser does not support the video tag.
+        <!-- controls attribute in video element for closed captions on video - track element stores values for these controls -->
+        <track
+          kind="captions"
+          src="captions_en.vtt"
+          srclang="en"
+          label="English"
+          default
+        >
       </video>
       <button id="heroVolumeBtn" class="btn btn-sm btn-light position-absolute" aria-pressed="true" aria-label="Unmute video" title="Unmute" style="right:12px; bottom:12px; opacity:0.95; padding:6px 7px; border-radius:28px;">
         <!-- Inline SVGs to avoid relying on FontAwesome JS replacing <i> tags -->
