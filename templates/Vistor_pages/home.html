@@ -17,15 +17,15 @@
         <!-- controls attribute in video element for closed captions on video - track element stores values for these controls -->
         <track
           kind="captions"
-          src="captions_en.vtt"
+          src="{% static 'vtt/captions_en.vtt' %}"
           srclang="en"
           label="English"
           default
         >
       </video>
-      <button id="heroVolumeBtn" class="btn btn-sm btn-light position-absolute" aria-pressed="true" aria-label="Unmute video" title="Unmute" style="right:12px; bottom:12px; opacity:0.95; padding:6px 7px; border-radius:28px;">
+      <button id="heroVolumeBtn" class="btn btn-lg btn-light position-absolute unmute" aria-pressed="true" aria-label="Unmute video" title="Unmute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); opacity:0.95; padding:6px 7px; border-radius:28px; background-color: #797979;">
         <!-- Inline SVGs to avoid relying on FontAwesome JS replacing <i> tags -->
-        <svg id="heroIconMuted" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg id="heroIconMuted" width="260" height="260" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M16.5 12a4.5 4.5 0 0 0-4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M19.07 4.93L4.93 19.07" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
@@ -35,6 +35,7 @@
           <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M19.07 4.93a9 9 0 0 1 0 14.14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
+        <p style="color: white !important;">Unmute for live caption</p>
       </button>
       </div>
       {% else %}
@@ -74,6 +75,12 @@
 <style>
   /* Make hero/secondary clips span full viewport width while remaining centered and responsive */
   /* default: videos constrained and centered on larger screens */
+  .mute{
+    visibility: hidden !important;
+  }
+  .unmute{
+    visibility: show;
+  }
   .hero-clip,
   .secondary-clip {
     width: 100%;
@@ -298,14 +305,12 @@
     function refresh(){
       var isMuted = !!vid.muted || (typeof vid.volume === 'number' && vid.volume === 0);
       if(isMuted){
-        iconMuted.style.display = '';
-        iconOn.style.display = 'none';
+        btn.classList.add("unmute")
         btn.setAttribute('aria-pressed','true');
         btn.setAttribute('aria-label','Unmute video');
         btn.title = 'Unmute';
       } else {
-        iconMuted.style.display = 'none';
-        iconOn.style.display = '';
+        btn.classList.add("mute")
         btn.setAttribute('aria-pressed','false');
         btn.setAttribute('aria-label','Mute video');
         btn.title = 'Mute';
